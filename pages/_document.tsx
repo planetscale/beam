@@ -19,7 +19,13 @@ class MyDocument extends Document {
             href="/fonts/inter-italic.var.woff2"
             crossOrigin="anonymous"
           />
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="mask-icon" href="/favicon.svg" color="#ff455d" />
+          <link
+            rel="shortcut icon"
+            href="/favicon.svg"
+            sizes="any"
+            type="image/svg+xml"
+          />
         </Head>
         <body>
           <Main />
