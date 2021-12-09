@@ -111,6 +111,9 @@ module.exports = {
         'green-light': 'var(--bg-green-light)',
         'yellow-light': 'var(--bg-yellow-light)',
       },
+      backgroundImage: {
+        'square-grid': "url('/images/bg-squaregrid.svg')",
+      },
       borderColor: {
         DEFAULT: 'var(--border-primary)',
         secondary: 'var(--border-secondary)',
