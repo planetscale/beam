@@ -1,12 +1,8 @@
 import { Avatar } from '@/components/avatar'
 import { ButtonLink } from '@/components/button-link'
+import { Footer } from '@/components/footer'
 import { IconButton } from '@/components/icon-button'
-import {
-  GithubLogo,
-  HeartFilledIcon,
-  Logo,
-  SearchIcon,
-} from '@/components/icons'
+import { Logo, SearchIcon } from '@/components/icons'
 import { SearchDialog } from '@/components/search-dialog'
 import { classNames } from '@/lib/classnames'
 import { capitalize } from '@/lib/text'
@@ -133,27 +129,9 @@ export function Layout({ children }: LayoutProps) {
 
       <main>{children}</main>
 
-      <footer className="flex items-center justify-between gap-4 pb-20 pt-28">
-        <a
-          href="https://planetscale.com"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1 text-sm transition-colors text-secondary hover:text-blue-dark"
-        >
-          <span>Made with</span>
-          <HeartFilledIcon className="w-4 h-4" />
-          <span>by PlanetScale</span>
-        </a>
-        <a
-          href="https://github.com/"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 text-sm transition-colors text-secondary hover:text-blue-dark"
-        >
-          <GithubLogo className="w-4 h-4" />
-          <span>Version 1.0.0</span>
-        </a>
-      </footer>
+      <div className="py-20">
+        <Footer />
+      </div>
 
       <SearchDialog
         isOpen={isSearchDialogOpen}
