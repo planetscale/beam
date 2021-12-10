@@ -53,8 +53,12 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  title         String?
   accounts      Account[]
   sessions      Session[]
+  posts         Post[]    @relation("WrittenPosts")
+  likedPosts    Post[]    @relation("LikedPosts")
+  comments      Comment[]
   role          Role      @default(USER)
 }
 
@@ -64,4 +68,33 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Post {
+  id          String    @id @default(uuid())
+  title       String    @db.VarChar(255)
+  content     String    @db.Text
+  contentHtml String    @db.Text
+  hidden      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  author      User      @relation("WrittenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
+  likedBy     User[]    @relation("LikedPosts")
+  comments    Comment[]
+
+  @@index([authorId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.VarChar(500)
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+
+  @@index([authorId])
+  @@index([postId])
 }
