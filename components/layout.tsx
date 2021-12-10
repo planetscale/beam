@@ -129,7 +129,9 @@ export function Layout({ children }: LayoutProps) {
 
       <main>{children}</main>
 
-      <Footer />
+      <div className="py-20">
+        <Footer />
+      </div>
 
       <SearchDialog
         isOpen={isSearchDialogOpen}

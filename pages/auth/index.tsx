@@ -16,13 +16,13 @@ const Auth: NextPage = () => {
           <div className="relative bottom-16">
             <Logo className="w-[318px] text-red-light h-[102px] mb-8 bg-primary" />
             <div className="flex justify-center w-full bg-primary">
-              <button className="whitespace-nowrap text-white bg-gray-800 h-12 rounded-full font-semibold text-[18px] px-5 ">
+              <button className="whitespace-nowrap text-white bg-gray-800 hover:bg-gray-900 h-12 rounded-full font-semibold text-[18px] px-5 ">
                 Log in with Okta
               </button>
             </div>
-          </div>
-          <div className="absolute w-1/2 max-w-xl bottom-7 md:bottom-12">
-            <Footer />
+            <div className="-mt-4 md:mt-0 w-screen left-1/2 transform -translate-x-1/2 absolute sm:w-[434px] lg:w-[646px] xl:w-[862px] auth-footer">
+              <Footer />
+            </div>
           </div>
         </main>
       </div>

@@ -3,7 +3,7 @@ import * as React from 'react'
 
 export function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-between gap-4 pb-20 text-sm md:flex-row text-secondary pt-28">
+    <footer className="flex flex-col items-center justify-between gap-2 text-sm pb-20_ md:gap-4 md:flex-row text-secondary pt-28_">
       <div className="inline-flex items-center gap-1 text-sm">
         <span>Made with</span>
         <HeartFilledIcon className="w-4 h-4" />
