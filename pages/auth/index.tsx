@@ -8,8 +8,7 @@ const Auth: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Flux</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Flux Login</title>
       </Head>
 
       <Div100vh>
