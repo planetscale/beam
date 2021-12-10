@@ -115,6 +115,7 @@ module.exports = {
       },
       backgroundImage: {
         'square-grid': "url('/images/bg-squaregrid.svg')",
+        'square-grid-dark': "url('/images/bg-squaregrid-dark.svg')",
       },
       borderColor: {
         DEFAULT: 'var(--border-primary)',

@@ -13,7 +13,7 @@ const Auth: NextPage = () => {
       </Head>
 
       <Div100vh>
-        <main className="relative flex items-center justify-center h-full bg-center bg-square-grid">
+        <main className="relative flex items-center justify-center h-full bg-center bg-square-grid dark:bg-square-grid-dark">
           <div className="relative bottom-16">
             <Logo className="w-[318px] text-red-light h-[102px] mb-8 bg-primary" />
             <div className="flex justify-center w-full bg-primary">
