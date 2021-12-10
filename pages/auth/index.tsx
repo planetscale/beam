@@ -2,6 +2,7 @@ import { Footer } from '@/components/footer'
 import { Logo } from '@/components/icons'
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Div100vh from 'react-div-100vh'
 
 const Auth: NextPage = () => {
   return (
@@ -11,7 +12,7 @@ const Auth: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="h-screen">
+      <Div100vh>
         <main className="relative flex items-center justify-center h-full bg-center bg-square-grid">
           <div className="relative bottom-16">
             <Logo className="w-[318px] text-red-light h-[102px] mb-8 bg-primary" />
@@ -25,7 +26,7 @@ const Auth: NextPage = () => {
             </div>
           </div>
         </main>
-      </div>
+      </Div100vh>
     </>
   )
 }
