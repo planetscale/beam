@@ -1,3 +1,4 @@
+import { Button } from '@/components/button'
 import { Footer } from '@/components/footer'
 import { Logo } from '@/components/icons'
 import type { NextPage } from 'next'
@@ -16,9 +17,7 @@ const Auth: NextPage = () => {
           <div className="relative bottom-16">
             <Logo className="w-[318px] text-red-light h-[102px] mb-8 bg-primary" />
             <div className="flex justify-center w-full bg-primary">
-              <button className="whitespace-nowrap text-white bg-gray-800 hover:bg-gray-900 h-12 rounded-full font-semibold text-[18px] px-5 ">
-                Log in with Okta
-              </button>
+              <Button className="!h-12 !px-5 !text-lg">Log in with Okta</Button>
             </div>
             <div className="-mt-4 md:mt-0 w-screen left-1/2 transform -translate-x-1/2 absolute sm:w-[434px] lg:w-[646px] xl:w-[862px] auth-footer">
               <Footer />
