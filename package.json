@@ -5,14 +5,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.2",
     "@next-auth/prisma-adapter": "^0.5.2-next.19",
     "@prisma/client": "^3.6.0",
-    "@tailwindcss/forms": "^0.3.4",
-    "@tailwindcss/typography": "^0.4.1",
     "cloudinary": "^1.27.1",
     "crypto-hash": "^2.0.1",
     "date-fns": "^2.27.0",
@@ -31,6 +30,8 @@
     "use-item-list": "^0.1.2"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.4.0",
+    "@tailwindcss/typography": "^0.5.0",
     "@types/dompurify": "^2.3.1",
     "@types/marked": "^4.0.1",
     "@types/node": "16.11.11",
@@ -38,11 +39,13 @@
     "autoprefixer": "^10.4.0",
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.7",
+    "husky": "^7.0.0",
     "postcss": "^8.4.4",
     "prettier": "2.5.1",
     "prettier-plugin-organize-imports": "^2.3.4",
+    "pretty-quick": "^3.1.2",
     "prisma": "^3.6.0",
-    "tailwindcss": "^2.2.19",
+    "tailwindcss": "^3.0.0",
     "typescript": "4.5.2"
   }
 }
