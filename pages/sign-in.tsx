@@ -1,5 +1,9 @@
-import { withSession } from '@/lib/auth'
-import type { InferGetServerSidePropsType } from 'next'
+import { authOptions } from '@/lib/auth'
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next'
+import { getServerSession } from 'next-auth/next'
 import { getProviders, signIn } from 'next-auth/react'
 import Head from 'next/head'
 
@@ -25,10 +29,13 @@ const SignIn = ({
   )
 }
 
-export const getServerSideProps = withSession(async ({ req }) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session = await getServerSession(context, authOptions)
   const providers = await getProviders()
 
-  if (req.session?.user) {
+  if (session?.user) {
     return {
       redirect: {
         permanent: false,
@@ -41,6 +48,6 @@ export const getServerSideProps = withSession(async ({ req }) => {
   return {
     props: { providers },
   }
-})
+}
 
 export default SignIn

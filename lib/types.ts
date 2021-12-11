@@ -1,3 +1,12 @@
+import { User } from '@prisma/client'
+import type { NextPage } from 'next'
+import * as React from 'react'
+
+export type NextPageWithAuthAndLayout = NextPage & {
+  auth?: boolean
+  getLayout?: (page: React.ReactElement) => React.ReactNode
+}
+
 export type Post = {
   id: string
   title: string
@@ -14,9 +23,4 @@ export type Post = {
   }
 }
 
-export type User = {
-  id: string
-  name: string
-  avatarUrl?: string
-  title?: string
-}
+export type Author = Pick<User, 'id' | 'name' | 'image'>

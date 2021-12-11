@@ -1,22 +1,36 @@
 import { AuthorWithDate } from '@/components/author-with-date'
 import { Button } from '@/components/button'
 import { ButtonLink } from '@/components/button-link'
-import { ChevronRightIcon, HeartIcon, MessageIcon } from '@/components/icons'
+import {
+  ChevronRightIcon,
+  HeartFilledIcon,
+  HeartIcon,
+  MessageIcon,
+} from '@/components/icons'
 import { classNames } from '@/lib/classnames'
-import type { Post } from '@/lib/types'
+import { inferQueryOutput } from '@/lib/trpc'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import Link from 'next/link'
 import * as React from 'react'
 
 export type PostSummaryProps = {
-  post: Post
+  post: inferQueryOutput<'post.feed'>['items'][number]
   hideAuthor?: boolean
+  isLiked?: boolean
+  onLike: () => void
+  onUnlike: () => void
 }
 
-export function PostSummary({ post, hideAuthor = false }: PostSummaryProps) {
+export function PostSummary({
+  post,
+  hideAuthor = false,
+  isLiked,
+  onLike,
+  onUnlike,
+}: PostSummaryProps) {
   const contentDocument = React.useMemo(
-    () => new DOMParser().parseFromString(post.content, 'text/html'),
-    [post.content]
+    () => new DOMParser().parseFromString(post.contentHtml, 'text/html'),
+    [post.contentHtml]
   )
   //   TODO: decide on the order of the allowed tags
   //   and research on how to truncate html to a max amount of characters
@@ -63,13 +77,28 @@ export function PostSummary({ post, hideAuthor = false }: PostSummaryProps) {
         )}
 
         <div className="flex gap-4">
-          <Button variant="secondary">
-            <HeartIcon className="w-4 h-4 text-red" />
-            <span className="ml-1.5">{post.likeCount}</span>
+          <Button
+            variant="secondary"
+            className={
+              isLiked
+                ? '!border-red-300 !bg-red-100 hover:!bg-red-200 dark:!bg-red-900 dark:!border-red-700 dark:hover:!bg-red-800'
+                : ''
+            }
+            onClick={() => {
+              isLiked ? onUnlike() : onLike()
+            }}
+          >
+            {isLiked ? (
+              <HeartFilledIcon className="w-4 h-4 text-red" />
+            ) : (
+              <HeartIcon className="w-4 h-4 text-red" />
+            )}
+
+            <span className="ml-1.5">{post._count.likedBy}</span>
           </Button>
           <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
             <MessageIcon className="w-4 h-4 text-secondary" />
-            <span className="ml-1.5">{post.commentCount}</span>
+            <span className="ml-1.5">{post._count.comments}</span>
           </ButtonLink>
         </div>
       </div>

@@ -1,10 +1,10 @@
 import { Avatar } from '@/components/avatar'
-import type { User } from '@/lib/types'
+import type { Author } from '@/lib/types'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import Link from 'next/link'
 
 type AuthorWithDateProps = {
-  author: User
+  author: Author
   date: Date
 }
 
@@ -13,7 +13,7 @@ export function AuthorWithDate({ author, date }: AuthorWithDateProps) {
     <div className="flex items-center gap-4">
       <Link href={`/profile/${author.id}`}>
         <a className="relative inline-flex group">
-          <Avatar name={author.name} src={author.avatarUrl} />
+          <Avatar name={author.name!} src={author.image} />
           <div className="absolute inset-0 transition-opacity bg-gray-800 rounded-full opacity-0 group-hover:opacity-10" />
         </a>
       </Link>

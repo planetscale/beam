@@ -1,9 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { Role } from '@prisma/client'
-import type { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
-import { NextAuthOptions, Session } from 'next-auth'
-import { getServerSession } from 'next-auth/next'
+import { NextAuthOptions } from 'next-auth'
 import OktaProvider from 'next-auth/providers/okta'
 
 export const authOptions: NextAuthOptions = {
@@ -22,6 +20,7 @@ export const authOptions: NextAuthOptions = {
         ...session,
         user: {
           ...session.user,
+          id: user.id,
           role: user.role,
         },
       }
@@ -33,64 +32,10 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 }
 
-export function withSession<
-  P extends { [key: string]: unknown } = { [key: string]: unknown }
->(
-  handler: (
-    context: GetServerSidePropsContext
-  ) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
-) {
-  return async function nextGetServerSidePropsHandlerWrappedWithSession(
-    context: GetServerSidePropsContext
-  ) {
-    const session = await getServerSession(context, authOptions)
-
-    Object.defineProperty(
-      context.req,
-      'session',
-      getPropertyDescriptorForReqSession(session)
-    )
-
-    return handler(context)
-  }
-}
-
-function getPropertyDescriptorForReqSession(
-  session: Session | null
-): PropertyDescriptor {
-  return {
-    enumerable: true,
-    get() {
-      return session
-    },
-    set(value) {
-      if (session) {
-        const keys = Object.keys(value)
-        const currentKeys = Object.keys(session)
-
-        currentKeys.forEach((key) => {
-          if (!keys.includes(key)) {
-            delete session[key]
-          }
-        })
-
-        keys.forEach((key) => {
-          session[key] = value[key]
-        })
-      }
-    },
-  }
-}
-
-declare module 'http' {
-  interface IncomingMessage {
-    session?: Session
-  }
-}
-
 declare module 'next-auth' {
   interface Session {
     user: {
+      id: string
       name: string
       email: string
       image?: string | null
