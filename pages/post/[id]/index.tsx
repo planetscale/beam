@@ -3,6 +3,14 @@ import { Avatar } from '@/components/avatar'
 import { Banner } from '@/components/banner'
 import { Button } from '@/components/button'
 import { ButtonLink } from '@/components/button-link'
+import {
+  Dialog,
+  DialogActions,
+  DialogCloseButton,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/dialog'
 import { IconButton } from '@/components/icon-button'
 import { EditIcon, MessageIcon, TrashIcon } from '@/components/icons'
 import { Layout } from '@/components/layout'
@@ -84,6 +92,8 @@ const PostPage: NextPageWithAuthAndLayout = () => {
       utils.invalidateQueries(['post.detail', postQueryInput])
     },
   })
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    React.useState(false)
 
   if (postQuery.data) {
     const postBelongsToUser = postQuery.data.author.id === session!.user.id
@@ -117,7 +127,12 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                   >
                     <EditIcon className="w-4 h-4" />
                   </IconButton>
-                  <IconButton variant="secondary">
+                  <IconButton
+                    variant="secondary"
+                    onClick={() => {
+                      setIsConfirmDeleteDialogOpen(true)
+                    }}
+                  >
                     <TrashIcon className="w-4 h-4 text-red" />
                   </IconButton>
                 </div>
@@ -164,7 +179,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                       date={comment.createdAt}
                     />
                     <div className="pl-16 mt-4">
-                      <p>{comment.content}</p>
+                      <p className="whitespace-pre-wrap">{comment.content}</p>
                     </div>
                   </li>
                 ))}
@@ -176,6 +191,14 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             </div>
           </div>
         </div>
+
+        <ConfirmDeleteDialog
+          postId={postQuery.data.id}
+          isOpen={isConfirmDeleteDialogOpen}
+          onClose={() => {
+            setIsConfirmDeleteDialogOpen(false)
+          }}
+        />
       </>
     )
   }
@@ -187,17 +210,11 @@ const PostPage: NextPageWithAuthAndLayout = () => {
   return (
     <div className="animate-pulse">
       <div className="w-3/4 bg-gray-200 rounded h-9 dark:bg-gray-700" />
-      <div className="flex items-center justify-between gap-4 mt-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700" />
-          <div className="flex-1">
-            <div className="w-24 h-4 bg-gray-200 rounded dark:bg-gray-700" />
-            <div className="w-32 h-3 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <div className="w-16 border rounded-full h-button border-secondary" />
-          <div className="w-16 border rounded-full h-button border-secondary" />
+      <div className="flex items-center gap-4 mt-6">
+        <div className="w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700" />
+        <div className="flex-1">
+          <div className="w-24 h-4 bg-gray-200 rounded dark:bg-gray-700" />
+          <div className="w-32 h-3 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
         </div>
       </div>
       <div className="space-y-3 mt-7">
@@ -215,6 +232,10 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             <div className="w-3/5 h-5 bg-gray-200 rounded dark:bg-gray-700" />
           </React.Fragment>
         ))}
+      </div>
+      <div className="flex gap-4 mt-6">
+        <div className="w-16 border rounded-full h-button border-secondary" />
+        <div className="w-16 border rounded-full h-button border-secondary" />
       </div>
     </div>
   )
@@ -267,6 +288,49 @@ function CommentForm({ postId }: { postId: string }) {
         </Button>
       </div>
     </form>
+  )
+}
+
+function ConfirmDeleteDialog({
+  postId,
+  isOpen,
+  onClose,
+}: {
+  postId: string
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const router = useRouter()
+  const deletePostMutation = trpc.useMutation('post.delete')
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose} initialFocus={cancelRef}>
+      <DialogContent>
+        <DialogTitle>Delete post</DialogTitle>
+        <DialogDescription className="mt-6">
+          Are you sure you want to delete this post?
+        </DialogDescription>
+        <DialogCloseButton onClick={onClose} />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="secondary"
+          className="!text-red"
+          isLoading={deletePostMutation.isLoading}
+          onClick={() => {
+            deletePostMutation.mutate(postId, {
+              onSuccess: () => router.push('/'),
+            })
+          }}
+        >
+          Delete post
+        </Button>
+        <Button variant="secondary" onClick={onClose} ref={cancelRef}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

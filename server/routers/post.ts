@@ -209,3 +209,10 @@ export const postRouter = createProtectedRouter()
       return post
     },
   })
+  .mutation('delete', {
+    input: z.string().uuid(),
+    async resolve({ input: id, ctx }) {
+      await ctx.prisma.post.delete({ where: { id } })
+      return id
+    },
+  })
