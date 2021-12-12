@@ -1,12 +1,7 @@
 import { AuthorWithDate } from '@/components/author-with-date'
-import { Button } from '@/components/button'
 import { ButtonLink } from '@/components/button-link'
-import {
-  ChevronRightIcon,
-  HeartFilledIcon,
-  HeartIcon,
-  MessageIcon,
-} from '@/components/icons'
+import { ChevronRightIcon, MessageIcon } from '@/components/icons'
+import { LikeButton } from '@/components/like-button'
 import { classNames } from '@/lib/classnames'
 import { inferQueryOutput } from '@/lib/trpc'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
@@ -77,25 +72,13 @@ export function PostSummary({
         )}
 
         <div className="flex gap-4">
-          <Button
-            variant="secondary"
-            className={
-              isLiked
-                ? '!border-red-300 !bg-red-100 hover:!bg-red-200 dark:!bg-red-900 dark:!border-red-700 dark:hover:!bg-red-800'
-                : ''
-            }
-            onClick={() => {
-              isLiked ? onUnlike() : onLike()
-            }}
-          >
-            {isLiked ? (
-              <HeartFilledIcon className="w-4 h-4 text-red" />
-            ) : (
-              <HeartIcon className="w-4 h-4 text-red" />
-            )}
+          <LikeButton
+            isLiked={isLiked}
+            likeCount={post._count.likedBy}
+            onLike={onLike}
+            onUnlike={onUnlike}
+          />
 
-            <span className="ml-1.5">{post._count.likedBy}</span>
-          </Button>
           <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
             <MessageIcon className="w-4 h-4 text-secondary" />
             <span className="ml-1.5">{post._count.comments}</span>

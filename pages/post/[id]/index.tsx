@@ -4,136 +4,269 @@ import { Banner } from '@/components/banner'
 import { Button } from '@/components/button'
 import { ButtonLink } from '@/components/button-link'
 import { IconButton } from '@/components/icon-button'
-import { EditIcon, HeartIcon, MessageIcon, TrashIcon } from '@/components/icons'
+import { EditIcon, MessageIcon, TrashIcon } from '@/components/icons'
 import { Layout } from '@/components/layout'
+import { LikeButton } from '@/components/like-button'
 import { Textarea } from '@/components/textarea'
-import type { NextPage } from 'next'
+import { trpc } from '@/lib/trpc'
+import type { NextPageWithAuthAndLayout } from '@/lib/types'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import * as React from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
-const post = {
-  id: '1',
-  title: 'We shipped a thing!',
-  author: {
-    id: '1',
-    name: 'Bogdan Soare',
-    avatarUrl:
-      'https://pbs.twimg.com/profile_images/1028943463209943040/EtBuwo-A_400x400.jpg',
-  },
-  createdAt: new Date('2021/11/24'),
-  content:
-    '<p>This is the first few lines of the post right here. We could do something like the first four lines or so? And we could show the rendered Markdown version with <strong>bold</strong> and <em>italic</em> text and so on. If the post is longer than this preview snippet, we show a link below to continue to the full post.</p><h3>Some section heading</h3><p>Bacon ipsum dolor amet beef hamburger landjaeger corned beef t-bone prosciutto. Ham hock pastrami ham pork chop prosciutto capicola bacon alcatra turducken ribeye sausage landjaeger chicken. Cow porchetta pork tenderloin chislic bresaola. Turducken meatball ham hock hamburger sausage shank, capicola pork chop.</p><img src="https://images.unsplash.com/photo-1613203713329-b2e39e14c266?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80" /><p>Bacon ipsum dolor amet beef hamburger landjaeger corned beef t-bone prosciutto. Ham hock pastrami ham pork chop prosciutto capicola bacon alcatra turducken ribeye sausage landjaeger chicken. Cow porchetta pork tenderloin chislic bresaola. Turducken meatball ham hock hamburger sausage shank, capicola pork chop.</p>',
-  likeCount: 17,
-  commentCount: 5,
-  comments: [
-    {
-      id: '1',
-      content:
-        'Bacon ipsum dolor amet beef hamburger landjaeger corned beef t-bone prosciutto. Ham hock pastrami ham pork chop prosciutto capicola bacon alcatra turducken ribeye sausage landjaeger chicken. Cow porchetta pork tenderloin chislic bresaola. Turducken meatball ham hock hamburger sausage shank, capicola pork chop.',
-      createdAt: new Date('2021/11/24'),
-      author: {
-        id: '2',
-        name: 'Jason Long',
-        avatarUrl:
-          'https://pbs.twimg.com/profile_images/1329913134602199040/_r-DZlub_400x400.jpg',
-      },
-    },
-    {
-      id: '2',
-      content:
-        'Bacon ipsum dolor amet beef hamburger landjaeger corned beef t-bone prosciutto. Ham hock pastrami ham pork chop prosciutto capicola bacon.',
-      createdAt: new Date('2021/11/25'),
-      author: {
-        id: '1',
-        name: 'Bogdan Soare',
-        avatarUrl:
-          'https://pbs.twimg.com/profile_images/1028943463209943040/EtBuwo-A_400x400.jpg',
-      },
-    },
-  ],
-}
-
-const PostPage: NextPage = () => {
+const PostPage: NextPageWithAuthAndLayout = () => {
+  const { data: session } = useSession()
   const router = useRouter()
+  const utils = trpc.useContext()
+  const postQueryInput = { id: String(router.query.id) }
+  const postQuery = trpc.useQuery(['post.detail', postQueryInput])
+  const likeMutation = trpc.useMutation(['post.like'], {
+    onMutate: async (likedPostId) => {
+      await utils.cancelQuery(['post.detail', postQueryInput])
 
-  return (
-    <Layout>
-      <Head>
-        <title>{post.title} - Flux</title>
-      </Head>
+      const previousPost = utils.getQueryData(['post.detail', postQueryInput])
 
-      <div className="divide-y divide-primary">
-        <div className="pb-12">
-          <Banner className="mb-6">
-            This post has been hidden and is only visible to administrators.
-          </Banner>
+      if (previousPost) {
+        utils.setQueryData(['post.detail', postQueryInput], {
+          ...previousPost,
+          likedBy: [{ id: session!.user.id }],
+          _count: {
+            ...previousPost._count,
+            likedBy: previousPost._count.likedBy + 1,
+          },
+        })
+      }
 
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
-            <div className="flex gap-4">
-              <IconButton
-                variant="secondary"
-                onClick={() => {
-                  router.push(`/post/${post.id}/edit`)
+      return { previousPost }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousPost) {
+        utils.setQueryData(
+          ['post.detail', postQueryInput],
+          context.previousPost
+        )
+      }
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['post.detail', postQueryInput])
+    },
+  })
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
+    onMutate: async (unlikedPostId) => {
+      await utils.cancelQuery(['post.detail', postQueryInput])
+
+      const previousPost = utils.getQueryData(['post.detail', postQueryInput])
+
+      if (previousPost) {
+        utils.setQueryData(['post.detail', postQueryInput], {
+          ...previousPost,
+          likedBy: [],
+          _count: {
+            ...previousPost._count,
+            likedBy: previousPost._count.likedBy - 1,
+          },
+        })
+      }
+
+      return { previousPost }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousPost) {
+        utils.setQueryData(
+          ['post.detail', postQueryInput],
+          context.previousPost
+        )
+      }
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['post.detail', postQueryInput])
+    },
+  })
+
+  if (postQuery.data) {
+    const postBelongsToUser = postQuery.data.author.id === session!.user.id
+    const isPostLiked = postQuery.data.likedBy.length === 1
+
+    return (
+      <>
+        <Head>
+          <title>{postQuery.data.title} - Flux</title>
+        </Head>
+
+        <div className="divide-y divide-primary">
+          <div className="pb-12">
+            {postQuery.data.hidden && (
+              <Banner className="mb-6">
+                This post has been hidden and is only visible to administrators.
+              </Banner>
+            )}
+
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-3xl font-bold tracking-tight">
+                {postQuery.data.title}
+              </h1>
+              {postBelongsToUser && (
+                <div className="flex gap-4">
+                  <IconButton
+                    variant="secondary"
+                    onClick={() => {
+                      router.push(`/post/${postQuery.data.id}/edit`)
+                    }}
+                  >
+                    <EditIcon className="w-4 h-4" />
+                  </IconButton>
+                  <IconButton variant="secondary">
+                    <TrashIcon className="w-4 h-4 text-red" />
+                  </IconButton>
+                </div>
+              )}
+            </div>
+            <div className="mt-6 ">
+              <AuthorWithDate
+                author={postQuery.data.author}
+                date={postQuery.data.createdAt}
+              />
+            </div>
+            <div
+              className="mt-6 prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: postQuery.data.contentHtml }}
+            />
+            <div className="flex gap-4 mt-6">
+              <LikeButton
+                isLiked={isPostLiked}
+                likeCount={postQuery.data._count.likedBy}
+                onLike={() => {
+                  likeMutation.mutate(postQuery.data.id)
                 }}
+                onUnlike={() => {
+                  unlikeMutation.mutate(postQuery.data.id)
+                }}
+              />
+              <ButtonLink
+                href={`/post/${postQuery.data.id}#comments`}
+                variant="secondary"
               >
-                <EditIcon className="w-4 h-4" />
-              </IconButton>
-              <IconButton variant="secondary">
-                <TrashIcon className="w-4 h-4 text-red" />
-              </IconButton>
+                <MessageIcon className="w-4 h-4 text-secondary" />
+                <span className="ml-1.5">{postQuery.data._count.comments}</span>
+              </ButtonLink>
             </div>
           </div>
-          <div className="mt-6 ">
-            <AuthorWithDate author={post.author} date={post.createdAt} />
-          </div>
-          <div
-            className="mt-6 prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-          <div className="flex gap-4 mt-6">
-            <Button variant="secondary">
-              <HeartIcon className="w-4 h-4 text-red" />
-              <span className="ml-1.5">{post.likeCount}</span>
-            </Button>
-            <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
-              <MessageIcon className="w-4 h-4 text-secondary" />
-              <span className="ml-1.5">{post.commentCount}</span>
-            </ButtonLink>
+
+          <div id="comments" className="pt-12 space-y-12">
+            {postQuery.data.comments.length > 0 && (
+              <ul className="space-y-12">
+                {postQuery.data.comments.map((comment) => (
+                  <li key={comment.id}>
+                    <AuthorWithDate
+                      author={comment.author}
+                      date={comment.createdAt}
+                    />
+                    <div className="pl-16 mt-4">
+                      <p>{comment.content}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex items-start gap-4">
+              <Avatar name={session!.user.name} src={session!.user.image} />
+              <CommentForm postId={postQuery.data.id} />
+            </div>
           </div>
         </div>
+      </>
+    )
+  }
 
-        <div id="comments" className="pt-12 space-y-12">
-          {post.comments.length > 0 && (
-            <ul className="space-y-12">
-              {post.comments.map((comment) => (
-                <li key={comment.id}>
-                  <AuthorWithDate
-                    author={comment.author}
-                    date={comment.createdAt}
-                  />
-                  <div className="pl-16 mt-4">
-                    <p>{comment.content}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="flex items-start gap-4">
-            <Avatar
-              name="Jason"
-              src="https://pbs.twimg.com/profile_images/1329913134602199040/_r-DZlub_400x400.jpg"
-            />
-            <form className="flex-1">
-              <Textarea placeholder="Comment" rows={4} required />
-              <div className="mt-4">
-                <Button type="submit">Add comment</Button>
-              </div>
-            </form>
+  if (postQuery.isError) {
+    return <div>Error: {postQuery.error.message}</div>
+  }
+
+  return (
+    <div className="animate-pulse">
+      <div className="w-3/4 bg-gray-200 rounded h-9 dark:bg-gray-700" />
+      <div className="flex items-center justify-between gap-4 mt-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700" />
+          <div className="flex-1">
+            <div className="w-24 h-4 bg-gray-200 rounded dark:bg-gray-700" />
+            <div className="w-32 h-3 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
           </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="w-16 border rounded-full h-button border-secondary" />
+          <div className="w-16 border rounded-full h-button border-secondary" />
         </div>
       </div>
-    </Layout>
+      <div className="space-y-3 mt-7">
+        {[...Array(3)].map((_, idx) => (
+          <React.Fragment key={idx}>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="h-5 col-span-2 bg-gray-200 rounded dark:bg-gray-700" />
+              <div className="h-5 col-span-1 bg-gray-200 rounded dark:bg-gray-700" />
+            </div>
+            <div className="w-1/2 h-5 bg-gray-200 rounded dark:bg-gray-700" />
+            <div className="grid grid-cols-3 gap-4">
+              <div className="h-5 col-span-1 bg-gray-200 rounded dark:bg-gray-700" />
+              <div className="h-5 col-span-2 bg-gray-200 rounded dark:bg-gray-700" />
+            </div>
+            <div className="w-3/5 h-5 bg-gray-200 rounded dark:bg-gray-700" />
+          </React.Fragment>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+PostPage.auth = true
+
+PostPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>
+}
+
+type CommentFormData = {
+  content: string
+}
+
+function CommentForm({ postId }: { postId: string }) {
+  const utils = trpc.useContext()
+  const addCommentMutation = trpc.useMutation('comment.add', {
+    onSuccess: () => {
+      return utils.invalidateQueries(['post.detail', { id: postId }])
+    },
+  })
+  const { register, handleSubmit, reset } = useForm<CommentFormData>()
+
+  const onSubmit: SubmitHandler<CommentFormData> = (data) => {
+    addCommentMutation.mutate(
+      {
+        postId,
+        content: data.content,
+      },
+      {
+        onSuccess: () => {
+          reset()
+        },
+      }
+    )
+  }
+
+  return (
+    <form className="flex-1" onSubmit={handleSubmit(onSubmit)}>
+      <Textarea
+        placeholder="Comment"
+        rows={4}
+        required
+        {...register('content', { required: true })}
+      />
+      <div className="mt-4">
+        <Button type="submit" isLoading={addCommentMutation.isLoading}>
+          Add comment
+        </Button>
+      </div>
+    </form>
   )
 }
 

@@ -7,7 +7,7 @@ import { SearchDialog } from '@/components/search-dialog'
 import { classNames } from '@/lib/classnames'
 import { capitalize } from '@/lib/text'
 import { Menu, Transition } from '@headlessui/react'
-import { signOut } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useTheme } from 'next-themes'
 import Link, { LinkProps } from 'next/link'
 import * as React from 'react'
@@ -29,6 +29,7 @@ function MenuLink({
 }
 
 export function Layout({ children }: LayoutProps) {
+  const { data: session } = useSession()
   const { theme, themes, setTheme } = useTheme()
   const [isSearchDialogOpen, setIsSearchDialogOpen] = React.useState(false)
 
@@ -53,8 +54,8 @@ export function Layout({ children }: LayoutProps) {
           <Menu as="div" className="relative inline-flex">
             <Menu.Button className="relative inline-flex group">
               <Avatar
-                name="Jason Long"
-                src="https://pbs.twimg.com/profile_images/1329913134602199040/_r-DZlub_400x400.jpg"
+                name={session!.user.name}
+                src={session!.user.image}
                 size="sm"
               />
               <div className="absolute inset-0 transition-opacity bg-gray-800 rounded-full opacity-0 group-hover:opacity-10" />
@@ -74,7 +75,7 @@ export function Layout({ children }: LayoutProps) {
                   <Menu.Item>
                     {({ active }) => (
                       <MenuLink
-                        href={`/profile/1`}
+                        href={`/profile/${session!.user.id}`}
                         className={classNames(
                           active && 'bg-secondary',
                           'block px-4 py-2 text-sm text-primary transition-colors'

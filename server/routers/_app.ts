@@ -1,5 +1,6 @@
 import superjson from 'superjson'
 import { createRouter } from '../create-router'
+import { commentRouter } from './comment'
 import { postRouter } from './post'
 
 /**
@@ -20,5 +21,6 @@ export const appRouter = createRouter()
    */
   // .formatError(({ shape, error }) => { })
   .merge('post.', postRouter)
+  .merge('comment.', commentRouter)
 
 export type AppRouter = typeof appRouter

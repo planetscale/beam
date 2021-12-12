@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createProtectedRouter } from '../create-protected-router'
 
@@ -49,12 +50,6 @@ export const postRouter = createProtectedRouter()
           title: true,
           contentHtml: true,
           createdAt: true,
-          _count: {
-            select: {
-              comments: true,
-              likedBy: true,
-            },
-          },
           author: {
             select: {
               id: true,
@@ -70,6 +65,12 @@ export const postRouter = createProtectedRouter()
               id: true,
             },
           },
+          _count: {
+            select: {
+              comments: true,
+              likedBy: true,
+            },
+          },
         },
       })
 
@@ -83,31 +84,74 @@ export const postRouter = createProtectedRouter()
       }
     },
   })
-  // .query('byId', {
-  //   input: z.object({
-  //     id: z.string(),
-  //   }),
-  //   async resolve({ ctx, input }) {
-  //     const { id } = input
-  //     const post = await ctx.prisma.post.findUnique({
-  //       where: { id },
-  //       select: {
-  //         id: true,
-  //         title: true,
-  //         text: true,
-  //         createdAt: true,
-  //         updatedAt: true,
-  //       },
-  //     })
-  //     if (!post) {
-  //       throw new TRPCError({
-  //         code: 'NOT_FOUND',
-  //         message: `No post with id '${id}'`,
-  //       })
-  //     }
-  //     return post
-  //   },
-  // })
+  .query('detail', {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      const { id } = input
+      const post = await ctx.prisma.post.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          contentHtml: true,
+          createdAt: true,
+          hidden: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          likedBy: {
+            where: {
+              id: ctx.session.user.id,
+            },
+            select: {
+              id: true,
+            },
+          },
+          comments: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+            select: {
+              id: true,
+              content: true,
+              createdAt: true,
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              comments: true,
+              likedBy: true,
+            },
+          },
+        },
+      })
+
+      const postBelongsToUser = post?.author.id === ctx.session.user.id
+
+      if (!post || (post.hidden && !postBelongsToUser && !ctx.isUserAdmin)) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `No post with id '${id}'`,
+        })
+      }
+
+      return post
+    },
+  })
   // // update
   // .mutation('edit', {
   //   input: z.object({
@@ -139,6 +183,9 @@ export const postRouter = createProtectedRouter()
             },
           },
         },
+        select: {
+          id: true,
+        },
       })
       return post
     },
@@ -154,6 +201,9 @@ export const postRouter = createProtectedRouter()
               id: ctx.session.user.id,
             },
           },
+        },
+        select: {
+          id: true,
         },
       })
       return post
