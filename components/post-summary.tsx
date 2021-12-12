@@ -14,9 +14,8 @@ import Link from 'next/link'
 import * as React from 'react'
 
 export type PostSummaryProps = {
-  post: inferQueryOutput<'post.feed'>['items'][number]
+  post: inferQueryOutput<'post.feed'>['posts'][number]
   hideAuthor?: boolean
-  isLiked?: boolean
   onLike: () => void
   onUnlike: () => void
 }
@@ -24,7 +23,6 @@ export type PostSummaryProps = {
 export function PostSummary({
   post,
   hideAuthor = false,
-  isLiked,
   onLike,
   onUnlike,
 }: PostSummaryProps) {
@@ -50,6 +48,8 @@ export function PostSummary({
     () => contentDocument.body.children.length > 1,
     [contentDocument]
   )
+
+  const isLiked = post.likedBy.length === 1
 
   return (
     <div>

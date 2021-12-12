@@ -4,6 +4,7 @@ import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
+import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -17,73 +18,138 @@ const PostSummary = dynamic<PostSummaryProps>(
 )
 
 const Home: NextPageWithAuthAndLayout = () => {
+  const { data: session } = useSession()
   const router = useRouter()
   const page = router.query.page ? Number(router.query.page) : 1
-  const skip = page === 1 ? undefined : POSTS_PER_PAGE * (page - 1)
   const utils = trpc.useContext()
-  const feedQuery = trpc.useQuery([
-    'post.feed',
-    {
-      take: POSTS_PER_PAGE,
-      skip,
-    },
-  ])
+  const feedQueryInput = {
+    take: POSTS_PER_PAGE,
+    skip: page === 1 ? undefined : POSTS_PER_PAGE * (page - 1),
+  }
+  const feedQuery = trpc.useQuery(['post.feed', feedQueryInput])
   const likeMutation = trpc.useMutation(['post.like'], {
-    onMutate: async (id) => {
-      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await utils.cancelQuery([
-        'post.feed',
-        {
-          take: POSTS_PER_PAGE,
-          skip,
-        },
-      ])
+    onMutate: async (likedPostId) => {
+      await utils.cancelQuery(['post.feed', feedQueryInput])
 
-      // Snapshot the previous value
-      const previousPosts = utils.getQueryData([
-        'post.feed',
-        {
-          take: POSTS_PER_PAGE,
-          skip,
-        },
-      ])
+      const previousQuery = utils.getQueryData(['post.feed', feedQueryInput])
 
-      // Optimistically update to the new value
-      utils.setQueryData(
-        [
-          'post.feed',
-          {
-            take: POSTS_PER_PAGE,
-            skip,
-          },
-        ],
-        previousPosts?.items.map((t) =>
-          t.id === id
-            ? {
-                ...t,
-                likedBy: [{ id: 'aa' }],
-              }
-            : t
-        )
-      )
+      if (previousQuery) {
+        utils.setQueryData(['post.feed', feedQueryInput], {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === likedPostId
+              ? {
+                  ...post,
+                  likedBy: [{ id: session!.user.id }],
+                  _count: {
+                    ...post._count,
+                    likedBy: post._count.likedBy + 1,
+                  },
+                }
+              : post
+          ),
+        })
+      }
 
-      // Return a context with the previous and new todo
-      return { previousTodo, newTodo }
+      return { previousQuery }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
+      }
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['post.feed', feedQueryInput])
     },
   })
-  const unlikeMutation = trpc.useMutation(['post.unlike'])
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
+    onMutate: async (unlikedPostId) => {
+      await utils.cancelQuery(['post.feed', feedQueryInput])
 
-  if (feedQuery.isLoading) {
+      const previousQuery = utils.getQueryData(['post.feed', feedQueryInput])
+
+      if (previousQuery) {
+        utils.setQueryData(['post.feed', feedQueryInput], {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === unlikedPostId
+              ? {
+                  ...post,
+                  likedBy: [],
+                  _count: {
+                    ...post._count,
+                    likedBy: post._count.likedBy - 1,
+                  },
+                }
+              : post
+          ),
+        })
+      }
+
+      return { previousQuery }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
+      }
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['post.feed', feedQueryInput])
+    },
+  })
+
+  if (feedQuery.data) {
+    const totalPages = Math.ceil(feedQuery.data.postCount / POSTS_PER_PAGE)
+
     return (
-      <div className="flow-root">
-        <ul className="-my-12 divide-y divide-primary">
-          {[...Array(3)].map((_, idx) => (
-            <li key={idx} className="py-12">
-              <PostSummarySkeleton />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <>
+        <Head>
+          <title>Flux</title>
+        </Head>
+
+        {feedQuery.data.postCount === 0 ? (
+          <div className="text-lg text-center">No posts</div>
+        ) : (
+          <div className="flow-root">
+            <ul className="-my-12 divide-y divide-primary">
+              {feedQuery.data.posts.map((post) => (
+                <li key={post.id} className="py-12">
+                  <PostSummary
+                    post={post}
+                    onLike={() => {
+                      likeMutation.mutate(post.id)
+                    }}
+                    onUnlike={() => {
+                      unlikeMutation.mutate(post.id)
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-4 mt-12">
+            <ButtonLink
+              href={{ pathname: '/', query: { page: page - 1 } }}
+              variant="secondary"
+              className={page === 1 ? 'pointer-events-none opacity-50' : ''}
+            >
+              Previous
+            </ButtonLink>
+            <ButtonLink
+              href={{ pathname: '/', query: { page: page + 1 } }}
+              variant="secondary"
+              className={
+                page === totalPages ? 'pointer-events-none opacity-50' : ''
+              }
+            >
+              Next
+            </ButtonLink>
+          </div>
+        )}
+      </>
     )
   }
 
@@ -91,58 +157,16 @@ const Home: NextPageWithAuthAndLayout = () => {
     return <div>Error: {feedQuery.error.message}</div>
   }
 
-  const totalPages = Math.ceil(feedQuery.data!.count / POSTS_PER_PAGE)
-
   return (
-    <>
-      <Head>
-        <title>Flux</title>
-      </Head>
-
-      {feedQuery.data?.items.length === 0 ? (
-        <div className="text-lg text-center">No posts</div>
-      ) : (
-        <div className="flow-root">
-          <ul className="-my-12 divide-y divide-primary">
-            {feedQuery.data?.items.map((post) => (
-              <li key={post.id} className="py-12">
-                <PostSummary
-                  post={post}
-                  isLiked={post.likedBy.length === 1}
-                  onLike={() => {
-                    likeMutation.mutate(post.id)
-                  }}
-                  onUnlike={() => {
-                    unlikeMutation.mutate(post.id)
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-4 mt-12">
-          <ButtonLink
-            href={{ pathname: '/', query: { page: page - 1 } }}
-            variant="secondary"
-            className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-          >
-            Previous
-          </ButtonLink>
-          <ButtonLink
-            href={{ pathname: '/', query: { page: page + 1 } }}
-            variant="secondary"
-            className={
-              page === totalPages ? 'pointer-events-none opacity-50' : ''
-            }
-          >
-            Next
-          </ButtonLink>
-        </div>
-      )}
-    </>
+    <div className="flow-root">
+      <ul className="-my-12 divide-y divide-primary">
+        {[...Array(3)].map((_, idx) => (
+          <li key={idx} className="py-12">
+            <PostSummarySkeleton />
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 

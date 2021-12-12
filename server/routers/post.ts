@@ -37,7 +37,7 @@ export const postRouter = createProtectedRouter()
         hidden: ctx.isUserAdmin ? undefined : false,
       }
 
-      const items = await ctx.prisma.post.findMany({
+      const posts = await ctx.prisma.post.findMany({
         take,
         skip,
         orderBy: {
@@ -73,13 +73,13 @@ export const postRouter = createProtectedRouter()
         },
       })
 
-      const count = await ctx.prisma.post.count({
+      const postCount = await ctx.prisma.post.count({
         where,
       })
 
       return {
-        items,
-        count,
+        posts,
+        postCount,
       }
     },
   })

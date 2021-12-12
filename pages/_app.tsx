@@ -1,3 +1,4 @@
+import { transformer } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { AppRouter } from '@/server/routers/_app'
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink'
@@ -8,7 +9,6 @@ import { ThemeProvider } from 'next-themes'
 import type { AppProps } from 'next/app'
 import * as React from 'react'
 import { Toaster } from 'react-hot-toast'
-import superjson from 'superjson'
 import '../styles/globals.css'
 
 type AppPropsWithAuthAndLayout = AppProps & {
@@ -77,7 +77,7 @@ export default withTRPC<AppRouter>({
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-      transformer: superjson,
+      transformer,
     }
   },
 })(MyApp)
