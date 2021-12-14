@@ -2,12 +2,13 @@ import { SpinnerIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
 import * as React from 'react'
 
-export type ButtonOwnProps = {
-  variant?: 'primary' | 'secondary'
-  isLoading?: boolean
-}
+export type ButtonVariant = 'primary' | 'secondary'
 
-type ButtonProps = ButtonOwnProps & React.ComponentPropsWithoutRef<'button'>
+type ButtonProps = {
+  variant?: ButtonVariant
+  isLoading?: boolean
+  loadingChildren?: React.ReactNode
+} & React.ComponentPropsWithoutRef<'button'>
 
 export function buttonClasses({
   className,
@@ -33,6 +34,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant = 'primary',
       type = 'button',
       isLoading = false,
+      loadingChildren,
       disabled,
       children,
       ...rest
@@ -50,7 +52,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading && (
           <SpinnerIcon className="w-4 h-4 mr-2 -ml-1 animate-spin" />
         )}
-        {children}
+        {isLoading && loadingChildren ? loadingChildren : children}
       </button>
     )
   }

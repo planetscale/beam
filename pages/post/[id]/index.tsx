@@ -57,9 +57,6 @@ const PostPage: NextPageWithAuthAndLayout = () => {
         )
       }
     },
-    onSettled: () => {
-      utils.invalidateQueries(['post.detail', postQueryInput])
-    },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
@@ -87,9 +84,6 @@ const PostPage: NextPageWithAuthAndLayout = () => {
           context.previousPost
         )
       }
-    },
-    onSettled: () => {
-      utils.invalidateQueries(['post.detail', postQueryInput])
     },
   })
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
@@ -283,7 +277,11 @@ function CommentForm({ postId }: { postId: string }) {
         {...register('content', { required: true })}
       />
       <div className="mt-4">
-        <Button type="submit" isLoading={addCommentMutation.isLoading}>
+        <Button
+          type="submit"
+          isLoading={addCommentMutation.isLoading}
+          loadingChildren="Adding comment"
+        >
           Add comment
         </Button>
       </div>
@@ -318,6 +316,7 @@ function ConfirmDeleteDialog({
           variant="secondary"
           className="!text-red"
           isLoading={deletePostMutation.isLoading}
+          loadingChildren="Deleting post"
           onClick={() => {
             deletePostMutation.mutate(postId, {
               onSuccess: () => router.push('/'),

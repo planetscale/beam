@@ -51,7 +51,7 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
             </div>
           </>
         ) : (
-          <div>You don't have permissions to edit this post.</div>
+          <div>You don&apos;t have permissions to edit this post.</div>
         )}
       </>
     )

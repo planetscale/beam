@@ -54,7 +54,11 @@ export function PostForm({
 
       <div className="flex items-center justify-between gap-4 mt-8">
         <div className="flex gap-4">
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            loadingChildren={`${defaultValues ? 'Editing' : 'Publishing'} post`}
+          >
             {defaultValues ? 'Edit' : 'Publish'} post
           </Button>
           <ButtonLink href="/" variant="secondary">

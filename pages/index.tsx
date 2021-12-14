@@ -58,9 +58,6 @@ const Home: NextPageWithAuthAndLayout = () => {
         utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
       }
     },
-    onSettled: () => {
-      utils.invalidateQueries(['post.feed', feedQueryInput])
-    },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
@@ -92,9 +89,6 @@ const Home: NextPageWithAuthAndLayout = () => {
       if (context?.previousQuery) {
         utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
       }
-    },
-    onSettled: () => {
-      utils.invalidateQueries(['post.feed', feedQueryInput])
     },
   })
 

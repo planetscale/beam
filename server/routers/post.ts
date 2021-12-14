@@ -66,7 +66,7 @@ export const postRouter = createProtectedRouter()
   })
   .query('detail', {
     input: z.object({
-      id: z.string().uuid(),
+      id: z.string(),
     }),
     async resolve({ ctx, input }) {
       const { id } = input
@@ -134,8 +134,8 @@ export const postRouter = createProtectedRouter()
   })
   .mutation('add', {
     input: z.object({
-      title: z.string().min(1).max(100),
-      content: z.string().min(5),
+      title: z.string().min(1),
+      content: z.string().min(1),
     }),
     async resolve({ ctx, input }) {
       const post = await ctx.prisma.post.create({
@@ -155,10 +155,10 @@ export const postRouter = createProtectedRouter()
   })
   .mutation('edit', {
     input: z.object({
-      id: z.string().uuid(),
+      id: z.string(),
       data: z.object({
-        title: z.string().min(1).max(100),
-        content: z.string().min(5),
+        title: z.string().min(1),
+        content: z.string().min(1),
       }),
     }),
     async resolve({ ctx, input }) {
@@ -194,14 +194,14 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('delete', {
-    input: z.string().uuid(),
+    input: z.string(),
     async resolve({ input: id, ctx }) {
       await ctx.prisma.post.delete({ where: { id } })
       return id
     },
   })
   .mutation('like', {
-    input: z.string().uuid(),
+    input: z.string(),
     async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.update({
         where: { id },
@@ -220,7 +220,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('unlike', {
-    input: z.string().uuid(),
+    input: z.string(),
     async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.update({
         where: { id },

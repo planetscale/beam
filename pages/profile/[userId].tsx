@@ -70,9 +70,6 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
         )
       }
     },
-    onSettled: () => {
-      utils.invalidateQueries(['user.profile', profileQueryInput])
-    },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
@@ -111,9 +108,6 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
         )
       }
     },
-    onSettled: () => {
-      utils.invalidateQueries(['user.profile', profileQueryInput])
-    },
   })
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] =
     React.useState(false)
@@ -143,7 +137,6 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
                   {profileQuery.data.title}
                 </p>
               )}
-              <p className="text-lg tracking-tight text-secondary">Developer</p>
             </div>
           </div>
 
@@ -270,7 +263,7 @@ function DotPattern() {
 
 type EditFormData = {
   name: string
-  title: string
+  title: string | null
 }
 
 function EditProfileDialog({
@@ -280,8 +273,8 @@ function EditProfileDialog({
 }: {
   user: {
     name: string
-    title?: string | null
-    image?: string | null
+    title: string | null
+    image: string | null
   }
   isOpen: boolean
   onClose: () => void
@@ -289,11 +282,31 @@ function EditProfileDialog({
   const { register, handleSubmit } = useForm<EditFormData>({
     defaultValues: {
       name: user.name,
-      title: user.title || '',
+      title: user.title,
+    },
+  })
+  const router = useRouter()
+  const utils = trpc.useContext()
+  const editUserMutation = trpc.useMutation('user.edit', {
+    onSuccess: () => {
+      return utils.invalidateQueries([
+        'user.profile',
+        { id: String(router.query.userId) },
+      ])
     },
   })
 
-  const onSubmit: SubmitHandler<EditFormData> = (data) => console.log(data)
+  const onSubmit: SubmitHandler<EditFormData> = (data) => {
+    editUserMutation.mutate(
+      {
+        name: data.name,
+        title: data.title,
+      },
+      {
+        onSuccess: () => onClose(),
+      }
+    )
+  }
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose}>
@@ -330,16 +343,18 @@ function EditProfileDialog({
               required
             />
 
-            <TextField
-              {...register('title', { required: true })}
-              label="Title"
-              required
-            />
+            <TextField {...register('title')} label="Title" />
           </div>
           <DialogCloseButton onClick={onClose} />
         </DialogContent>
         <DialogActions>
-          <Button type="submit">Save</Button>
+          <Button
+            type="submit"
+            isLoading={editUserMutation.isLoading}
+            loadingChildren="Saving"
+          >
+            Save
+          </Button>
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

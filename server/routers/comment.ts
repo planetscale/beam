@@ -3,7 +3,7 @@ import { createProtectedRouter } from '../create-protected-router'
 
 export const commentRouter = createProtectedRouter().mutation('add', {
   input: z.object({
-    postId: z.string().uuid(),
+    postId: z.string(),
     content: z.string().min(1),
   }),
   async resolve({ ctx, input }) {
