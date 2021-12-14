@@ -13,10 +13,15 @@ type FormData = {
 
 type PostFormProps = {
   defaultValues?: FormData
+  isSubmitting?: boolean
   onSubmit: SubmitHandler<FormData>
 }
 
-export function PostForm({ defaultValues, onSubmit }: PostFormProps) {
+export function PostForm({
+  defaultValues,
+  isSubmitting,
+  onSubmit,
+}: PostFormProps) {
   const { control, register, handleSubmit } = useForm<FormData>({
     defaultValues,
   })
@@ -49,7 +54,7 @@ export function PostForm({ defaultValues, onSubmit }: PostFormProps) {
 
       <div className="flex items-center justify-between gap-4 mt-8">
         <div className="flex gap-4">
-          <Button type="submit">
+          <Button type="submit" isLoading={isSubmitting}>
             {defaultValues ? 'Edit' : 'Publish'} post
           </Button>
           <ButtonLink href="/" variant="secondary">

@@ -1,11 +1,16 @@
 import { Layout } from '@/components/layout'
 import { PostForm } from '@/components/post-form'
-import type { NextPage } from 'next'
+import { trpc } from '@/lib/trpc'
+import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
-const NewPostPage: NextPage = () => {
+const NewPostPage: NextPageWithAuthAndLayout = () => {
+  const router = useRouter()
+  const addPostMutation = trpc.useMutation('post.add')
+
   return (
-    <Layout>
+    <>
       <Head>
         <title>New Post - Flux</title>
       </Head>
@@ -14,13 +19,25 @@ const NewPostPage: NextPage = () => {
 
       <div className="mt-6">
         <PostForm
+          isSubmitting={addPostMutation.isLoading}
           onSubmit={(values) => {
-            console.log(values)
+            addPostMutation.mutate(
+              { title: values.title, content: values.content },
+              {
+                onSuccess: (data) => router.push(`/post/${data.id}`),
+              }
+            )
           }}
         />
       </div>
-    </Layout>
+    </>
   )
+}
+
+NewPostPage.auth = true
+
+NewPostPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>
 }
 
 export default NewPostPage

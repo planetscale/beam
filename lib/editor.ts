@@ -1,5 +1,11 @@
+import DOMPurify from 'isomorphic-dompurify'
+import { marked } from 'marked'
 import toast from 'react-hot-toast'
 import { Cursor } from 'textarea-markdown-editor'
+
+export function markdownToHtml(markdown: string) {
+  return DOMPurify.sanitize(marked.parse(markdown, { breaks: true }))
+}
 
 async function uploadImageToCloudinary(file: File) {
   const signResponse = await fetch('/api/sign-cloudinary', { method: 'POST' })

@@ -1,9 +1,7 @@
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
-import { handleUploadImages } from '@/lib/editor'
+import { handleUploadImages, markdownToHtml } from '@/lib/editor'
 import { Switch } from '@headlessui/react'
-import DOMPurify from 'dompurify'
-import { marked } from 'marked'
 import * as React from 'react'
 import TextareaAutosize, {
   TextareaAutosizeProps,
@@ -46,9 +44,7 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
         <div
           className="prose max-w-none"
           dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(
-              marked.parse(markdown, { breaks: true })
-            ),
+            __html: markdownToHtml(markdown),
           }}
         />
       ) : (
@@ -68,7 +64,7 @@ export function MarkdownEditor({
   const [showPreview, setShowPreview] = React.useState(false)
 
   return (
-    <div className="mt-6">
+    <div>
       {label && <label className="block mb-2 font-semibold">{label}</label>}
       <div>
         <div className="flex items-center justify-between gap-4 px-4 py-px border rounded bg-primary">
