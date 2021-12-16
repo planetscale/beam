@@ -12,7 +12,13 @@ import {
   DialogTitle,
 } from '@/components/dialog'
 import { IconButton } from '@/components/icon-button'
-import { EditIcon, MessageIcon, TrashIcon } from '@/components/icons'
+import {
+  EditIcon,
+  EyeClosedIcon,
+  EyeIcon,
+  MessageIcon,
+  TrashIcon,
+} from '@/components/icons'
 import { Layout } from '@/components/layout'
 import { LikeButton } from '@/components/like-button'
 import { Textarea } from '@/components/textarea'
@@ -23,6 +29,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 
 const PostPage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
@@ -88,8 +95,13 @@ const PostPage: NextPageWithAuthAndLayout = () => {
   })
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
     React.useState(false)
+  const [isConfirmHideDialogOpen, setIsConfirmHideDialogOpen] =
+    React.useState(false)
+  const [isConfirmUnhideDialogOpen, setIsConfirmUnhideDialogOpen] =
+    React.useState(false)
 
   if (postQuery.data) {
+    const isUserAdmin = session!.user.role === 'ADMIN'
     const postBelongsToUser = postQuery.data.author.id === session!.user.id
     const isPostLiked = postQuery.data.likedBy.length === 1
 
@@ -111,28 +123,56 @@ const PostPage: NextPageWithAuthAndLayout = () => {
               <h1 className="text-3xl font-bold tracking-tight">
                 {postQuery.data.title}
               </h1>
-              {postBelongsToUser && (
+              {(postBelongsToUser || isUserAdmin) && (
                 <div className="flex gap-4">
-                  <IconButton
-                    variant="secondary"
-                    onClick={() => {
-                      router.push(`/post/${postQuery.data.id}/edit`)
-                    }}
-                  >
-                    <EditIcon className="w-4 h-4" />
-                  </IconButton>
-                  <IconButton
-                    variant="secondary"
-                    onClick={() => {
-                      setIsConfirmDeleteDialogOpen(true)
-                    }}
-                  >
-                    <TrashIcon className="w-4 h-4 text-red" />
-                  </IconButton>
+                  {isUserAdmin &&
+                    (postQuery.data.hidden ? (
+                      <IconButton
+                        variant="secondary"
+                        title="Unhide"
+                        onClick={() => {
+                          setIsConfirmUnhideDialogOpen(true)
+                        }}
+                      >
+                        <EyeIcon className="w-4 h-4" />
+                      </IconButton>
+                    ) : (
+                      <IconButton
+                        variant="secondary"
+                        title="Hide"
+                        onClick={() => {
+                          setIsConfirmHideDialogOpen(true)
+                        }}
+                      >
+                        <EyeClosedIcon className="w-4 h-4" />
+                      </IconButton>
+                    ))}
+                  {postBelongsToUser && (
+                    <>
+                      <IconButton
+                        variant="secondary"
+                        title="Edit"
+                        onClick={() => {
+                          router.push(`/post/${postQuery.data.id}/edit`)
+                        }}
+                      >
+                        <EditIcon className="w-4 h-4" />
+                      </IconButton>
+                      <IconButton
+                        variant="secondary"
+                        title="Delete"
+                        onClick={() => {
+                          setIsConfirmDeleteDialogOpen(true)
+                        }}
+                      >
+                        <TrashIcon className="w-4 h-4 text-red" />
+                      </IconButton>
+                    </>
+                  )}
                 </div>
               )}
             </div>
-            <div className="mt-6 ">
+            <div className="mt-6">
               <AuthorWithDate
                 author={postQuery.data.author}
                 date={postQuery.data.createdAt}
@@ -191,6 +231,22 @@ const PostPage: NextPageWithAuthAndLayout = () => {
           isOpen={isConfirmDeleteDialogOpen}
           onClose={() => {
             setIsConfirmDeleteDialogOpen(false)
+          }}
+        />
+
+        <ConfirmHideDialog
+          postId={postQuery.data.id}
+          isOpen={isConfirmHideDialogOpen}
+          onClose={() => {
+            setIsConfirmHideDialogOpen(false)
+          }}
+        />
+
+        <ConfirmUnhideDialog
+          postId={postQuery.data.id}
+          isOpen={isConfirmUnhideDialogOpen}
+          onClose={() => {
+            setIsConfirmUnhideDialogOpen(false)
           }}
         />
       </>
@@ -324,6 +380,106 @@ function ConfirmDeleteDialog({
           }}
         >
           Delete post
+        </Button>
+        <Button variant="secondary" onClick={onClose} ref={cancelRef}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+function ConfirmHideDialog({
+  postId,
+  isOpen,
+  onClose,
+}: {
+  postId: string
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const utils = trpc.useContext()
+  const hidePostMutation = trpc.useMutation('post.hide', {
+    onSuccess: () => {
+      return utils.invalidateQueries(['post.detail', { id: postId }])
+    },
+  })
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose} initialFocus={cancelRef}>
+      <DialogContent>
+        <DialogTitle>Hide post</DialogTitle>
+        <DialogDescription className="mt-6">
+          Are you sure you want to hide this post?
+        </DialogDescription>
+        <DialogCloseButton onClick={onClose} />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="secondary"
+          isLoading={hidePostMutation.isLoading}
+          loadingChildren="Hiding post"
+          onClick={() => {
+            hidePostMutation.mutate(postId, {
+              onSuccess: () => {
+                toast.success('Post hidden')
+                onClose()
+              },
+            })
+          }}
+        >
+          Hide post
+        </Button>
+        <Button variant="secondary" onClick={onClose} ref={cancelRef}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+function ConfirmUnhideDialog({
+  postId,
+  isOpen,
+  onClose,
+}: {
+  postId: string
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const utils = trpc.useContext()
+  const unhidePostMutation = trpc.useMutation('post.unhide', {
+    onSuccess: () => {
+      return utils.invalidateQueries(['post.detail', { id: postId }])
+    },
+  })
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose} initialFocus={cancelRef}>
+      <DialogContent>
+        <DialogTitle>Unhide post</DialogTitle>
+        <DialogDescription className="mt-6">
+          Are you sure you want to unhide this post?
+        </DialogDescription>
+        <DialogCloseButton onClick={onClose} />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="secondary"
+          isLoading={unhidePostMutation.isLoading}
+          loadingChildren="Unhiding post"
+          onClick={() => {
+            unhidePostMutation.mutate(postId, {
+              onSuccess: () => {
+                toast.success('Post unhidden')
+                onClose()
+              },
+            })
+          }}
+        >
+          Unhide post
         </Button>
         <Button variant="secondary" onClick={onClose} ref={cancelRef}>
           Cancel

@@ -31,6 +31,7 @@ export const userRouter = createProtectedRouter()
               title: true,
               contentHtml: true,
               createdAt: true,
+              hidden: true,
               author: {
                 select: {
                   id: true,

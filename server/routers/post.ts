@@ -30,6 +30,7 @@ export const postRouter = createProtectedRouter()
           title: true,
           contentHtml: true,
           createdAt: true,
+          hidden: true,
           author: {
             select: {
               id: true,
@@ -230,6 +231,44 @@ export const postRouter = createProtectedRouter()
               id: ctx.session.user.id,
             },
           },
+        },
+        select: {
+          id: true,
+        },
+      })
+      return post
+    },
+  })
+  .mutation('hide', {
+    input: z.string(),
+    async resolve({ input: id, ctx }) {
+      if (!ctx.isUserAdmin) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
+      const post = await ctx.prisma.post.update({
+        where: { id },
+        data: {
+          hidden: true,
+        },
+        select: {
+          id: true,
+        },
+      })
+      return post
+    },
+  })
+  .mutation('unhide', {
+    input: z.string(),
+    async resolve({ input: id, ctx }) {
+      if (!ctx.isUserAdmin) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
+      const post = await ctx.prisma.post.update({
+        where: { id },
+        data: {
+          hidden: false,
         },
         select: {
           id: true,

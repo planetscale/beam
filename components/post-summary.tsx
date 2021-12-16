@@ -1,4 +1,5 @@
 import { AuthorWithDate } from '@/components/author-with-date'
+import { Banner } from '@/components/banner'
 import { ButtonLink } from '@/components/button-link'
 import { ChevronRightIcon, MessageIcon } from '@/components/icons'
 import { LikeButton } from '@/components/like-button'
@@ -48,58 +49,68 @@ export function PostSummary({
 
   return (
     <div>
-      <Link href={`/post/${post.id}`}>
-        <a>
-          <h2 className="text-2xl font-bold tracking-tight">{post.title}</h2>
-        </a>
-      </Link>
-
-      <div
-        className={classNames(
-          'flex items-center justify-between gap-4',
-          hideAuthor ? 'mt-2' : 'mt-6'
-        )}
-      >
-        {hideAuthor ? (
-          <p className="tracking-tight text-secondary">
-            <time dateTime={post.createdAt.toISOString()}>
-              {formatDistanceToNow(post.createdAt)}
-            </time>{' '}
-            ago
-          </p>
-        ) : (
-          <AuthorWithDate author={post.author} date={post.createdAt} />
-        )}
-
-        <div className="flex gap-4">
-          <LikeButton
-            isLiked={isLiked}
-            likeCount={post._count.likedBy}
-            onLike={onLike}
-            onUnlike={onUnlike}
-          />
-
-          <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
-            <MessageIcon className="w-4 h-4 text-secondary" />
-            <span className="ml-1.5">{post._count.comments}</span>
-          </ButtonLink>
-        </div>
-      </div>
-
-      <div
-        className={classNames('prose max-w-none', hideAuthor ? 'mt-4' : 'mt-6')}
-        dangerouslySetInnerHTML={{ __html: summary }}
-      />
-
-      {hasMoreContent && (
-        <div className="mt-4">
-          <Link href={`/post/${post.id}`}>
-            <a className="inline-flex items-center font-medium transition-colors text-blue hover:text-blue-dark">
-              Continue reading <ChevronRightIcon className="w-4 h-4 ml-1" />
-            </a>
-          </Link>
-        </div>
+      {post.hidden && (
+        <Banner className="mb-6">
+          This post has been hidden and is only visible to administrators.
+        </Banner>
       )}
+      <div className={classNames(post.hidden ? 'opacity-50' : '')}>
+        <Link href={`/post/${post.id}`}>
+          <a>
+            <h2 className="text-2xl font-bold tracking-tight">{post.title}</h2>
+          </a>
+        </Link>
+
+        <div
+          className={classNames(
+            'flex items-center justify-between gap-4',
+            hideAuthor ? 'mt-2' : 'mt-6'
+          )}
+        >
+          {hideAuthor ? (
+            <p className="tracking-tight text-secondary">
+              <time dateTime={post.createdAt.toISOString()}>
+                {formatDistanceToNow(post.createdAt)}
+              </time>{' '}
+              ago
+            </p>
+          ) : (
+            <AuthorWithDate author={post.author} date={post.createdAt} />
+          )}
+
+          <div className="flex gap-4">
+            <LikeButton
+              isLiked={isLiked}
+              likeCount={post._count.likedBy}
+              onLike={onLike}
+              onUnlike={onUnlike}
+            />
+
+            <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
+              <MessageIcon className="w-4 h-4 text-secondary" />
+              <span className="ml-1.5">{post._count.comments}</span>
+            </ButtonLink>
+          </div>
+        </div>
+
+        <div
+          className={classNames(
+            'prose max-w-none',
+            hideAuthor ? 'mt-4' : 'mt-6'
+          )}
+          dangerouslySetInnerHTML={{ __html: summary }}
+        />
+
+        {hasMoreContent && (
+          <div className="mt-4">
+            <Link href={`/post/${post.id}`}>
+              <a className="inline-flex items-center font-medium transition-colors text-blue hover:text-blue-dark">
+                Continue reading <ChevronRightIcon className="w-4 h-4 ml-1" />
+              </a>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
