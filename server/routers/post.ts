@@ -133,6 +133,33 @@ export const postRouter = createProtectedRouter()
       return post
     },
   })
+  .query('search', {
+    input: z.object({
+      query: z.string().min(1),
+    }),
+    async resolve({ input, ctx }) {
+      const posts = await ctx.prisma.post.findMany({
+        take: 10,
+        where: {
+          hidden: false,
+          OR: [
+            {
+              title: { contains: input.query },
+            },
+            {
+              content: { contains: input.query },
+            },
+          ],
+        },
+        select: {
+          id: true,
+          title: true,
+        },
+      })
+
+      return posts
+    },
+  })
   .mutation('add', {
     input: z.object({
       title: z.string().min(1),
