@@ -22,7 +22,7 @@ import {
 import { Layout } from '@/components/layout'
 import { LikeButton } from '@/components/like-button'
 import { Textarea } from '@/components/textarea'
-import { trpc } from '@/lib/trpc'
+import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -31,20 +31,33 @@ import * as React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
+function getPostQueryPathAndInput(
+  id: string
+): InferQueryPathAndInput<'post.detail'> {
+  return [
+    'post.detail',
+    {
+      id,
+    },
+  ]
+}
+
 const PostPage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
   const utils = trpc.useContext()
-  const postQueryInput = { id: String(router.query.id) }
-  const postQuery = trpc.useQuery(['post.detail', postQueryInput])
+  const postQueryPathAndInput = getPostQueryPathAndInput(
+    String(router.query.id)
+  )
+  const postQuery = trpc.useQuery(postQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.cancelQuery(['post.detail', postQueryInput])
+      await utils.cancelQuery(postQueryPathAndInput)
 
-      const previousPost = utils.getQueryData(['post.detail', postQueryInput])
+      const previousPost = utils.getQueryData(postQueryPathAndInput)
 
       if (previousPost) {
-        utils.setQueryData(['post.detail', postQueryInput], {
+        utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
           likedBy: [{ id: session!.user.id }],
           _count: {
@@ -58,21 +71,18 @@ const PostPage: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousPost) {
-        utils.setQueryData(
-          ['post.detail', postQueryInput],
-          context.previousPost
-        )
+        utils.setQueryData(postQueryPathAndInput, context.previousPost)
       }
     },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.cancelQuery(['post.detail', postQueryInput])
+      await utils.cancelQuery(postQueryPathAndInput)
 
-      const previousPost = utils.getQueryData(['post.detail', postQueryInput])
+      const previousPost = utils.getQueryData(postQueryPathAndInput)
 
       if (previousPost) {
-        utils.setQueryData(['post.detail', postQueryInput], {
+        utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
           likedBy: [],
           _count: {
@@ -86,10 +96,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousPost) {
-        utils.setQueryData(
-          ['post.detail', postQueryInput],
-          context.previousPost
-        )
+        utils.setQueryData(postQueryPathAndInput, context.previousPost)
       }
     },
   })
@@ -305,7 +312,7 @@ function CommentForm({ postId }: { postId: string }) {
   const utils = trpc.useContext()
   const addCommentMutation = trpc.useMutation('comment.add', {
     onSuccess: () => {
-      return utils.invalidateQueries(['post.detail', { id: postId }])
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
   })
   const { register, handleSubmit, reset } = useForm<CommentFormData>()
@@ -402,7 +409,7 @@ function ConfirmHideDialog({
   const utils = trpc.useContext()
   const hidePostMutation = trpc.useMutation('post.hide', {
     onSuccess: () => {
-      return utils.invalidateQueries(['post.detail', { id: postId }])
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
   })
 
@@ -452,7 +459,7 @@ function ConfirmUnhideDialog({
   const utils = trpc.useContext()
   const unhidePostMutation = trpc.useMutation('post.unhide', {
     onSuccess: () => {
-      return utils.invalidateQueries(['post.detail', { id: postId }])
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
   })
 

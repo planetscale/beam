@@ -9,8 +9,10 @@ import { useRouter } from 'next/router'
 const EditPostPage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
-  const postQueryInput = { id: String(router.query.id) }
-  const postQuery = trpc.useQuery(['post.detail', postQueryInput])
+  const postQuery = trpc.useQuery([
+    'post.detail',
+    { id: String(router.query.id) },
+  ])
   const editPostMutation = trpc.useMutation('post.edit')
 
   if (postQuery.data) {

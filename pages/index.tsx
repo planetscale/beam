@@ -2,7 +2,7 @@ import { ButtonLink } from '@/components/button-link'
 import { Layout } from '@/components/layout'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
-import { trpc } from '@/lib/trpc'
+import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
@@ -22,19 +22,22 @@ const Home: NextPageWithAuthAndLayout = () => {
   const router = useRouter()
   const page = router.query.page ? Number(router.query.page) : 1
   const utils = trpc.useContext()
-  const feedQueryInput = {
-    take: POSTS_PER_PAGE,
-    skip: page === 1 ? undefined : POSTS_PER_PAGE * (page - 1),
-  }
-  const feedQuery = trpc.useQuery(['post.feed', feedQueryInput])
+  const feedQueryPathAndInput: InferQueryPathAndInput<'post.feed'> = [
+    'post.feed',
+    {
+      take: POSTS_PER_PAGE,
+      skip: page === 1 ? undefined : POSTS_PER_PAGE * (page - 1),
+    },
+  ]
+  const feedQuery = trpc.useQuery(feedQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.cancelQuery(['post.feed', feedQueryInput])
+      await utils.cancelQuery(feedQueryPathAndInput)
 
-      const previousQuery = utils.getQueryData(['post.feed', feedQueryInput])
+      const previousQuery = utils.getQueryData(feedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.setQueryData(['post.feed', feedQueryInput], {
+        utils.setQueryData(feedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === likedPostId
@@ -55,18 +58,18 @@ const Home: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
+        utils.setQueryData(feedQueryPathAndInput, context.previousQuery)
       }
     },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.cancelQuery(['post.feed', feedQueryInput])
+      await utils.cancelQuery(feedQueryPathAndInput)
 
-      const previousQuery = utils.getQueryData(['post.feed', feedQueryInput])
+      const previousQuery = utils.getQueryData(feedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.setQueryData(['post.feed', feedQueryInput], {
+        utils.setQueryData(feedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === unlikedPostId
@@ -87,7 +90,7 @@ const Home: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.setQueryData(['post.feed', feedQueryInput], context.previousQuery)
+        utils.setQueryData(feedQueryPathAndInput, context.previousQuery)
       }
     },
   })

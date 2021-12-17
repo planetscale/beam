@@ -13,7 +13,7 @@ import { Layout } from '@/components/layout'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { TextField } from '@/components/text-field'
-import { trpc } from '@/lib/trpc'
+import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
@@ -27,23 +27,32 @@ const PostSummary = dynamic<PostSummaryProps>(
   { ssr: false }
 )
 
+// This is a hack until next-auth has proper way of reloading the session
+// https://github.com/nextauthjs/next-auth/issues/596#issuecomment-943453568
+export function reloadSession() {
+  const event = new Event('visibilitychange')
+  document.dispatchEvent(event)
+}
+
 const ProfilePage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
   const utils = trpc.useContext()
-  const profileQueryInput = { id: String(router.query.userId) }
-  const profileQuery = trpc.useQuery(['user.profile', profileQueryInput])
+  const profileQueryPathAndInput: InferQueryPathAndInput<'user.profile'> = [
+    'user.profile',
+    {
+      id: String(router.query.userId),
+    },
+  ]
+  const profileQuery = trpc.useQuery(profileQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.cancelQuery(['user.profile', profileQueryInput])
+      await utils.cancelQuery(profileQueryPathAndInput)
 
-      const previousQuery = utils.getQueryData([
-        'user.profile',
-        profileQueryInput,
-      ])
+      const previousQuery = utils.getQueryData(profileQueryPathAndInput)
 
       if (previousQuery) {
-        utils.setQueryData(['user.profile', profileQueryInput], {
+        utils.setQueryData(profileQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === likedPostId
@@ -64,24 +73,18 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.setQueryData(
-          ['user.profile', profileQueryInput],
-          context.previousQuery
-        )
+        utils.setQueryData(profileQueryPathAndInput, context.previousQuery)
       }
     },
   })
   const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.cancelQuery(['user.profile', profileQueryInput])
+      await utils.cancelQuery(profileQueryPathAndInput)
 
-      const previousQuery = utils.getQueryData([
-        'user.profile',
-        profileQueryInput,
-      ])
+      const previousQuery = utils.getQueryData(profileQueryPathAndInput)
 
       if (previousQuery) {
-        utils.setQueryData(['user.profile', profileQueryInput], {
+        utils.setQueryData(profileQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === unlikedPostId
@@ -102,14 +105,13 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
     },
     onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.setQueryData(
-          ['user.profile', profileQueryInput],
-          context.previousQuery
-        )
+        utils.setQueryData(profileQueryPathAndInput, context.previousQuery)
       }
     },
   })
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] =
+    React.useState(false)
+  const [isUpdateAvatarDialogOpen, setIsUpdateAvatarDialogOpen] =
     React.useState(false)
 
   if (profileQuery.data) {
@@ -123,11 +125,32 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
 
         <div className="relative flex items-center gap-4 py-8 overflow-hidden">
           <div className="flex items-center gap-8">
-            <Avatar
-              name={profileQuery.data.name!}
-              src={profileQuery.data.image}
-              size="lg"
-            />
+            {profileBelongsToUser ? (
+              <button
+                type="button"
+                className="relative group"
+                onClick={() => {
+                  setIsUpdateAvatarDialogOpen(true)
+                }}
+              >
+                <Avatar
+                  name={profileQuery.data.name!}
+                  src={profileQuery.data.image}
+                  size="lg"
+                />
+                <div className="absolute inset-0 transition-opacity bg-gray-900 rounded-full opacity-0 group-hover:opacity-50" />
+                <div className="absolute inline-flex items-center justify-center transition-opacity -translate-x-1/2 -translate-y-1/2 bg-gray-900 border border-white rounded-full opacity-0 top-1/2 left-1/2 h-9 w-9 group-hover:opacity-100">
+                  <EditIcon className="w-4 h-4 text-white" />
+                </div>
+              </button>
+            ) : (
+              <Avatar
+                name={profileQuery.data.name!}
+                src={profileQuery.data.image}
+                size="lg"
+              />
+            )}
+
             <div className="flex-1">
               <h1 className="text-3xl font-bold tracking-tight">
                 {profileQuery.data.name}
@@ -183,11 +206,21 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
           user={{
             name: profileQuery.data.name!,
             title: profileQuery.data.title,
-            image: profileQuery.data.image,
           }}
           isOpen={isEditProfileDialogOpen}
           onClose={() => {
             setIsEditProfileDialogOpen(false)
+          }}
+        />
+
+        <UpdateAvatarDialog
+          user={{
+            name: profileQuery.data.name!,
+            image: profileQuery.data.image,
+          }}
+          isOpen={isUpdateAvatarDialogOpen}
+          onClose={() => {
+            setIsUpdateAvatarDialogOpen(false)
           }}
         />
       </>
@@ -274,12 +307,11 @@ function EditProfileDialog({
   user: {
     name: string
     title: string | null
-    image: string | null
   }
   isOpen: boolean
   onClose: () => void
 }) {
-  const { register, handleSubmit } = useForm<EditFormData>({
+  const { register, handleSubmit, reset } = useForm<EditFormData>({
     defaultValues: {
       name: user.name,
       title: user.title,
@@ -289,12 +321,18 @@ function EditProfileDialog({
   const utils = trpc.useContext()
   const editUserMutation = trpc.useMutation('user.edit', {
     onSuccess: () => {
+      reloadSession()
       return utils.invalidateQueries([
         'user.profile',
         { id: String(router.query.userId) },
       ])
     },
   })
+
+  function handleClose() {
+    onClose()
+    reset()
+  }
 
   const onSubmit: SubmitHandler<EditFormData> = (data) => {
     editUserMutation.mutate(
@@ -309,34 +347,11 @@ function EditProfileDialog({
   }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={handleClose}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent>
           <DialogTitle>Edit profile</DialogTitle>
           <div className="mt-6 space-y-6">
-            <div>
-              <label className="block mb-2 font-semibold">Avatar</label>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <label htmlFor="user-photo" className="block cursor-pointer">
-                    <span className="block font-medium transition-colors text-blue hover:text-blue-dark">
-                      Choose file to upload
-                    </span>
-                    <span className="block text-xs text-secondary">
-                      JPEG, PNG, GIF. Max size: 5MB
-                    </span>
-                  </label>
-                  <input
-                    id="user-photo"
-                    name="user-photo"
-                    type="file"
-                    className="hidden"
-                  />
-                </div>
-                <Avatar name={user.name} src={user.image} />
-              </div>
-            </div>
-
             <TextField
               {...register('name', { required: true })}
               label="Name"
@@ -345,7 +360,7 @@ function EditProfileDialog({
 
             <TextField {...register('title')} label="Title" />
           </div>
-          <DialogCloseButton onClick={onClose} />
+          <DialogCloseButton onClick={handleClose} />
         </DialogContent>
         <DialogActions>
           <Button
@@ -355,11 +370,99 @@ function EditProfileDialog({
           >
             Save
           </Button>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
         </DialogActions>
       </form>
+    </Dialog>
+  )
+}
+
+function UpdateAvatarDialog({
+  user,
+  isOpen,
+  onClose,
+}: {
+  user: {
+    name: string
+    image: string | null
+  }
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const [uploadedImage, setUploadedImage] = React.useState(user.image)
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose}>
+      <DialogContent>
+        <DialogTitle>Update avatar</DialogTitle>
+        <DialogCloseButton onClick={onClose} />
+        <div className="flex justify-center mt-8">
+          <Avatar name={user.name} src={uploadedImage} size="lg" />
+        </div>
+        <div className="grid grid-flow-col gap-6 mt-6">
+          <div className="text-center">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                fileInputRef.current?.click()
+              }}
+            >
+              Choose file…
+            </Button>
+            <input
+              ref={fileInputRef}
+              name="user-image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => {
+                const curFiles = event.target.files
+
+                if (curFiles && curFiles.length > 0) {
+                  setUploadedImage(URL.createObjectURL(curFiles[0]))
+                }
+              }}
+            />
+            <p className="mt-2 text-xs text-secondary">
+              JPEG, PNG, GIF / 5MB max
+            </p>
+          </div>
+          {uploadedImage && (
+            <div className="text-center">
+              <Button
+                variant="secondary"
+                className="!text-red"
+                onClick={() => {
+                  fileInputRef.current!.value = ''
+                  URL.revokeObjectURL(uploadedImage)
+                  setUploadedImage(null)
+                }}
+              >
+                Remove photo
+              </Button>
+              <p className="mt-2 text-xs text-secondary">
+                And use default avatar
+              </p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          loadingChildren="Saving changes"
+          onClick={() => {
+            console.log(fileInputRef.current?.files)
+          }}
+        >
+          Save changes
+        </Button>
+        <Button variant="secondary" onClick={onClose}>
+          Cancel
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
