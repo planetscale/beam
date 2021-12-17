@@ -85,3 +85,18 @@ export const userRouter = createProtectedRouter()
       return user
     },
   })
+  .mutation('update-avatar', {
+    input: z.object({
+      image: z.string().nullish(),
+    }),
+    async resolve({ ctx, input }) {
+      const user = await ctx.prisma.user.update({
+        where: { id: ctx.session.user.id },
+        data: {
+          image: input.image,
+        },
+      })
+
+      return user
+    },
+  })

@@ -13,6 +13,7 @@ import { Layout } from '@/components/layout'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { TextField } from '@/components/text-field'
+import { uploadImage } from '@/lib/cloudinary'
 import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
@@ -21,6 +22,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { useMutation } from 'react-query'
 
 const PostSummary = dynamic<PostSummaryProps>(
   () => import('@/components/post-summary').then((mod) => mod.PostSummary),
@@ -34,16 +37,24 @@ export function reloadSession() {
   document.dispatchEvent(event)
 }
 
+function getProfileQueryPathAndInput(
+  id: string
+): InferQueryPathAndInput<'user.profile'> {
+  return [
+    'user.profile',
+    {
+      id,
+    },
+  ]
+}
+
 const ProfilePage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
   const utils = trpc.useContext()
-  const profileQueryPathAndInput: InferQueryPathAndInput<'user.profile'> = [
-    'user.profile',
-    {
-      id: String(router.query.userId),
-    },
-  ]
+  const profileQueryPathAndInput = getProfileQueryPathAndInput(
+    String(router.query.userId)
+  )
   const profileQuery = trpc.useQuery(profileQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
@@ -128,7 +139,7 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
             {profileBelongsToUser ? (
               <button
                 type="button"
-                className="relative group"
+                className="relative inline-flex group"
                 onClick={() => {
                   setIsUpdateAvatarDialogOpen(true)
                 }}
@@ -214,6 +225,7 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
         />
 
         <UpdateAvatarDialog
+          key={profileQuery.data.image}
           user={{
             name: profileQuery.data.name!,
             image: profileQuery.data.image,
@@ -322,10 +334,9 @@ function EditProfileDialog({
   const editUserMutation = trpc.useMutation('user.edit', {
     onSuccess: () => {
       reloadSession()
-      return utils.invalidateQueries([
-        'user.profile',
-        { id: String(router.query.userId) },
-      ])
+      return utils.invalidateQueries(
+        getProfileQueryPathAndInput(String(router.query.userId))
+      )
     },
   })
 
@@ -393,12 +404,30 @@ function UpdateAvatarDialog({
 }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [uploadedImage, setUploadedImage] = React.useState(user.image)
+  const router = useRouter()
+  const utils = trpc.useContext()
+  const updateUserAvatarMutation = trpc.useMutation('user.update-avatar', {
+    onSuccess: () => {
+      reloadSession()
+      return utils.invalidateQueries(
+        getProfileQueryPathAndInput(String(router.query.userId))
+      )
+    },
+  })
+  const uploadImageMutation = useMutation((file: File) => {
+    return uploadImage(file)
+  })
+
+  function handleClose() {
+    onClose()
+    setUploadedImage(user.image)
+  }
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose}>
+    <Dialog isOpen={isOpen} onClose={handleClose}>
       <DialogContent>
         <DialogTitle>Update avatar</DialogTitle>
-        <DialogCloseButton onClick={onClose} />
+        <DialogCloseButton onClick={handleClose} />
         <div className="flex justify-center mt-8">
           <Avatar name={user.name} src={uploadedImage} size="lg" />
         </div>
@@ -416,13 +445,18 @@ function UpdateAvatarDialog({
               ref={fileInputRef}
               name="user-image"
               type="file"
-              accept="image/*"
+              accept=".jpg, .jpeg, .png, .gif"
               className="hidden"
               onChange={(event) => {
-                const curFiles = event.target.files
+                const files = event.target.files
 
-                if (curFiles && curFiles.length > 0) {
-                  setUploadedImage(URL.createObjectURL(curFiles[0]))
+                if (files && files.length > 0) {
+                  const file = files[0]
+                  if (file.size > 5242880) {
+                    toast.error('Image is bigger than 5MB')
+                    return
+                  }
+                  setUploadedImage(URL.createObjectURL(files[0]))
                 }
               }}
             />
@@ -452,14 +486,43 @@ function UpdateAvatarDialog({
       </DialogContent>
       <DialogActions>
         <Button
+          isLoading={
+            updateUserAvatarMutation.isLoading || uploadImageMutation.isLoading
+          }
           loadingChildren="Saving changes"
-          onClick={() => {
-            console.log(fileInputRef.current?.files)
+          onClick={async () => {
+            if (user.image === uploadedImage) {
+              handleClose()
+            } else {
+              let image = null
+
+              const files = fileInputRef.current?.files
+              if (files && files.length > 0) {
+                try {
+                  const uploadedImage = await uploadImageMutation.mutateAsync(
+                    files[0]
+                  )
+                  image = uploadedImage.url
+                } catch (error: any) {
+                  console.log(error)
+                  toast.error(`Error uploading image: ${error.message}`)
+                }
+              }
+
+              updateUserAvatarMutation.mutate(
+                {
+                  image,
+                },
+                {
+                  onSuccess: () => handleClose(),
+                }
+              )
+            }
           }}
         >
           Save changes
         </Button>
-        <Button variant="secondary" onClick={onClose}>
+        <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
       </DialogActions>
