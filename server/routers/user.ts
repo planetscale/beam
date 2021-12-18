@@ -16,45 +16,6 @@ export const userRouter = createProtectedRouter()
           name: true,
           image: true,
           title: true,
-          posts: {
-            orderBy: {
-              createdAt: 'desc',
-            },
-            where: {
-              hidden:
-                ctx.isUserAdmin || ctx.session.user.id === id
-                  ? undefined
-                  : false,
-            },
-            select: {
-              id: true,
-              title: true,
-              contentHtml: true,
-              createdAt: true,
-              hidden: true,
-              author: {
-                select: {
-                  id: true,
-                  name: true,
-                  image: true,
-                },
-              },
-              likedBy: {
-                where: {
-                  id: ctx.session.user.id,
-                },
-                select: {
-                  id: true,
-                },
-              },
-              _count: {
-                select: {
-                  comments: true,
-                  likedBy: true,
-                },
-              },
-            },
-          },
         },
       })
 

@@ -7,15 +7,17 @@ export const postRouter = createProtectedRouter()
   .query('feed', {
     input: z
       .object({
-        take: z.number().min(1).max(100).optional(),
+        take: z.number().min(1).max(50).optional(),
         skip: z.number().min(1).optional(),
+        authorId: z.string().optional(),
       })
       .optional(),
     async resolve({ input, ctx }) {
-      const take = input?.take ?? 100
+      const take = input?.take ?? 50
       const skip = input?.skip
       const where = {
         hidden: ctx.isUserAdmin ? undefined : false,
+        authorId: input?.authorId,
       }
 
       const posts = await ctx.prisma.post.findMany({

@@ -10,6 +10,7 @@ import {
 import { IconButton } from '@/components/icon-button'
 import { EditIcon } from '@/components/icons'
 import { Layout } from '@/components/layout'
+import { getQueryPaginationInput, Pagination } from '@/components/pagination'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { TextField } from '@/components/text-field'
@@ -30,6 +31,8 @@ const PostSummary = dynamic<PostSummaryProps>(
   { ssr: false }
 )
 
+const POSTS_PER_PAGE = 20
+
 // This is a hack until next-auth has proper way of reloading the session
 // https://github.com/nextauthjs/next-auth/issues/596#issuecomment-943453568
 export function reloadSession() {
@@ -49,77 +52,28 @@ function getProfileQueryPathAndInput(
 }
 
 const ProfilePage: NextPageWithAuthAndLayout = () => {
+  return (
+    <>
+      <ProfileInfo />
+      <ProfileFeed />
+    </>
+  )
+}
+
+ProfilePage.auth = true
+
+ProfilePage.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>
+}
+
+function ProfileInfo() {
   const { data: session } = useSession()
   const router = useRouter()
-  const utils = trpc.useContext()
   const profileQueryPathAndInput = getProfileQueryPathAndInput(
     String(router.query.userId)
   )
   const profileQuery = trpc.useQuery(profileQueryPathAndInput)
-  const likeMutation = trpc.useMutation(['post.like'], {
-    onMutate: async (likedPostId) => {
-      await utils.cancelQuery(profileQueryPathAndInput)
 
-      const previousQuery = utils.getQueryData(profileQueryPathAndInput)
-
-      if (previousQuery) {
-        utils.setQueryData(profileQueryPathAndInput, {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === likedPostId
-              ? {
-                  ...post,
-                  likedBy: [{ id: session!.user.id }],
-                  _count: {
-                    ...post._count,
-                    likedBy: post._count.likedBy + 1,
-                  },
-                }
-              : post
-          ),
-        })
-      }
-
-      return { previousQuery }
-    },
-    onError: (err, id, context: any) => {
-      if (context?.previousQuery) {
-        utils.setQueryData(profileQueryPathAndInput, context.previousQuery)
-      }
-    },
-  })
-  const unlikeMutation = trpc.useMutation(['post.unlike'], {
-    onMutate: async (unlikedPostId) => {
-      await utils.cancelQuery(profileQueryPathAndInput)
-
-      const previousQuery = utils.getQueryData(profileQueryPathAndInput)
-
-      if (previousQuery) {
-        utils.setQueryData(profileQueryPathAndInput, {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === unlikedPostId
-              ? {
-                  ...post,
-                  likedBy: [],
-                  _count: {
-                    ...post._count,
-                    likedBy: post._count.likedBy - 1,
-                  },
-                }
-              : post
-          ),
-        })
-      }
-
-      return { previousQuery }
-    },
-    onError: (err, id, context: any) => {
-      if (context?.previousQuery) {
-        utils.setQueryData(profileQueryPathAndInput, context.previousQuery)
-      }
-    },
-  })
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] =
     React.useState(false)
   const [isUpdateAvatarDialogOpen, setIsUpdateAvatarDialogOpen] =
@@ -190,29 +144,6 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
           <DotPattern />
         </div>
 
-        <div className="flow-root mt-28">
-          {profileQuery.data.posts.length === 0 ? (
-            <div className="text-lg text-center">No posts</div>
-          ) : (
-            <ul className="-my-12 divide-y divide-primary">
-              {profileQuery.data.posts.map((post) => (
-                <li key={post.id} className="py-12">
-                  <PostSummary
-                    post={post}
-                    hideAuthor
-                    onLike={() => {
-                      likeMutation.mutate(post.id)
-                    }}
-                    onUnlike={() => {
-                      unlikeMutation.mutate(post.id)
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
         <EditProfileDialog
           user={{
             name: profileQuery.data.name!,
@@ -244,33 +175,145 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
   }
 
   return (
-    <>
-      <div className="relative flex items-center gap-8 py-8 overflow-hidden animate-pulse">
-        <div className="w-32 h-32 bg-gray-200 rounded-full dark:bg-gray-700" />
-        <div className="flex-1">
-          <div className="h-8 bg-gray-200 rounded w-60 dark:bg-gray-700" />
-          <div className="w-40 h-5 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
-        </div>
-        <DotPattern />
+    <div className="relative flex items-center gap-8 py-8 overflow-hidden animate-pulse">
+      <div className="w-32 h-32 bg-gray-200 rounded-full dark:bg-gray-700" />
+      <div className="flex-1">
+        <div className="h-8 bg-gray-200 rounded w-60 dark:bg-gray-700" />
+        <div className="w-40 h-5 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
       </div>
-
-      <div className="flow-root mt-28">
-        <ul className="-my-12 divide-y divide-primary">
-          {[...Array(2)].map((_, idx) => (
-            <li key={idx} className="py-12">
-              <PostSummarySkeleton />
-            </li>
-          ))}
-        </ul>
-      </div>
-    </>
+      <DotPattern />
+    </div>
   )
 }
 
-ProfilePage.auth = true
+function ProfileFeed() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const currentPageNumber = router.query.page ? Number(router.query.page) : 1
+  const utils = trpc.useContext()
+  const profileFeedQueryPathAndInput: InferQueryPathAndInput<'post.feed'> = [
+    'post.feed',
+    {
+      ...getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
+      authorId: String(router.query.userId),
+    },
+  ]
+  const profileFeedQuery = trpc.useQuery(profileFeedQueryPathAndInput)
+  const likeMutation = trpc.useMutation(['post.like'], {
+    onMutate: async (likedPostId) => {
+      await utils.cancelQuery(profileFeedQueryPathAndInput)
 
-ProfilePage.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>
+      const previousQuery = utils.getQueryData(profileFeedQueryPathAndInput)
+
+      if (previousQuery) {
+        utils.setQueryData(profileFeedQueryPathAndInput, {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === likedPostId
+              ? {
+                  ...post,
+                  likedBy: [{ id: session!.user.id }],
+                  _count: {
+                    ...post._count,
+                    likedBy: post._count.likedBy + 1,
+                  },
+                }
+              : post
+          ),
+        })
+      }
+
+      return { previousQuery }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(profileFeedQueryPathAndInput, context.previousQuery)
+      }
+    },
+  })
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
+    onMutate: async (unlikedPostId) => {
+      await utils.cancelQuery(profileFeedQueryPathAndInput)
+
+      const previousQuery = utils.getQueryData(profileFeedQueryPathAndInput)
+
+      if (previousQuery) {
+        utils.setQueryData(profileFeedQueryPathAndInput, {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === unlikedPostId
+              ? {
+                  ...post,
+                  likedBy: [],
+                  _count: {
+                    ...post._count,
+                    likedBy: post._count.likedBy - 1,
+                  },
+                }
+              : post
+          ),
+        })
+      }
+
+      return { previousQuery }
+    },
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(profileFeedQueryPathAndInput, context.previousQuery)
+      }
+    },
+  })
+
+  if (profileFeedQuery.data) {
+    return (
+      <>
+        <div className="flow-root mt-28">
+          {profileFeedQuery.data.postCount === 0 ? (
+            <div className="text-lg text-center">No posts</div>
+          ) : (
+            <ul className="-my-12 divide-y divide-primary">
+              {profileFeedQuery.data.posts.map((post) => (
+                <li key={post.id} className="py-12">
+                  <PostSummary
+                    hideAuthor
+                    post={post}
+                    onLike={() => {
+                      likeMutation.mutate(post.id)
+                    }}
+                    onUnlike={() => {
+                      unlikeMutation.mutate(post.id)
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <Pagination
+          itemCount={profileFeedQuery.data.postCount}
+          itemsPerPage={POSTS_PER_PAGE}
+          currentPageNumber={currentPageNumber}
+        />
+      </>
+    )
+  }
+
+  if (profileFeedQuery.isError) {
+    return <div className="mt-28">Error: {profileFeedQuery.error.message}</div>
+  }
+
+  return (
+    <div className="flow-root mt-28">
+      <ul className="-my-12 divide-y divide-primary">
+        {[...Array(3)].map((_, idx) => (
+          <li key={idx} className="py-12">
+            <PostSummarySkeleton hideAuthor />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 function DotPattern() {

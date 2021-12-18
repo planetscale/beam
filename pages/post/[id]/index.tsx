@@ -446,7 +446,7 @@ function EditCommentForm({
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
   })
-  const { register, handleSubmit, reset } = useForm<CommentFormData>({
+  const { register, handleSubmit } = useForm<CommentFormData>({
     defaultValues: {
       content: comment.content,
     },

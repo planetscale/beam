@@ -1,13 +1,28 @@
-export function PostSummarySkeleton() {
+import { classNames } from '@/lib/classnames'
+
+type PostSummarySkeletonProps = {
+  hideAuthor?: boolean
+}
+
+export function PostSummarySkeleton({ hideAuthor }: PostSummarySkeletonProps) {
   return (
     <div className="animate-pulse">
       <div className="w-3/4 h-8 bg-gray-200 rounded dark:bg-gray-700" />
-      <div className="flex items-center justify-between gap-4 mt-6">
+      <div
+        className={classNames(
+          'flex items-center justify-between gap-4',
+          hideAuthor ? 'mt-2' : 'mt-6'
+        )}
+      >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700" />
+          {!hideAuthor && (
+            <div className="w-12 h-12 bg-gray-200 rounded-full dark:bg-gray-700" />
+          )}
           <div className="flex-1">
             <div className="w-24 h-4 bg-gray-200 rounded dark:bg-gray-700" />
-            <div className="w-32 h-3 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
+            {!hideAuthor && (
+              <div className="w-32 h-3 mt-2 bg-gray-200 rounded dark:bg-gray-700" />
+            )}
           </div>
         </div>
         <div className="flex gap-4">

@@ -1,5 +1,5 @@
-import { ButtonLink } from '@/components/button-link'
 import { Layout } from '@/components/layout'
+import { getQueryPaginationInput, Pagination } from '@/components/pagination'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
@@ -10,24 +10,21 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 
-const POSTS_PER_PAGE = 20
-
 const PostSummary = dynamic<PostSummaryProps>(
   () => import('@/components/post-summary').then((mod) => mod.PostSummary),
   { ssr: false }
 )
 
+const POSTS_PER_PAGE = 20
+
 const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
-  const page = router.query.page ? Number(router.query.page) : 1
+  const currentPageNumber = router.query.page ? Number(router.query.page) : 1
   const utils = trpc.useContext()
   const feedQueryPathAndInput: InferQueryPathAndInput<'post.feed'> = [
     'post.feed',
-    {
-      take: POSTS_PER_PAGE,
-      skip: page === 1 ? undefined : POSTS_PER_PAGE * (page - 1),
-    },
+    getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
   ]
   const feedQuery = trpc.useQuery(feedQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
@@ -96,8 +93,6 @@ const Home: NextPageWithAuthAndLayout = () => {
   })
 
   if (feedQuery.data) {
-    const totalPages = Math.ceil(feedQuery.data.postCount / POSTS_PER_PAGE)
-
     return (
       <>
         <Head>
@@ -126,26 +121,11 @@ const Home: NextPageWithAuthAndLayout = () => {
           </div>
         )}
 
-        {totalPages > 1 && (
-          <div className="flex justify-center gap-4 mt-12">
-            <ButtonLink
-              href={{ pathname: '/', query: { page: page - 1 } }}
-              variant="secondary"
-              className={page === 1 ? 'pointer-events-none opacity-50' : ''}
-            >
-              Previous
-            </ButtonLink>
-            <ButtonLink
-              href={{ pathname: '/', query: { page: page + 1 } }}
-              variant="secondary"
-              className={
-                page === totalPages ? 'pointer-events-none opacity-50' : ''
-              }
-            >
-              Next
-            </ButtonLink>
-          </div>
-        )}
+        <Pagination
+          itemCount={feedQuery.data.postCount}
+          itemsPerPage={POSTS_PER_PAGE}
+          currentPageNumber={currentPageNumber}
+        />
       </>
     )
   }
