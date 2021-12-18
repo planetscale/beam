@@ -14,12 +14,14 @@ type FormData = {
 type PostFormProps = {
   defaultValues?: FormData
   isSubmitting?: boolean
+  backTo: string
   onSubmit: SubmitHandler<FormData>
 }
 
 export function PostForm({
   defaultValues,
   isSubmitting,
+  backTo,
   onSubmit,
 }: PostFormProps) {
   const { control, register, handleSubmit } = useForm<FormData>({
@@ -61,7 +63,7 @@ export function PostForm({
           >
             {defaultValues ? 'Edit' : 'Publish'} post
           </Button>
-          <ButtonLink href="/" variant="secondary">
+          <ButtonLink href={backTo} variant="secondary">
             Cancel
           </ButtonLink>
         </div>

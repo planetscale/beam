@@ -20,6 +20,7 @@ const NewPostPage: NextPageWithAuthAndLayout = () => {
       <div className="mt-6">
         <PostForm
           isSubmitting={addPostMutation.isLoading}
+          backTo="/"
           onSubmit={(values) => {
             addPostMutation.mutate(
               { title: values.title, content: values.content },

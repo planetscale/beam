@@ -37,6 +37,7 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
                   title: postQuery.data.title,
                   content: postQuery.data.content,
                 }}
+                backTo={`/post/${postQuery.data.id}`}
                 onSubmit={(values) => {
                   editPostMutation.mutate(
                     {
