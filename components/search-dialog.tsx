@@ -1,6 +1,6 @@
 import { SearchIcon, SpinnerIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
-import { inferQueryOutput, trpc } from '@/lib/trpc'
+import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Dialog, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -25,7 +25,7 @@ function SearchResult({
     selected: any
     useHighlighted: () => Boolean
   }
-  result: inferQueryOutput<'post.search'>[number]
+  result: InferQueryOutput<'post.search'>[number]
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
   const { id, index, highlight, select, useHighlighted } = useItem({

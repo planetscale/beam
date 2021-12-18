@@ -15,9 +15,9 @@ export type TQuery = keyof AppRouter['_def']['queries']
 
 /**
  * This is a helper method to infer the output of a query resolver
- * @example type HelloOutput = inferQueryOutput<'hello'>
+ * @example type HelloOutput = InferQueryOutput<'hello'>
  */
-export type inferQueryOutput<TRouteKey extends TQuery> = inferProcedureOutput<
+export type InferQueryOutput<TRouteKey extends TQuery> = inferProcedureOutput<
   AppRouter['_def']['queries'][TRouteKey]
 >
 

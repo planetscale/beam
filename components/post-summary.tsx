@@ -4,13 +4,13 @@ import { ButtonLink } from '@/components/button-link'
 import { ChevronRightIcon, MessageIcon } from '@/components/icons'
 import { LikeButton } from '@/components/like-button'
 import { classNames } from '@/lib/classnames'
-import { inferQueryOutput } from '@/lib/trpc'
+import { InferQueryOutput } from '@/lib/trpc'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import Link from 'next/link'
 import * as React from 'react'
 
 export type PostSummaryProps = {
-  post: inferQueryOutput<'post.feed'>['posts'][number]
+  post: InferQueryOutput<'post.feed'>['posts'][number]
   hideAuthor?: boolean
   onLike: () => void
   onUnlike: () => void

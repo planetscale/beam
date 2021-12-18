@@ -13,6 +13,7 @@ import {
 } from '@/components/dialog'
 import { IconButton } from '@/components/icon-button'
 import {
+  DotsIcon,
   EditIcon,
   EyeClosedIcon,
   EyeIcon,
@@ -21,8 +22,15 @@ import {
 } from '@/components/icons'
 import { Layout } from '@/components/layout'
 import { LikeButton } from '@/components/like-button'
+import {
+  Menu,
+  MenuButton,
+  MenuItemButton,
+  MenuItems,
+  MenuItemsContent,
+} from '@/components/menu'
 import { Textarea } from '@/components/textarea'
-import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
+import { InferQueryOutput, InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -215,20 +223,14 @@ const PostPage: NextPageWithAuthAndLayout = () => {
               <ul className="space-y-12">
                 {postQuery.data.comments.map((comment) => (
                   <li key={comment.id}>
-                    <AuthorWithDate
-                      author={comment.author}
-                      date={comment.createdAt}
-                    />
-                    <div className="pl-16 mt-4">
-                      <p className="whitespace-pre-wrap">{comment.content}</p>
-                    </div>
+                    <Comment postId={postQuery.data.id} comment={comment} />
                   </li>
                 ))}
               </ul>
             )}
             <div className="flex items-start gap-4">
               <Avatar name={session!.user.name} src={session!.user.image} />
-              <CommentForm postId={postQuery.data.id} />
+              <AddCommentForm postId={postQuery.data.id} />
             </div>
           </div>
         </div>
@@ -304,11 +306,88 @@ PostPage.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }
 
+function Comment({
+  postId,
+  comment,
+}: {
+  postId: string
+  comment: InferQueryOutput<'post.detail'>['comments'][number]
+}) {
+  const { data: session } = useSession()
+  const [isEditing, setIsEditing] = React.useState(false)
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    React.useState(false)
+
+  const commentBelongsToUser = comment.author.id === session!.user.id
+
+  if (isEditing) {
+    return (
+      <div className="flex items-start gap-4">
+        <Avatar name={comment.author.name!} src={comment.author.image} />
+        <EditCommentForm
+          postId={postId}
+          comment={comment}
+          onDone={() => {
+            setIsEditing(false)
+          }}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-4">
+        <AuthorWithDate author={comment.author} date={comment.createdAt} />
+        {commentBelongsToUser && (
+          <Menu>
+            <MenuButton as={IconButton} variant="secondary" title="More">
+              <DotsIcon className="w-4 h-4" />
+            </MenuButton>
+
+            <MenuItems className="w-28">
+              <MenuItemsContent>
+                <MenuItemButton
+                  onClick={() => {
+                    setIsEditing(true)
+                  }}
+                >
+                  Edit
+                </MenuItemButton>
+                <MenuItemButton
+                  className="!text-red"
+                  onClick={() => {
+                    setIsConfirmDeleteDialogOpen(true)
+                  }}
+                >
+                  Delete
+                </MenuItemButton>
+              </MenuItemsContent>
+            </MenuItems>
+          </Menu>
+        )}
+      </div>
+      <div className="pl-16 mt-4">
+        <p className="whitespace-pre-wrap">{comment.content}</p>
+      </div>
+
+      <ConfirmDeleteCommentDialog
+        postId={postId}
+        commentId={comment.id}
+        isOpen={isConfirmDeleteDialogOpen}
+        onClose={() => {
+          setIsConfirmDeleteDialogOpen(false)
+        }}
+      />
+    </div>
+  )
+}
+
 type CommentFormData = {
   content: string
 }
 
-function CommentForm({ postId }: { postId: string }) {
+function AddCommentForm({ postId }: { postId: string }) {
   const utils = trpc.useContext()
   const addCommentMutation = trpc.useMutation('comment.add', {
     onSuccess: () => {
@@ -349,6 +428,116 @@ function CommentForm({ postId }: { postId: string }) {
         </Button>
       </div>
     </form>
+  )
+}
+
+function EditCommentForm({
+  postId,
+  comment,
+  onDone,
+}: {
+  postId: string
+  comment: InferQueryOutput<'post.detail'>['comments'][number]
+  onDone: () => void
+}) {
+  const utils = trpc.useContext()
+  const editCommentMutation = trpc.useMutation('comment.edit', {
+    onSuccess: () => {
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
+    },
+  })
+  const { register, handleSubmit, reset } = useForm<CommentFormData>({
+    defaultValues: {
+      content: comment.content,
+    },
+  })
+
+  const onSubmit: SubmitHandler<CommentFormData> = (data) => {
+    editCommentMutation.mutate(
+      {
+        id: comment.id,
+        data: {
+          content: data.content,
+        },
+      },
+      {
+        onSuccess: () => onDone(),
+      }
+    )
+  }
+
+  return (
+    <form className="flex-1" onSubmit={handleSubmit(onSubmit)}>
+      <Textarea
+        placeholder="Comment"
+        rows={4}
+        required
+        autoFocus
+        {...register('content', { required: true })}
+      />
+      <div className="flex gap-4 mt-4">
+        <Button
+          type="submit"
+          isLoading={editCommentMutation.isLoading}
+          loadingChildren="Updating comment"
+        >
+          Update comment
+        </Button>
+        <Button variant="secondary" onClick={onDone}>
+          Cancel
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+function ConfirmDeleteCommentDialog({
+  postId,
+  commentId,
+  isOpen,
+  onClose,
+}: {
+  postId: string
+  commentId: string
+  isOpen: boolean
+  onClose: () => void
+}) {
+  const cancelRef = React.useRef<HTMLButtonElement>(null)
+  const utils = trpc.useContext()
+  const deleteCommentMutation = trpc.useMutation('comment.delete', {
+    onSuccess: () => {
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
+    },
+  })
+
+  return (
+    <Dialog isOpen={isOpen} onClose={onClose} initialFocus={cancelRef}>
+      <DialogContent>
+        <DialogTitle>Delete comment</DialogTitle>
+        <DialogDescription className="mt-6">
+          Are you sure you want to delete this comment?
+        </DialogDescription>
+        <DialogCloseButton onClick={onClose} />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="secondary"
+          className="!text-red"
+          isLoading={deleteCommentMutation.isLoading}
+          loadingChildren="Deleting comment"
+          onClick={() => {
+            deleteCommentMutation.mutate(commentId, {
+              onSuccess: () => onClose(),
+            })
+          }}
+        >
+          Delete comment
+        </Button>
+        <Button variant="secondary" onClick={onClose} ref={cancelRef}>
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

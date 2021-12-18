@@ -224,6 +224,23 @@ export const postRouter = createProtectedRouter()
   .mutation('delete', {
     input: z.string(),
     async resolve({ input: id, ctx }) {
+      const post = await ctx.prisma.post.findUnique({
+        where: { id },
+        select: {
+          author: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      const postBelongsToUser = post?.author.id === ctx.session.user.id
+
+      if (!postBelongsToUser) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
       await ctx.prisma.post.delete({ where: { id } })
       return id
     },
