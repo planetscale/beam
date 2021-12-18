@@ -172,22 +172,15 @@ module.exports = {
       typography: {
         DEFAULT: {
           css: {
-            color: 'var(--text-primary)',
-            strong: {
-              color: 'var(--text-primary)',
-              fontWeight: '700',
-            },
-            a: {
-              color: 'var(--text-blue)',
-              textDecoration: 'none',
-              '&:hover': {
-                color: 'var(--text-blue)',
-                textDecoration: 'underline',
-              },
-            },
-            h3: {
-              color: 'var(--text-primary)',
-            },
+            '--tw-prose-body': 'var(--text-primary)',
+            '--tw-prose-headings': 'var(--text-primary)',
+            '--tw-prose-links': 'var(--text-blue)',
+            '--tw-prose-bold': 'var(--text-primary)',
+            '--tw-prose-counters': 'var(--text-primary)',
+            '--tw-prose-bullets': 'var(--text-primary)',
+            '--tw-prose-hr': 'var(--border-secondary)',
+            '--tw-prose-quotes': 'var(--text-primary)',
+            '--tw-prose-quote-borders': 'var(--border-secondary)',
           },
         },
       },
