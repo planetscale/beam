@@ -1,3 +1,6 @@
+import { Button } from '@/components/button'
+import { Footer } from '@/components/footer'
+import { Logo } from '@/components/icons'
 import { authOptions } from '@/lib/auth'
 import type {
   GetServerSidePropsContext,
@@ -6,6 +9,7 @@ import type {
 import { getServerSession } from 'next-auth/next'
 import { getProviders, signIn } from 'next-auth/react'
 import Head from 'next/head'
+import Div100vh from 'react-div-100vh'
 
 const SignIn = ({
   providers,
@@ -16,15 +20,28 @@ const SignIn = ({
         <title>Sign In - Flux</title>
       </Head>
 
-      <div>
-        {Object.values(providers!).map((provider) => (
-          <div key={provider.name}>
-            <button onClick={() => signIn(provider.id)}>
-              Sign in with {provider.name}
-            </button>
+      <Div100vh>
+        <main className="relative flex items-center justify-center h-full bg-center bg-square-grid dark:bg-square-grid-dark">
+          <div className="relative bottom-16">
+            <Logo className="w-[318px] text-red-light h-[102px] mb-8 bg-primary" />
+            <div className="w-full space-y-4 text-center bg-primary">
+              {Object.values(providers!).map((provider) => (
+                <div key={provider.name}>
+                  <Button
+                    className="!h-12 !px-5 !text-lg"
+                    onClick={() => signIn(provider.id)}
+                  >
+                    Sign in with {provider.name}
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="-mt-4 md:mt-0 w-screen left-1/2 transform -translate-x-1/2 absolute sm:w-[434px] lg:w-[646px] xl:w-[862px] auth-footer">
+              <Footer />
+            </div>
           </div>
-        ))}
-      </div>
+        </main>
+      </Div100vh>
     </>
   )
 }
