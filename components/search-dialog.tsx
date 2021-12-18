@@ -1,25 +1,17 @@
-import { SearchIcon } from '@/components/icons'
+import { SearchIcon, SpinnerIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
+import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Dialog, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { useDebounce } from 'use-debounce'
 import { ItemOptions, useItemList } from 'use-item-list'
 
 type SearchDialogProps = {
   isOpen: boolean
   onClose: () => void
 }
-
-const results = [
-  'We shipped a thing',
-  'Another result',
-  'IPhone growth hacking',
-  'Facebook gen-z ownership monetization strategy channels',
-  'Early adopters strategy return',
-  'Low hanging fruit iPad focus ',
-  'MVP marketing early adopters seed',
-]
 
 function SearchResult({
   useItem,
@@ -33,7 +25,7 @@ function SearchResult({
     selected: any
     useHighlighted: () => Boolean
   }
-  result: string
+  result: InferQueryOutput<'post.search'>[number]
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
   const { id, index, highlight, select, useHighlighted } = useItem({
@@ -44,14 +36,14 @@ function SearchResult({
 
   return (
     <li ref={ref} id={id} onMouseEnter={highlight} onClick={select}>
-      <Link href={`/post/${result}`}>
+      <Link href={`/post/${result.id}`}>
         <a
           className={classNames(
             'block py-3.5 pl-10 pr-3 transition-colors leading-tight',
             highlighted && 'bg-blue-600 text-white'
           )}
         >
-          {result}
+          {result.title}
         </a>
       </Link>
     </li>
@@ -60,11 +52,24 @@ function SearchResult({
 
 function SearchField({ onSelect }: { onSelect: () => void }) {
   const [value, setValue] = React.useState('')
+  const [debouncedValue] = useDebounce(value, 1000)
   const router = useRouter()
+
+  const feedQuery = trpc.useQuery(
+    [
+      'post.search',
+      {
+        query: debouncedValue,
+      },
+    ],
+    {
+      enabled: debouncedValue.trim().length > 0,
+    }
+  )
 
   const { moveHighlightedItem, selectHighlightedItem, useItem } = useItemList({
     onSelect: (item) => {
-      router.push(`/post/${item.value}`)
+      router.push(`/post/${item.value.id}`)
       onSelect()
     },
   })
@@ -99,7 +104,20 @@ function SearchField({ onSelect }: { onSelect: () => void }) {
   return (
     <div>
       <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div
+          className={classNames(
+            'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-opacity',
+            feedQuery.isLoading ? 'opacity-100' : 'opacity-0'
+          )}
+        >
+          <SpinnerIcon className="w-4 h-4 animate-spin" />
+        </div>
+        <div
+          className={classNames(
+            'absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-opacity',
+            feedQuery.isLoading ? 'opacity-0' : 'opacity-100'
+          )}
+        >
           <SearchIcon className="w-4 h-4" aria-hidden="true" />
         </div>
         <input
@@ -119,17 +137,22 @@ function SearchField({ onSelect }: { onSelect: () => void }) {
           }}
         />
       </div>
-      {value && (
-        <ul
-          id="search-results"
-          role="listbox"
-          className="max-h-[286px] border-t overflow-y-auto"
-        >
-          {results.map((result) => (
-            <SearchResult key={result} useItem={useItem} result={result} />
-          ))}
-        </ul>
-      )}
+      {feedQuery.data &&
+        (feedQuery.data.length > 0 ? (
+          <ul
+            id="search-results"
+            role="listbox"
+            className="max-h-[286px] border-t overflow-y-auto"
+          >
+            {feedQuery.data.map((result) => (
+              <SearchResult key={result.id} useItem={useItem} result={result} />
+            ))}
+          </ul>
+        ) : (
+          <div className="border-t py-3.5 px-3 text-center leading-tight">
+            No results. Try something else
+          </div>
+        ))}
     </div>
   )
 }
@@ -165,7 +188,11 @@ export function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
             leaveTo="opacity-0 scale-95"
           >
             <div className="inline-block w-full max-w-md mt-[10vh] mb-8 overflow-hidden text-left align-middle transition-all transform bg-primary rounded-lg shadow-xl dark:border">
-              {isOpen && <SearchField onSelect={onClose} />}
+              {isOpen ? (
+                <SearchField onSelect={onClose} />
+              ) : (
+                <div className="h-12" />
+              )}
             </div>
           </Transition.Child>
         </div>

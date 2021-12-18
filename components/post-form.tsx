@@ -13,10 +13,17 @@ type FormData = {
 
 type PostFormProps = {
   defaultValues?: FormData
+  isSubmitting?: boolean
+  backTo: string
   onSubmit: SubmitHandler<FormData>
 }
 
-export function PostForm({ defaultValues, onSubmit }: PostFormProps) {
+export function PostForm({
+  defaultValues,
+  isSubmitting,
+  backTo,
+  onSubmit,
+}: PostFormProps) {
   const { control, register, handleSubmit } = useForm<FormData>({
     defaultValues,
   })
@@ -49,10 +56,14 @@ export function PostForm({ defaultValues, onSubmit }: PostFormProps) {
 
       <div className="flex items-center justify-between gap-4 mt-8">
         <div className="flex gap-4">
-          <Button type="submit">
+          <Button
+            type="submit"
+            isLoading={isSubmitting}
+            loadingChildren={`${defaultValues ? 'Editing' : 'Publishing'} post`}
+          >
             {defaultValues ? 'Edit' : 'Publish'} post
           </Button>
-          <ButtonLink href="/" variant="secondary">
+          <ButtonLink href={backTo} variant="secondary">
             Cancel
           </ButtonLink>
         </div>

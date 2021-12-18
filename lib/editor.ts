@@ -1,38 +1,11 @@
+import { uploadImage } from '@/lib/cloudinary'
+import DOMPurify from 'isomorphic-dompurify'
+import { marked } from 'marked'
 import toast from 'react-hot-toast'
 import { Cursor } from 'textarea-markdown-editor'
 
-async function uploadImageToCloudinary(file: File) {
-  const signResponse = await fetch('/api/sign-cloudinary', { method: 'POST' })
-  const signData = await signResponse.json()
-
-  const formData = new FormData()
-
-  formData.append('file', file)
-  formData.append('api_key', signData.apiKey)
-  formData.append('timestamp', signData.timestamp)
-  formData.append('signature', signData.signature)
-  formData.append('folder', signData.folder)
-  formData.append('image_metadata', 'true')
-
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${signData.cloudName}/image/upload`,
-    {
-      method: 'POST',
-      body: formData,
-    }
-  )
-  const data = await response.json()
-
-  if (data.error) {
-    throw Error(data.error.message)
-  }
-
-  return {
-    url: data.secure_url,
-    originalFilename: data.original_filename,
-    width: data.width,
-    dpi: Number(data.image_metadata.DPI),
-  }
+export function markdownToHtml(markdown: string) {
+  return DOMPurify.sanitize(marked.parse(markdown, { breaks: true }))
 }
 
 function replacePlaceholder(
@@ -58,7 +31,7 @@ export function handleUploadImages(
     })
 
     try {
-      const uploadedImage = await uploadImageToCloudinary(file)
+      const uploadedImage = await uploadImage(file)
 
       replacePlaceholder(
         cursor,

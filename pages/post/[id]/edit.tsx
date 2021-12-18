@@ -1,45 +1,95 @@
 import { Layout } from '@/components/layout'
 import { PostForm } from '@/components/post-form'
-import type { NextPage } from 'next'
+import { trpc } from '@/lib/trpc'
+import type { NextPageWithAuthAndLayout } from '@/lib/types'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
-const post = {
-  id: '1',
-  title: 'We shipped a thing!',
-  author: {
-    id: '1',
-    name: 'Bogdan Soare',
-    avatarUrl:
-      'https://pbs.twimg.com/profile_images/1028943463209943040/EtBuwo-A_400x400.jpg',
-  },
-  createdAt: new Date('2021/11/24'),
-  content: 'Hey test \n **lorem**',
+const EditPostPage: NextPageWithAuthAndLayout = () => {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const postQuery = trpc.useQuery([
+    'post.detail',
+    { id: String(router.query.id) },
+  ])
+  const editPostMutation = trpc.useMutation('post.edit')
+
+  if (postQuery.data) {
+    const postBelongsToUser = postQuery.data.author.id === session!.user.id
+
+    return (
+      <>
+        <Head>
+          <title>Edit {postQuery.data.title} - Flux</title>
+        </Head>
+
+        {postBelongsToUser ? (
+          <>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Edit &quot;{postQuery.data.title}&quot;
+            </h1>
+
+            <div className="mt-6">
+              <PostForm
+                isSubmitting={editPostMutation.isLoading}
+                defaultValues={{
+                  title: postQuery.data.title,
+                  content: postQuery.data.content,
+                }}
+                backTo={`/post/${postQuery.data.id}`}
+                onSubmit={(values) => {
+                  editPostMutation.mutate(
+                    {
+                      id: postQuery.data.id,
+                      data: { title: values.title, content: values.content },
+                    },
+                    {
+                      onSuccess: () =>
+                        router.push(`/post/${postQuery.data.id}`),
+                    }
+                  )
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          <div>You don&apos;t have permissions to edit this post.</div>
+        )}
+      </>
+    )
+  }
+
+  if (postQuery.isError) {
+    return <div>Error: {postQuery.error.message}</div>
+  }
+
+  return (
+    <div className="animate-pulse">
+      <div className="w-3/4 bg-gray-200 rounded h-9 dark:bg-gray-700" />
+      <div className="mt-7">
+        <div>
+          <div className="w-10 h-5 bg-gray-200 rounded dark:bg-gray-700" />
+          <div className="border rounded h-[42px] border-secondary mt-2" />
+        </div>
+        <div className="mt-6">
+          <div className="w-10 h-5 bg-gray-200 rounded dark:bg-gray-700" />
+          <div className="mt-2 border rounded h-9 border-secondary" />
+          <div className="mt-2 border rounded h-[378px] border-secondary" />
+        </div>
+      </div>
+      <div className="flex gap-4 mt-9">
+        <div className="w-[92px] bg-gray-200 rounded-full h-button dark:bg-gray-700" />
+        <div className="w-20 border rounded-full h-button border-secondary" />
+      </div>
+    </div>
+  )
 }
 
-const EditPostPage: NextPage = () => {
-  return (
-    <Layout>
-      <Head>
-        <title>Edit {post.title} - Flux</title>
-      </Head>
+EditPostPage.auth = true
 
-      <h1 className="text-3xl font-bold tracking-tight">
-        Edit &quot;{post.title}&quot;
-      </h1>
-
-      <div className="mt-6">
-        <PostForm
-          defaultValues={{
-            title: post.title,
-            content: post.content,
-          }}
-          onSubmit={(values) => {
-            console.log(values)
-          }}
-        />
-      </div>
-    </Layout>
-  )
+EditPostPage.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>
 }
 
 export default EditPostPage

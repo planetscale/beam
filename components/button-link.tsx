@@ -1,9 +1,10 @@
-import { buttonClasses, ButtonOwnProps } from '@/components/button'
+import { buttonClasses, ButtonVariant } from '@/components/button'
 import Link, { LinkProps } from 'next/link'
 import * as React from 'react'
 
-type ButtonLinkProps = ButtonOwnProps &
-  Omit<React.ComponentPropsWithoutRef<'a'>, 'href'> &
+type ButtonLinkProps = {
+  variant?: ButtonVariant
+} & Omit<React.ComponentPropsWithoutRef<'a'>, 'href'> &
   LinkProps
 
 export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
