@@ -154,14 +154,6 @@
     font-named-instance: 'Italic';
   }
 
-  @font-face {
-    font-family: 'Pixel';
-    font-style: normal;
-    font-weight: normal;
-    font-display: fallback;
-    src: url('/fonts/pixel.woff2') format('woff2');
-  }
-
   body {
     @apply text-base;
     @apply text-primary;

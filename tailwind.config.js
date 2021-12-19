@@ -99,7 +99,6 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
-        pixel: ['Pixel'],
       },
       fontSize: {
         '3xl': ['2rem', '2.25rem'],
