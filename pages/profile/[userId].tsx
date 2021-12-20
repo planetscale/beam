@@ -381,6 +381,9 @@ function EditProfileDialog({
         getProfileQueryPathAndInput(String(router.query.userId))
       )
     },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
   })
 
   function handleClose() {
@@ -455,6 +458,9 @@ function UpdateAvatarDialog({
       return utils.invalidateQueries(
         getProfileQueryPathAndInput(String(router.query.userId))
       )
+    },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
     },
   })
   const uploadImageMutation = useMutation((file: File) => {

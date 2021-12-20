@@ -5,6 +5,7 @@ import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
 const EditPostPage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
@@ -13,7 +14,11 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
     'post.detail',
     { id: String(router.query.id) },
   ])
-  const editPostMutation = trpc.useMutation('post.edit')
+  const editPostMutation = trpc.useMutation('post.edit', {
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
+  })
 
   if (postQuery.data) {
     const postBelongsToUser = postQuery.data.author.id === session!.user.id

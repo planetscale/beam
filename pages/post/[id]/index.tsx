@@ -393,6 +393,9 @@ function AddCommentForm({ postId }: { postId: string }) {
     onSuccess: () => {
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
   })
   const { register, handleSubmit, reset } = useForm<CommentFormData>()
 
@@ -444,6 +447,9 @@ function EditCommentForm({
   const editCommentMutation = trpc.useMutation('comment.edit', {
     onSuccess: () => {
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
+    },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
     },
   })
   const { register, handleSubmit } = useForm<CommentFormData>({
@@ -508,6 +514,9 @@ function ConfirmDeleteCommentDialog({
     onSuccess: () => {
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
   })
 
   return (
@@ -552,7 +561,11 @@ function ConfirmDeleteDialog({
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
   const router = useRouter()
-  const deletePostMutation = trpc.useMutation('post.delete')
+  const deletePostMutation = trpc.useMutation('post.delete', {
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
+  })
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} initialFocus={cancelRef}>
@@ -599,6 +612,9 @@ function ConfirmHideDialog({
   const hidePostMutation = trpc.useMutation('post.hide', {
     onSuccess: () => {
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
+    },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
     },
   })
 
@@ -649,6 +665,9 @@ function ConfirmUnhideDialog({
   const unhidePostMutation = trpc.useMutation('post.unhide', {
     onSuccess: () => {
       return utils.invalidateQueries(getPostQueryPathAndInput(postId))
+    },
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
     },
   })
 

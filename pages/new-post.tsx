@@ -4,10 +4,15 @@ import { trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
 const NewPostPage: NextPageWithAuthAndLayout = () => {
   const router = useRouter()
-  const addPostMutation = trpc.useMutation('post.add')
+  const addPostMutation = trpc.useMutation('post.add', {
+    onError: (error) => {
+      toast.error(`Something went wrong: ${error.message}`)
+    },
+  })
 
   return (
     <>
