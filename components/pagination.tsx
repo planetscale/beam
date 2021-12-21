@@ -29,7 +29,7 @@ export function Pagination({
 
   const totalPages = Math.ceil(itemCount / itemsPerPage)
 
-  if (totalPages === 1) {
+  if (totalPages <= 1) {
     return null
   }
 
