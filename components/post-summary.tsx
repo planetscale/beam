@@ -1,6 +1,7 @@
 import { AuthorWithDate } from '@/components/author-with-date'
 import { Banner } from '@/components/banner'
 import { ButtonLink } from '@/components/button-link'
+import { HtmlView } from '@/components/html-view'
 import { ChevronRightIcon, MessageIcon } from '@/components/icons'
 import { LikeButton } from '@/components/like-button'
 import { classNames } from '@/lib/classnames'
@@ -93,13 +94,7 @@ export function PostSummary({
           </div>
         </div>
 
-        <div
-          className={classNames(
-            'prose max-w-none',
-            hideAuthor ? 'mt-4' : 'mt-6'
-          )}
-          dangerouslySetInnerHTML={{ __html: summary }}
-        />
+        <HtmlView html={summary} className={hideAuthor ? 'mt-4' : 'mt-6'} />
 
         {hasMoreContent && (
           <div className="mt-4">

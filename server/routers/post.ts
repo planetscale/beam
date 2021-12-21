@@ -104,6 +104,7 @@ export const postRouter = createProtectedRouter()
             select: {
               id: true,
               content: true,
+              contentHtml: true,
               createdAt: true,
               author: {
                 select: {

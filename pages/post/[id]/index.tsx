@@ -11,6 +11,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/dialog'
+import { HtmlView } from '@/components/html-view'
 import { IconButton } from '@/components/icon-button'
 import {
   DotsIcon,
@@ -193,10 +194,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 date={postQuery.data.createdAt}
               />
             </div>
-            <div
-              className="mt-6 prose max-w-none"
-              dangerouslySetInnerHTML={{ __html: postQuery.data.contentHtml }}
-            />
+            <HtmlView html={postQuery.data.contentHtml} className="mt-6" />
             <div className="flex gap-4 mt-6">
               <LikeButton
                 isLiked={isPostLiked}
@@ -367,8 +365,9 @@ function Comment({
           </Menu>
         )}
       </div>
+
       <div className="pl-16 mt-4">
-        <p className="whitespace-pre-wrap">{comment.content}</p>
+        <HtmlView html={comment.contentHtml} />
       </div>
 
       <ConfirmDeleteCommentDialog
