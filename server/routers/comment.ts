@@ -1,3 +1,4 @@
+import { markdownToHtml } from '@/lib/editor'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createProtectedRouter } from '../create-protected-router'
@@ -12,6 +13,7 @@ export const commentRouter = createProtectedRouter()
       const comment = await ctx.prisma.comment.create({
         data: {
           content: input.content,
+          contentHtml: markdownToHtml(input.content),
           author: {
             connect: {
               id: ctx.session.user.id,
@@ -59,6 +61,7 @@ export const commentRouter = createProtectedRouter()
         where: { id },
         data: {
           content: data.content,
+          contentHtml: markdownToHtml(data.content),
         },
       })
 

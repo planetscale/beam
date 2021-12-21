@@ -1,3 +1,4 @@
+import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
 import { handleUploadImages, markdownToHtml } from '@/lib/editor'
@@ -41,12 +42,7 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
   return (
     <div className="pb-6 mt-8 border-b">
       {markdown ? (
-        <div
-          className="prose max-w-none"
-          dangerouslySetInnerHTML={{
-            __html: markdownToHtml(markdown),
-          }}
-        />
+        <HtmlView html={markdownToHtml(markdown)} />
       ) : (
         <p>Nothing to preview</p>
       )}

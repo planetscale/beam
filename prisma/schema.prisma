@@ -90,13 +90,14 @@ model Post {
 }
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String   @db.VarChar(500)
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
+  id          String   @id @default(uuid())
+  content     String   @db.Text
+  contentHtml String   @db.Text
+  createdAt   DateTime @default(now())
+  post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId      String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    String
 
   @@index([authorId])
   @@index([postId])
