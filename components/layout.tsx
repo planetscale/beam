@@ -29,13 +29,13 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="max-w-3xl px-6 mx-auto">
-      <header className="flex items-center justify-between gap-4 py-20">
+      <header className="flex items-center justify-between gap-4 py-12 md:py-20">
         <Link href="/">
           <a>
             <Logo className="w-auto text-red-light h-[34px]" />
           </a>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <IconButton
             variant="secondary"
             onClick={() => {
@@ -86,7 +86,10 @@ export function Layout({ children }: LayoutProps) {
             </MenuItems>
           </Menu>
 
-          <ButtonLink href="/new-post">New Post</ButtonLink>
+          <ButtonLink href="/new-post">
+            <span className="md:hidden">Post</span>
+            <span className="hidden md:block">New post</span>
+          </ButtonLink>
         </div>
       </header>
 
