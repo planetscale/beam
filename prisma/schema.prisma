@@ -74,7 +74,7 @@ model VerificationToken {
 }
 
 model Post {
-  id          String    @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   title       String    @db.VarChar(255)
   content     String    @db.Text
   contentHtml String    @db.Text
@@ -90,12 +90,12 @@ model Post {
 }
 
 model Comment {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   content     String   @db.Text
   contentHtml String   @db.Text
   createdAt   DateTime @default(now())
   post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId      String
+  postId      Int
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
 

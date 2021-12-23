@@ -41,7 +41,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 function getPostQueryPathAndInput(
-  id: string
+  id: number
 ): InferQueryPathAndInput<'post.detail'> {
   return [
     'post.detail',
@@ -56,7 +56,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
   const router = useRouter()
   const utils = trpc.useContext()
   const postQueryPathAndInput = getPostQueryPathAndInput(
-    String(router.query.id)
+    Number(router.query.id)
   )
   const postQuery = trpc.useQuery(postQueryPathAndInput)
   const likeMutation = trpc.useMutation(['post.like'], {
@@ -308,7 +308,7 @@ function Comment({
   postId,
   comment,
 }: {
-  postId: string
+  postId: number
   comment: InferQueryOutput<'post.detail'>['comments'][number]
 }) {
   const { data: session } = useSession()
@@ -386,7 +386,7 @@ type CommentFormData = {
   content: string
 }
 
-function AddCommentForm({ postId }: { postId: string }) {
+function AddCommentForm({ postId }: { postId: number }) {
   const utils = trpc.useContext()
   const addCommentMutation = trpc.useMutation('comment.add', {
     onSuccess: () => {
@@ -438,7 +438,7 @@ function EditCommentForm({
   comment,
   onDone,
 }: {
-  postId: string
+  postId: number
   comment: InferQueryOutput<'post.detail'>['comments'][number]
   onDone: () => void
 }) {
@@ -502,8 +502,8 @@ function ConfirmDeleteCommentDialog({
   isOpen,
   onClose,
 }: {
-  postId: string
-  commentId: string
+  postId: number
+  commentId: number
   isOpen: boolean
   onClose: () => void
 }) {
@@ -554,7 +554,7 @@ function ConfirmDeleteDialog({
   isOpen,
   onClose,
 }: {
-  postId: string
+  postId: number
   isOpen: boolean
   onClose: () => void
 }) {
@@ -602,7 +602,7 @@ function ConfirmHideDialog({
   isOpen,
   onClose,
 }: {
-  postId: string
+  postId: number
   isOpen: boolean
   onClose: () => void
 }) {
@@ -655,7 +655,7 @@ function ConfirmUnhideDialog({
   isOpen,
   onClose,
 }: {
-  postId: string
+  postId: number
   isOpen: boolean
   onClose: () => void
 }) {
