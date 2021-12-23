@@ -31,7 +31,7 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
 
         {postBelongsToUser ? (
           <>
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
               Edit &quot;{postQuery.data.title}&quot;
             </h1>
 
