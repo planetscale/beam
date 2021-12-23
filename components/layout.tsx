@@ -31,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="max-w-3xl px-6 mx-auto">
       <header className="flex items-center justify-between gap-4 py-20">
         <Link href="/">
-          <a>
+          <a className="focus-ring">
             <Logo className="w-auto text-red-light h-[34px]" />
           </a>
         </Link>
@@ -46,7 +46,7 @@ export function Layout({ children }: LayoutProps) {
           </IconButton>
 
           <Menu>
-            <MenuButton className="relative inline-flex group">
+            <MenuButton className="relative inline-flex rounded-full group focus-ring">
               <Avatar
                 name={session!.user.name}
                 src={session!.user.image}

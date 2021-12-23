@@ -181,3 +181,15 @@
     }
   }
 }
+
+@layer utilities {
+  .focus-ring {
+    @apply focus:ring-2;
+    @apply focus:outline-none;
+    @apply focus:ring-offset-0;
+    @apply focus:ring-blue-200;
+    @apply dark:focus:ring-blue-800;
+    @apply focus:border-blue-500;
+    @apply focus:shadow-none;
+  }
+}

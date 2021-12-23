@@ -112,7 +112,7 @@ export function Avatar({ size = 'md', name, src }: AvatarProps) {
     UnknownLetter
 
   return (
-    <div className="relative inline-flex flex-shrink-0">
+    <div className="relative inline-flex flex-shrink-0 rounded-full">
       {src ? (
         <>
           <Image

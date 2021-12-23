@@ -73,7 +73,7 @@ export function MarkdownEditor({
                   ref.current?.trigger(toolbarItem.commandTrigger)
                 }}
                 className={classNames(
-                  'inline-flex items-center justify-center h-8 w-8 disabled:opacity-50 disabled:cursor-default',
+                  'rounded inline-flex items-center justify-center h-8 w-8 disabled:opacity-50 disabled:cursor-default focus:border focus-ring',
                   !showPreview && 'transition-colors hover:text-blue-dark'
                 )}
                 disabled={showPreview}
@@ -95,7 +95,7 @@ export function MarkdownEditor({
               }}
               className={classNames(
                 showPreview ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700',
-                'relative inline-flex flex-shrink-0 items-center h-[18px] w-8 rounded-full transition-colors ease-in-out duration-200'
+                'relative inline-flex flex-shrink-0 items-center h-[18px] w-8 rounded-full transition-colors ease-in-out duration-200 focus-ring focus:border'
               )}
             >
               <span
@@ -158,7 +158,7 @@ export function MarkdownEditor({
 
                 handleUploadImages(event.currentTarget, imageFiles)
               }}
-              className="block w-full rounded shadow-sm bg-secondary border-secondary"
+              className="block w-full rounded shadow-sm bg-secondary border-secondary focus-ring"
               minRows={15}
             />
           </TextareaMarkdown.Wrapper>
