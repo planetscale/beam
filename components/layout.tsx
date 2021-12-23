@@ -31,7 +31,7 @@ export function Layout({ children }: LayoutProps) {
     <div className="max-w-3xl px-6 mx-auto">
       <header className="flex items-center justify-between gap-4 py-20">
         <Link href="/">
-          <a className="focus-ring">
+          <a>
             <Logo className="w-auto text-red-light h-[34px]" />
           </a>
         </Link>
