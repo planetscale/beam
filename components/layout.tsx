@@ -87,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
             </MenuItems>
           </Menu>
 
-          <ButtonLink href="/new-post">New Post</ButtonLink>
+          <ButtonLink href="/new">New Post</ButtonLink>
         </div>
       </header>
 
