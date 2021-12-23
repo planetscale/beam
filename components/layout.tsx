@@ -87,8 +87,8 @@ export function Layout({ children }: LayoutProps) {
           </Menu>
 
           <ButtonLink href="/new-post">
-            <span className="md:hidden">Post</span>
-            <span className="hidden md:block">New post</span>
+            <span className="sm:hidden">Post</span>
+            <span className="hidden sm:block">New post</span>
           </ButtonLink>
         </div>
       </header>
