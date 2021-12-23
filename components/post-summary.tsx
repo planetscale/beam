@@ -79,7 +79,7 @@ export function PostSummary({
             <AuthorWithDate author={post.author} date={post.createdAt} />
           )}
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             <LikeButton
               isLiked={isLiked}
               likeCount={post._count.likedBy}

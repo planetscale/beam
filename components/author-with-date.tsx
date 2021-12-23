@@ -10,14 +10,18 @@ type AuthorWithDateProps = {
 
 export function AuthorWithDate({ author, date }: AuthorWithDateProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 md:gap-4">
       <Link href={`/profile/${author.id}`}>
         <a className="relative inline-flex group">
-          <Avatar name={author.name!} src={author.image} />
-          <div className="absolute inset-0 transition-opacity bg-gray-800 rounded-full opacity-0 group-hover:opacity-10" />
+          <span className="md:hidden">
+            <Avatar name={author.name!} src={author.image} size="sm" />
+          </span>
+          <span className="hidden md:visible">
+            <Avatar name={author.name!} src={author.image} />
+          </span>
         </a>
       </Link>
-      <div className="flex-1">
+      <div className="flex-1 text-sm md:text-base">
         <div>
           <Link href={`/profile/${author.id}`}>
             <a className="font-medium tracking-tight transition-colors hover:text-blue-dark">
