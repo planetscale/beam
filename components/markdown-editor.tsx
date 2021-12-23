@@ -94,14 +94,14 @@ export function MarkdownEditor({
                 setShowPreview(value)
               }}
               className={classNames(
-                showPreview ? 'bg-blue-500' : 'bg-gray-600 dark:bg-gray-400',
+                showPreview ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700',
                 'relative inline-flex flex-shrink-0 items-center h-[18px] w-8 rounded-full transition-colors ease-in-out duration-200'
               )}
             >
               <span
                 className={classNames(
                   showPreview ? 'translate-x-4' : 'translate-x-0.5',
-                  'inline-block w-3.5 h-3.5 transform bg-primary rounded-full transition-transform ease-in-out duration-200'
+                  'inline-block w-3.5 h-3.5 transform bg-white dark:bg-gray-100 rounded-full transition-transform ease-in-out duration-200'
                 )}
               />
             </Switch>
