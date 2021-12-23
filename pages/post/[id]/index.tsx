@@ -23,6 +23,7 @@ import {
 } from '@/components/icons'
 import { Layout } from '@/components/layout'
 import { LikeButton } from '@/components/like-button'
+import { MarkdownEditor } from '@/components/markdown-editor'
 import {
   Menu,
   MenuButton,
@@ -30,14 +31,13 @@ import {
   MenuItems,
   MenuItemsContent,
 } from '@/components/menu'
-import { Textarea } from '@/components/textarea'
 import { InferQueryOutput, InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 function getPostQueryPathAndInput(
@@ -396,7 +396,7 @@ function AddCommentForm({ postId }: { postId: number }) {
       toast.error(`Something went wrong: ${error.message}`)
     },
   })
-  const { register, handleSubmit, reset } = useForm<CommentFormData>()
+  const { control, handleSubmit, reset } = useForm<CommentFormData>()
 
   const onSubmit: SubmitHandler<CommentFormData> = (data) => {
     addCommentMutation.mutate(
@@ -414,11 +414,19 @@ function AddCommentForm({ postId }: { postId: number }) {
 
   return (
     <form className="flex-1" onSubmit={handleSubmit(onSubmit)}>
-      <Textarea
-        placeholder="Comment"
-        rows={4}
-        required
-        {...register('content', { required: true })}
+      <Controller
+        name="content"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <MarkdownEditor
+            value={field.value}
+            onChange={field.onChange}
+            required
+            placeholder="Comment"
+            minRows={4}
+          />
+        )}
       />
       <div className="mt-4">
         <Button
@@ -451,7 +459,7 @@ function EditCommentForm({
       toast.error(`Something went wrong: ${error.message}`)
     },
   })
-  const { register, handleSubmit } = useForm<CommentFormData>({
+  const { control, handleSubmit } = useForm<CommentFormData>({
     defaultValues: {
       content: comment.content,
     },
@@ -473,12 +481,20 @@ function EditCommentForm({
 
   return (
     <form className="flex-1" onSubmit={handleSubmit(onSubmit)}>
-      <Textarea
-        placeholder="Comment"
-        rows={4}
-        required
-        autoFocus
-        {...register('content', { required: true })}
+      <Controller
+        name="content"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <MarkdownEditor
+            value={field.value}
+            onChange={field.onChange}
+            required
+            placeholder="Comment"
+            minRows={4}
+            autoFocus
+          />
+        )}
       />
       <div className="flex gap-4 mt-4">
         <Button
