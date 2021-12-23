@@ -52,7 +52,6 @@ export function Layout({ children }: LayoutProps) {
                 src={session!.user.image}
                 size="sm"
               />
-              <div className="absolute inset-0 transition-opacity bg-gray-800 rounded-full opacity-0 group-hover:opacity-10" />
             </MenuButton>
 
             <MenuItems className="w-48">
