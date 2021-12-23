@@ -41,7 +41,7 @@ export function reloadSession() {
 }
 
 function getProfileQueryPathAndInput(
-  id: string
+  id: number
 ): InferQueryPathAndInput<'user.profile'> {
   return [
     'user.profile',
@@ -70,7 +70,7 @@ function ProfileInfo() {
   const { data: session } = useSession()
   const router = useRouter()
   const profileQueryPathAndInput = getProfileQueryPathAndInput(
-    String(router.query.userId)
+    Number(router.query.userId)
   )
   const profileQuery = trpc.useQuery(profileQueryPathAndInput)
 
@@ -195,7 +195,7 @@ function ProfileFeed() {
     'post.feed',
     {
       ...getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
-      authorId: String(router.query.userId),
+      authorId: Number(router.query.userId),
     },
   ]
   const profileFeedQuery = trpc.useQuery(profileFeedQueryPathAndInput)
@@ -378,7 +378,7 @@ function EditProfileDialog({
     onSuccess: () => {
       reloadSession()
       return utils.invalidateQueries(
-        getProfileQueryPathAndInput(String(router.query.userId))
+        getProfileQueryPathAndInput(Number(router.query.userId))
       )
     },
     onError: (error) => {
@@ -456,7 +456,7 @@ function UpdateAvatarDialog({
     onSuccess: () => {
       reloadSession()
       return utils.invalidateQueries(
-        getProfileQueryPathAndInput(String(router.query.userId))
+        getProfileQueryPathAndInput(Number(router.query.userId))
       )
     },
     onError: (error) => {

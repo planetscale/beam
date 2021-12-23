@@ -9,7 +9,6 @@ generator client {
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
-  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
   referentialIntegrity = "prisma"
 }
 
@@ -19,8 +18,8 @@ enum Role {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
+  id                 Int     @id @default(autoincrement())
+  userId             Int
   type               String
   provider           String
   providerAccountId  String
@@ -41,9 +40,9 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           Int      @id @default(autoincrement())
   sessionToken String   @unique
-  userId       String
+  userId       Int
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -51,7 +50,7 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            Int       @id @default(autoincrement())
   name          String?
   email         String?   @unique
   emailVerified DateTime?
@@ -74,7 +73,7 @@ model VerificationToken {
 }
 
 model Post {
-  id          String    @id @default(uuid())
+  id          Int       @id @default(autoincrement())
   title       String    @db.VarChar(255)
   content     String    @db.Text
   contentHtml String    @db.Text
@@ -82,7 +81,7 @@ model Post {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   author      User      @relation("WrittenPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
+  authorId    Int
   likedBy     User[]    @relation("LikedPosts")
   comments    Comment[]
 
@@ -90,14 +89,14 @@ model Post {
 }
 
 model Comment {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   content     String   @db.Text
   contentHtml String   @db.Text
   createdAt   DateTime @default(now())
   post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId      String
+  postId      Int
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
+  authorId    Int
 
   @@index([authorId])
   @@index([postId])

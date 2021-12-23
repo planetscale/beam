@@ -5,7 +5,7 @@ import { createProtectedRouter } from '../create-protected-router'
 export const userRouter = createProtectedRouter()
   .query('profile', {
     input: z.object({
-      id: z.string(),
+      id: z.number(),
     }),
     async resolve({ ctx, input }) {
       const { id } = input

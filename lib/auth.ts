@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string
+      id: number
       name: string
       email: string
       image?: string | null
@@ -44,6 +44,7 @@ declare module 'next-auth' {
   }
 
   interface User {
+    id: number
     role: Role
   }
 }
