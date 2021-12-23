@@ -83,11 +83,16 @@ export function PostSummary({
             <LikeButton
               isLiked={isLiked}
               likeCount={post._count.likedBy}
+              responsive
               onLike={onLike}
               onUnlike={onUnlike}
             />
 
-            <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
+            <ButtonLink
+              href={`/post/${post.id}#comments`}
+              variant="secondary"
+              responsive
+            >
               <MessageIcon className="w-4 h-4 text-secondary" />
               <span className="ml-1.5">{post._count.comments}</span>
             </ButtonLink>

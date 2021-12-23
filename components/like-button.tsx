@@ -4,6 +4,7 @@ import { HeartFilledIcon, HeartIcon } from '@/components/icons'
 type LikeButtonProps = {
   isLiked: boolean
   likeCount: number
+  responsive?: boolean
   onLike: () => void
   onUnlike: () => void
 }
@@ -11,12 +12,14 @@ type LikeButtonProps = {
 export function LikeButton({
   isLiked,
   likeCount,
+  responsive,
   onLike,
   onUnlike,
 }: LikeButtonProps) {
   return (
     <Button
       variant="secondary"
+      responsive={responsive}
       className={
         isLiked
           ? '!border-red-300 !bg-red-100 hover:!bg-red-200 dark:!bg-red-900 dark:!border-red-700 dark:hover:!bg-red-800'

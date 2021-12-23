@@ -4,6 +4,7 @@ import * as React from 'react'
 
 type ButtonLinkProps = {
   variant?: ButtonVariant
+  responsive?: boolean
 } & Omit<React.ComponentPropsWithoutRef<'a'>, 'href'> &
   LinkProps
 
@@ -20,6 +21,7 @@ export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
       locale,
       className,
       variant = 'primary',
+      responsive,
       ...rest
     },
     forwardedRef
@@ -38,7 +40,7 @@ export const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(
         <a
           {...rest}
           ref={forwardedRef}
-          className={buttonClasses({ className, variant })}
+          className={buttonClasses({ className, variant, responsive })}
         />
       </Link>
     )
