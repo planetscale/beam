@@ -12,7 +12,7 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
   const router = useRouter()
   const postQuery = trpc.useQuery([
     'post.detail',
-    { id: String(router.query.id) },
+    { id: Number(router.query.id) },
   ])
   const editPostMutation = trpc.useMutation('post.edit', {
     onError: (error) => {

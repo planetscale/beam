@@ -6,7 +6,7 @@ import { createProtectedRouter } from '../create-protected-router'
 export const commentRouter = createProtectedRouter()
   .mutation('add', {
     input: z.object({
-      postId: z.string(),
+      postId: z.number(),
       content: z.string().min(1),
     }),
     async resolve({ ctx, input }) {
@@ -32,7 +32,7 @@ export const commentRouter = createProtectedRouter()
   })
   .mutation('edit', {
     input: z.object({
-      id: z.string(),
+      id: z.number(),
       data: z.object({
         content: z.string().min(1),
       }),
@@ -69,7 +69,7 @@ export const commentRouter = createProtectedRouter()
     },
   })
   .mutation('delete', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       const comment = await ctx.prisma.comment.findUnique({
         where: { id },
