@@ -53,6 +53,7 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
 export function MarkdownEditor({
   label,
   value,
+  minRows = 15,
   onChange,
   ...rest
 }: MarkdownEditorProps) {
@@ -159,7 +160,7 @@ export function MarkdownEditor({
                 handleUploadImages(event.currentTarget, imageFiles)
               }}
               className="block w-full rounded shadow-sm bg-secondary border-secondary focus-ring"
-              minRows={15}
+              minRows={minRows}
             />
           </TextareaMarkdown.Wrapper>
         </div>

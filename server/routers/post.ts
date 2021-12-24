@@ -69,7 +69,7 @@ export const postRouter = createProtectedRouter()
   })
   .query('detail', {
     input: z.object({
-      id: z.string(),
+      id: z.number(),
     }),
     async resolve({ ctx, input }) {
       const { id } = input
@@ -186,7 +186,7 @@ export const postRouter = createProtectedRouter()
   })
   .mutation('edit', {
     input: z.object({
-      id: z.string(),
+      id: z.number(),
       data: z.object({
         title: z.string().min(1),
         content: z.string().min(1),
@@ -225,7 +225,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('delete', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.findUnique({
         where: { id },
@@ -249,7 +249,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('like', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.update({
         where: { id },
@@ -268,7 +268,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('unlike', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.update({
         where: { id },
@@ -287,7 +287,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('hide', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       if (!ctx.isUserAdmin) {
         throw new TRPCError({ code: 'FORBIDDEN' })
@@ -306,7 +306,7 @@ export const postRouter = createProtectedRouter()
     },
   })
   .mutation('unhide', {
-    input: z.string(),
+    input: z.number(),
     async resolve({ input: id, ctx }) {
       if (!ctx.isUserAdmin) {
         throw new TRPCError({ code: 'FORBIDDEN' })
