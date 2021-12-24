@@ -83,9 +83,13 @@ async function generateSVG(name: string) {
     return COLORS[colorName][colorShade]
   })
 
+  const rotationHash = hash.slice(6, 9)
+  const rotationDecimal = parseInt(rotationHash, 16)
+  const rotationDeg = rotationDecimal % 360
+
   const svg = `
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="12" cy="12" r="12" fill="url(#gradient)"/>
+  <circle cx="12" cy="12" r="12" fill="url(#gradient)" transform="rotate(${rotationDeg}, 12, 12)" />
   <defs>
     <radialGradient id="gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(20.5 2) rotate(127.694) scale(27.8029 21.5408)">
       <stop stop-color="${colors[0]}"/>
