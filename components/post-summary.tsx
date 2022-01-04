@@ -79,15 +79,20 @@ export function PostSummary({
             <AuthorWithDate author={post.author} date={post.createdAt} />
           )}
 
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4">
             <LikeButton
               isLiked={isLiked}
               likeCount={post._count.likedBy}
+              responsive
               onLike={onLike}
               onUnlike={onUnlike}
             />
 
-            <ButtonLink href={`/post/${post.id}#comments`} variant="secondary">
+            <ButtonLink
+              href={`/post/${post.id}#comments`}
+              variant="secondary"
+              responsive
+            >
               <MessageIcon className="w-4 h-4 text-secondary" />
               <span className="ml-1.5">{post._count.comments}</span>
             </ButtonLink>

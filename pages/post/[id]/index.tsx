@@ -136,7 +136,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             )}
 
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-3xl font-bold tracking-tight">
+              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
                 {postQuery.data.title}
               </h1>
               {(postBelongsToUser || isUserAdmin) && (
@@ -226,8 +226,17 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 ))}
               </ul>
             )}
-            <div className="flex items-start gap-4">
-              <Avatar name={session!.user.name} src={session!.user.image} />
+            <div className="flex items-start gap-2 sm:gap-4">
+              <span className="hidden sm:inline-block">
+                <Avatar name={session!.user.name} src={session!.user.image} />
+              </span>
+              <span className="inline-block sm:hidden">
+                <Avatar
+                  name={session!.user.name}
+                  src={session!.user.image}
+                  size="sm"
+                />
+              </span>
               <AddCommentForm postId={postQuery.data.id} />
             </div>
           </div>
@@ -366,7 +375,7 @@ function Comment({
         )}
       </div>
 
-      <div className="pl-16 mt-4">
+      <div className="mt-4 pl-11 sm:pl-16">
         <HtmlView html={comment.contentHtml} />
       </div>
 
