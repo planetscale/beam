@@ -13,10 +13,10 @@ export function AuthorWithDate({ author, date }: AuthorWithDateProps) {
     <div className="flex items-center gap-2 sm:gap-4">
       <Link href={`/profile/${author.id}`}>
         <a className="relative inline-flex">
-          <span className="hidden sm:inline-block">
+          <span className="hidden sm:flex">
             <Avatar name={author.name!} src={author.image} />
           </span>
-          <span className="inline-block sm:hidden">
+          <span className="flex sm:hidden">
             <Avatar name={author.name!} src={author.image} size="sm" />
           </span>
         </a>
