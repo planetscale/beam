@@ -75,7 +75,7 @@ export function MarkdownEditor({
                 }}
                 className={classNames(
                   'rounded inline-flex items-center justify-center h-8 w-8 disabled:opacity-50 disabled:cursor-default focus:border focus-ring',
-                  !showPreview && 'transition-colors hover:text-blue-dark'
+                  !showPreview && 'transition-colors hover:text-blue'
                 )}
                 disabled={showPreview}
                 title={toolbarItem.name}
