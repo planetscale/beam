@@ -6,7 +6,7 @@
 npm install
 ```
 
-## Getting Started
+## Getting started
 
 ```bash
 npm run dev
