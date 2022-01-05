@@ -136,7 +136,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             )}
 
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              <h1 className="text-3xl font-semibold tracking-tighter md:text-4xl">
                 {postQuery.data.title}
               </h1>
               {(postBelongsToUser || isUserAdmin) && (
@@ -188,7 +188,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 </div>
               )}
             </div>
-            <div className="mt-6">
+            <div className="mt-6 mb-8">
               <AuthorWithDate
                 author={postQuery.data.author}
                 date={postQuery.data.createdAt}

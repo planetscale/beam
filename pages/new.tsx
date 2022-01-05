@@ -20,7 +20,7 @@ const NewPostPage: NextPageWithAuthAndLayout = () => {
         <title>New Post - Flux</title>
       </Head>
 
-      <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+      <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
         New post
       </h1>
 
