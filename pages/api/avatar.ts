@@ -2,7 +2,6 @@ import { sha1 } from 'crypto-hash'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 const COLOR_NAMES = [
-  'gray',
   'red',
   'orange',
   'yellow',
@@ -11,60 +10,47 @@ const COLOR_NAMES = [
   'purple',
 ] as const
 
-const COLOR_SHADES = [500, 600, 700, 800, 900] as const
+const COLOR_SHADES = [500, 600, 700, 800] as const
 
 const COLORS: Record<
   typeof COLOR_NAMES[number],
   Record<typeof COLOR_SHADES[number], string>
 > = {
-  gray: {
-    500: '#7b7f87',
-    600: '#5a5f68',
-    700: '#444854',
-    800: '#30313a',
-    900: '#1a1b21',
-  },
   red: {
     500: '#ff455d',
     600: '#dd243c',
     700: '#c11027',
     800: '#8f0718',
-    900: '#51050e',
   },
   orange: {
     500: '#f35815',
     600: '#c43c02',
     700: '#962d00',
     800: '#672002',
-    900: '#391303',
   },
   yellow: {
     500: '#a78103',
     600: '#835c01',
     700: '#5c4716',
     800: '#41320c',
-    900: '#261c02',
   },
   green: {
     500: '#27b648',
     600: '#13862e',
     700: '#19652a',
     800: '#10481d',
-    900: '#0a2912',
   },
   blue: {
     500: '#1e9de7',
     600: '#0e73cc',
     700: '#144eb6',
     800: '#0e3682',
-    900: '#071f4d',
   },
   purple: {
     500: '#8467f3',
     600: '#624bbb',
     700: '#4b3990',
     800: '#3e1f75',
-    900: '#261149',
   },
 }
 
@@ -83,13 +69,9 @@ async function generateSVG(name: string) {
     return COLORS[colorName][colorShade]
   })
 
-  const rotationHash = hash.slice(6, 9)
-  const rotationDecimal = parseInt(rotationHash, 16)
-  const rotationDeg = rotationDecimal % 360
-
   const svg = `
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="12" cy="12" r="12" fill="url(#gradient)" transform="rotate(${rotationDeg}, 12, 12)" />
+  <circle cx="12" cy="12" r="12" fill="url(#gradient)" transform="rotate(-90, 12, 12)" />
   <defs>
     <radialGradient id="gradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(20.5 2) rotate(127.694) scale(27.8029 21.5408)">
       <stop stop-color="${colors[0]}"/>
