@@ -180,10 +180,9 @@ module.exports = {
             '--tw-prose-bold': 'var(--text-primary)',
             '--tw-prose-counters': 'var(--text-primary)',
             '--tw-prose-bullets': 'var(--text-primary)',
-            '--tw-prose-hr': 'var(--border-secondary)',
+            '--tw-prose-hr': 'var(--border-primary)',
             '--tw-prose-quotes': 'var(--text-primary)',
             '--tw-prose-quote-borders': 'var(--border-secondary)',
-            '--tw-prose-hr': 'var(--border-primary)',
             p: {
               lineHeight: '24px',
               marginBottom: '1em',
