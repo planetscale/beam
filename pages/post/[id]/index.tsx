@@ -188,13 +188,13 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 </div>
               )}
             </div>
-            <div className="mt-6 mb-8">
+            <div className="mt-6">
               <AuthorWithDate
                 author={postQuery.data.author}
                 date={postQuery.data.createdAt}
               />
             </div>
-            <HtmlView html={postQuery.data.contentHtml} className="mt-6" />
+            <HtmlView html={postQuery.data.contentHtml} className="mt-8" />
             <div className="flex gap-4 mt-6">
               <LikeButton
                 isLiked={isPostLiked}
