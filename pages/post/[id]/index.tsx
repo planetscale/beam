@@ -136,7 +136,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             )}
 
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              <h1 className="text-3xl font-semibold tracking-tighter md:text-4xl">
                 {postQuery.data.title}
               </h1>
               {(postBelongsToUser || isUserAdmin) && (
@@ -194,7 +194,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 date={postQuery.data.createdAt}
               />
             </div>
-            <HtmlView html={postQuery.data.contentHtml} className="mt-6" />
+            <HtmlView html={postQuery.data.contentHtml} className="mt-8" />
             <div className="flex gap-4 mt-6">
               <LikeButton
                 isLiked={isPostLiked}

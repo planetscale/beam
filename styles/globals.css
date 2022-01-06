@@ -101,7 +101,6 @@
   --text-secondary: var(--color-gray-600);
   --text-secondary-inverse: var(--color-gray-050);
   --text-blue: var(--color-blue-600);
-  --text-blue-dark: var(--color-blue-700);
   --text-green: var(--color-green-600);
   --text-orange: var(--color-orange-600);
   --text-red: var(--color-red-600);
@@ -127,7 +126,6 @@
   --text-secondary: var(--color-gray-300);
   --text-secondary-inverse: var(--color-gray-800);
   --text-blue: var(--color-blue-400);
-  --text-blue-dark: var(--color-blue-300);
   --text-green: var(--color-green-500);
   --text-orange: var(--color-orange-300);
   --text-red: var(--color-red-500);
@@ -163,6 +161,11 @@
 
   a {
     @apply focus-visible-ring;
+  }
+
+  b,
+  strong {
+    @apply font-semibold;
   }
 
   select {

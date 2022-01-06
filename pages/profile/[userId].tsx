@@ -117,7 +117,7 @@ function ProfileInfo() {
             )}
 
             <div className="flex-1">
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
+              <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
                 {profileQuery.data.name}
               </h1>
               {profileQuery.data.title && (
@@ -273,7 +273,7 @@ function ProfileFeed() {
           ) : (
             <ul className="-my-12 divide-y divide-primary">
               {profileFeedQuery.data.posts.map((post) => (
-                <li key={post.id} className="py-12">
+                <li key={post.id} className="py-10">
                   <PostSummary
                     hideAuthor
                     post={post}
@@ -307,7 +307,7 @@ function ProfileFeed() {
     <div className="flow-root mt-28">
       <ul className="-my-12 divide-y divide-primary">
         {[...Array(3)].map((_, idx) => (
-          <li key={idx} className="py-12">
+          <li key={idx} className="py-10">
             <PostSummarySkeleton hideAuthor />
           </li>
         ))}

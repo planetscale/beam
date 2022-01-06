@@ -24,7 +24,7 @@ export function AuthorWithDate({ author, date }: AuthorWithDateProps) {
       <div className="flex-1 text-sm sm:text-base">
         <div>
           <Link href={`/profile/${author.id}`}>
-            <a className="font-medium tracking-tight transition-colors hover:text-blue-dark">
+            <a className="font-medium tracking-tight transition-colors hover:text-blue">
               {author.name}
             </a>
           </Link>

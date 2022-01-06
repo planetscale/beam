@@ -105,7 +105,7 @@ const Home: NextPageWithAuthAndLayout = () => {
           <div className="flow-root">
             <ul className="-my-12 divide-y divide-primary">
               {feedQuery.data.posts.map((post) => (
-                <li key={post.id} className="py-12">
+                <li key={post.id} className="py-10">
                   <PostSummary
                     post={post}
                     onLike={() => {
@@ -138,7 +138,7 @@ const Home: NextPageWithAuthAndLayout = () => {
     <div className="flow-root">
       <ul className="-my-12 divide-y divide-primary">
         {[...Array(3)].map((_, idx) => (
-          <li key={idx} className="py-12">
+          <li key={idx} className="py-10">
             <PostSummarySkeleton />
           </li>
         ))}

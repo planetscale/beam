@@ -58,7 +58,9 @@ export function PostSummary({
       <div className={classNames(post.hidden ? 'opacity-50' : '')}>
         <Link href={`/post/${post.id}`}>
           <a>
-            <h2 className="text-2xl font-bold tracking-tight">{post.title}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              {post.title}
+            </h2>
           </a>
         </Link>
 
@@ -104,7 +106,7 @@ export function PostSummary({
         {hasMoreContent && (
           <div className="mt-4">
             <Link href={`/post/${post.id}`}>
-              <a className="inline-flex items-center font-medium transition-colors text-blue hover:text-blue-dark">
+              <a className="inline-flex items-center font-medium transition-colors text-blue">
                 Continue reading <ChevronRightIcon className="w-4 h-4 ml-1" />
               </a>
             </Link>

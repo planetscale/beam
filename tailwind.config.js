@@ -101,7 +101,11 @@ module.exports = {
         sans: ['Inter var', ...defaultTheme.fontFamily.sans],
       },
       fontSize: {
-        '3xl': ['2rem', '2.25rem'],
+        base: ['16px', '24px'],
+        xl: ['20px', '24px'],
+        '2xl': ['24px', '28px'],
+        '3xl': ['28px', '32px'],
+        '4xl': ['40px', '44px'],
       },
       backgroundColor: {
         primary: 'var(--bg-primary)',
@@ -147,7 +151,6 @@ module.exports = {
         secondary: 'var(--text-secondary)',
         'secondary-inverse': 'var(--text-secondary-inverse)',
         blue: 'var(--text-blue)',
-        'blue-dark': 'var(--text-blue-dark)',
         green: 'var(--text-green)',
         orange: 'var(--text-orange)',
         red: 'var(--text-red)',
@@ -177,9 +180,52 @@ module.exports = {
             '--tw-prose-bold': 'var(--text-primary)',
             '--tw-prose-counters': 'var(--text-primary)',
             '--tw-prose-bullets': 'var(--text-primary)',
-            '--tw-prose-hr': 'var(--border-secondary)',
+            '--tw-prose-hr': 'var(--border-primary)',
             '--tw-prose-quotes': 'var(--text-primary)',
             '--tw-prose-quote-borders': 'var(--border-secondary)',
+            p: {
+              lineHeight: '24px',
+              marginBottom: '1em',
+            },
+            a: {
+              textDecoration: 'none',
+              fontWeight: 'default',
+            },
+            img: {
+              marginTop: '1.5em',
+              marginBottom: '1.5em',
+            },
+            h1: {
+              fontWeight: '600',
+              fontSize: '28px',
+              lineHeight: '32px',
+            },
+            h2: {
+              fontWeight: '600',
+              fontSize: '24px',
+              lineHeight: '20px',
+              marginTop: '1em',
+            },
+            h3: {
+              fontSize: '20px',
+              lineHeight: '16px',
+            },
+            h4: {
+              fontSize: '16px',
+              lineHeight: '12px',
+            },
+            h5: {
+              fontSize: '16px',
+              lineHeight: '12px',
+            },
+            h6: {
+              fontSize: '16px',
+              lineHeight: '12px',
+            },
+            li: {
+              marginTop: '0.25em',
+              marginBottom: '0.25em',
+            },
           },
         },
       },
