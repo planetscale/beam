@@ -22,7 +22,7 @@ export function LikeButton({
 
   function handleLike() {
     setIsLikingAnimation(true)
-    isLiked ? onUnlike() : onLike()
+    // isLiked ? onUnlike() : onLike()
   }
 
   return (
