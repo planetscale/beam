@@ -212,11 +212,12 @@ function ProfileFeed() {
             post.id === likedPostId
               ? {
                   ...post,
-                  likedBy: [{ id: session!.user.id }],
-                  _count: {
-                    ...post._count,
-                    likedBy: post._count.likedBy + 1,
-                  },
+                  likedBy: [
+                    ...post.likedBy,
+                    {
+                      user: { id: session!.user.id, name: session!.user.name },
+                    },
+                  ],
                 }
               : post
           ),
@@ -244,11 +245,9 @@ function ProfileFeed() {
             post.id === unlikedPostId
               ? {
                   ...post,
-                  likedBy: [],
-                  _count: {
-                    ...post._count,
-                    likedBy: post._count.likedBy - 1,
-                  },
+                  likedBy: post.likedBy.filter(
+                    (item) => item.user.id !== session!.user.id
+                  ),
                 }
               : post
           ),

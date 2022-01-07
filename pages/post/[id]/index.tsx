@@ -68,11 +68,10 @@ const PostPage: NextPageWithAuthAndLayout = () => {
       if (previousPost) {
         utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
-          likedBy: [{ id: session!.user.id }],
-          _count: {
-            ...previousPost._count,
-            likedBy: previousPost._count.likedBy + 1,
-          },
+          likedBy: [
+            ...previousPost.likedBy,
+            { user: { id: session!.user.id, name: session!.user.name } },
+          ],
         })
       }
 
@@ -93,11 +92,9 @@ const PostPage: NextPageWithAuthAndLayout = () => {
       if (previousPost) {
         utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
-          likedBy: [],
-          _count: {
-            ...previousPost._count,
-            likedBy: previousPost._count.likedBy - 1,
-          },
+          likedBy: previousPost.likedBy.filter(
+            (item) => item.user.id !== session!.user.id
+          ),
         })
       }
 
@@ -119,7 +116,6 @@ const PostPage: NextPageWithAuthAndLayout = () => {
   if (postQuery.data) {
     const isUserAdmin = session!.user.role === 'ADMIN'
     const postBelongsToUser = postQuery.data.author.id === session!.user.id
-    const isPostLiked = postQuery.data.likedBy.length === 1
 
     return (
       <>
@@ -197,8 +193,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
             <HtmlView html={postQuery.data.contentHtml} className="mt-8" />
             <div className="flex gap-4 mt-6">
               <LikeButton
-                isLiked={isPostLiked}
-                likeCount={postQuery.data._count.likedBy}
+                likedBy={postQuery.data.likedBy}
                 onLike={() => {
                   likeMutation.mutate(postQuery.data.id)
                 }}

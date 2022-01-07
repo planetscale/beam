@@ -41,17 +41,21 @@ export const postRouter = createProtectedRouter()
             },
           },
           likedBy: {
-            where: {
-              id: ctx.session.user.id,
+            orderBy: {
+              createdAt: 'asc',
             },
             select: {
-              id: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
           _count: {
             select: {
               comments: true,
-              likedBy: true,
             },
           },
         },
@@ -90,11 +94,16 @@ export const postRouter = createProtectedRouter()
             },
           },
           likedBy: {
-            where: {
-              id: ctx.session.user.id,
+            orderBy: {
+              createdAt: 'asc',
             },
             select: {
-              id: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
           comments: {
@@ -251,39 +260,37 @@ export const postRouter = createProtectedRouter()
   .mutation('like', {
     input: z.number(),
     async resolve({ input: id, ctx }) {
-      const post = await ctx.prisma.post.update({
-        where: { id },
+      await ctx.prisma.likedPosts.create({
         data: {
-          likedBy: {
+          post: {
+            connect: {
+              id,
+            },
+          },
+          user: {
             connect: {
               id: ctx.session.user.id,
             },
           },
         },
-        select: {
-          id: true,
-        },
       })
-      return post
+
+      return id
     },
   })
   .mutation('unlike', {
     input: z.number(),
     async resolve({ input: id, ctx }) {
-      const post = await ctx.prisma.post.update({
-        where: { id },
-        data: {
-          likedBy: {
-            disconnect: {
-              id: ctx.session.user.id,
-            },
+      await ctx.prisma.likedPosts.delete({
+        where: {
+          postId_userId: {
+            postId: id,
+            userId: ctx.session.user.id,
           },
         },
-        select: {
-          id: true,
-        },
       })
-      return post
+
+      return id
     },
   })
   .mutation('hide', {
