@@ -410,7 +410,7 @@ function AddCommentForm({ postId }: { postId: number }) {
       },
       {
         onSuccess: () => {
-          reset()
+          reset({ content: '' })
         },
       }
     )
