@@ -46,8 +46,6 @@ export function PostSummary({
     [contentDocument]
   )
 
-  const isLiked = post.likedBy.length === 1
-
   return (
     <div>
       {post.hidden && (
@@ -83,8 +81,7 @@ export function PostSummary({
 
           <div className="flex gap-2 md:gap-4">
             <LikeButton
-              isLiked={isLiked}
-              likeCount={post._count.likedBy}
+              likedBy={post.likedBy}
               responsive
               onLike={onLike}
               onUnlike={onUnlike}
