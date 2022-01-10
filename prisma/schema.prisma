@@ -9,7 +9,6 @@ generator client {
 datasource db {
   provider             = "mysql"
   url                  = env("DATABASE_URL")
-  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
   referentialIntegrity = "prisma"
 }
 
@@ -51,18 +50,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String?      @unique
   emailVerified DateTime?
   image         String?
   title         String?
   accounts      Account[]
   sessions      Session[]
-  posts         Post[]    @relation("WrittenPosts")
-  likedPosts    Post[]    @relation("LikedPosts")
+  posts         Post[]
+  likedPosts    LikedPosts[]
   comments      Comment[]
-  role          Role      @default(USER)
+  role          Role         @default(USER)
 }
 
 model VerificationToken {
@@ -74,19 +73,31 @@ model VerificationToken {
 }
 
 model Post {
-  id          Int       @id @default(autoincrement())
-  title       String    @db.VarChar(255)
-  content     String    @db.Text
-  contentHtml String    @db.Text
-  hidden      Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  author      User      @relation("WrittenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  id          Int          @id @default(autoincrement())
+  title       String       @db.VarChar(255)
+  content     String       @db.Text
+  contentHtml String       @db.Text
+  hidden      Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  author      User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId    String
-  likedBy     User[]    @relation("LikedPosts")
+  likedBy     LikedPosts[]
   comments    Comment[]
 
   @@index([authorId])
+}
+
+model LikedPosts {
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@id([postId, userId])
+  @@index([postId])
+  @@index([userId])
 }
 
 model Comment {
