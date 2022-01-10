@@ -80,10 +80,11 @@ export function LikeButton({
         variant="secondary"
         responsive={responsive}
         className={classNames(
-          'transition-all overflow-hidden [transform:translateZ(0)] group cursor-pointer space-x-1.5',
+          'transition-colors overflow-hidden [transform:translateZ(0)] group cursor-pointer space-x-1.5',
           isLikedByCurrentUser &&
-            'border-red-300 !bg-red-100 dark:bg-red-900 dark:border-red-700 dark:hover:bg-red-800',
-          isLikingAnimation && '!border-red-600 !bg-red-600 pointer-events-none'
+            'border-red-300 !bg-red-100 dark:!bg-red-900 dark:border-red-700',
+          isLikingAnimation &&
+            '!border-red-600 !bg-red-600 dark:!bg-red-600 pointer-events-none'
         )}
         onClick={handleClick}
       >
