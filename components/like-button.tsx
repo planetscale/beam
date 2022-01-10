@@ -36,7 +36,7 @@ export function LikeButton({
       onLike()
       setTimeout(() => {
         setIsLikingAnimation(false)
-      }, 3000)
+      }, 1000)
     }
   }
 
@@ -116,7 +116,7 @@ export function LikeButton({
 
         <span
           className={classNames(
-            'relative z-10',
+            'relative z-10 tabular-nums',
             isLikingAnimation && 'transition-colors duration-100 text-gray-50'
           )}
         >
