@@ -88,7 +88,7 @@ export function Layout({ children }: LayoutProps) {
 
           <ButtonLink href="/new">
             <span className="sm:hidden">Post</span>
-            <span className="hidden sm:block">New post</span>
+            <span className="hidden sm:block shrink-0">New post</span>
           </ButtonLink>
         </div>
       </header>
