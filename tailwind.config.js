@@ -159,8 +159,14 @@ module.exports = {
         purple: 'var(--text-purple)',
         'purple-light': 'var(--color-purple-400)',
       },
+      transitionTimingFunction: {
+        spring: 'cubic-bezier(.25,1.6,.5,.8)',
+      },
       letterSpacing: {
         tight: '-.01em',
+      },
+      ringWidth: {
+        6: '6px',
       },
       height: {
         button: '34px',
