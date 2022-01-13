@@ -61,3 +61,17 @@ export const userRouter = createProtectedRouter()
       return user
     },
   })
+  .query('mentionList', {
+    async resolve({ ctx }) {
+      const users = await ctx.prisma.user.findMany({
+        select: {
+          name: true,
+        },
+        orderBy: {
+          name: 'asc',
+        },
+      })
+
+      return users
+    },
+  })

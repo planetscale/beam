@@ -1,19 +1,51 @@
 import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
 import { classNames } from '@/lib/classnames'
-import { handleUploadImages, markdownToHtml } from '@/lib/editor'
+import {
+  getMentionData,
+  handleUploadImages,
+  markdownToHtml,
+} from '@/lib/editor'
+import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Switch } from '@headlessui/react'
 import * as React from 'react'
+import { useDetectClickOutside } from 'react-detect-click-outside'
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize'
+import getCaretCoordinates from 'textarea-caret'
 import TextareaMarkdown, { TextareaMarkdownRef } from 'textarea-markdown-editor'
+import { ItemOptions, useItemList } from 'use-item-list'
 
 type MarkdownEditorProps = {
   label?: string
   value: string
   onChange: (value: string) => void
 } & Omit<TextareaAutosizeProps, 'value' | 'onChange'>
+
+type MentionPosition = {
+  top: number
+  left: number
+}
+
+type MentionState = {
+  isOpen: boolean
+  position: MentionPosition | null
+  triggerIdx: number | null
+  query: string
+}
+
+type MentionActionType =
+  | {
+      type: 'open'
+      payload: {
+        position: MentionPosition
+        triggerIdx: number
+        query: string
+      }
+    }
+  | { type: 'close' }
+  | { type: 'updateQuery'; payload: string }
 
 const TOOLBAR_ITEMS = [
   {
@@ -50,6 +82,24 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
   )
 }
 
+function mentionReducer(state: MentionState, action: MentionActionType) {
+  switch (action.type) {
+    case 'open':
+      return {
+        isOpen: true,
+        position: action.payload.position,
+        triggerIdx: action.payload.triggerIdx,
+        query: action.payload.query,
+      }
+    case 'close':
+      return { isOpen: false, position: null, triggerIdx: null, query: '' }
+    case 'updateQuery':
+      return { ...state, query: action.payload }
+    default:
+      throw new Error()
+  }
+}
+
 export function MarkdownEditor({
   label,
   value,
@@ -57,8 +107,18 @@ export function MarkdownEditor({
   onChange,
   ...rest
 }: MarkdownEditorProps) {
-  const ref = React.useRef<TextareaMarkdownRef>(null)
+  const textareaMarkdownRef = React.useRef<TextareaMarkdownRef>(null)
   const [showPreview, setShowPreview] = React.useState(false)
+  const [mentionState, mentionDispatch] = React.useReducer(mentionReducer, {
+    isOpen: false,
+    position: null,
+    triggerIdx: null,
+    query: '',
+  })
+
+  function closeMention() {
+    mentionDispatch({ type: 'close' })
+  }
 
   return (
     <div>
@@ -71,7 +131,9 @@ export function MarkdownEditor({
                 key={toolbarItem.commandTrigger}
                 type="button"
                 onClick={() => {
-                  ref.current?.trigger(toolbarItem.commandTrigger)
+                  textareaMarkdownRef.current?.trigger(
+                    toolbarItem.commandTrigger
+                  )
                 }}
                 className={classNames(
                   'rounded inline-flex items-center justify-center h-8 w-8 disabled:opacity-50 disabled:cursor-default focus:border focus-ring',
@@ -90,7 +152,7 @@ export function MarkdownEditor({
               checked={showPreview}
               onChange={(value) => {
                 if (value === false) {
-                  ref.current?.focus()
+                  textareaMarkdownRef.current?.focus()
                 }
                 setShowPreview(value)
               }}
@@ -115,12 +177,51 @@ export function MarkdownEditor({
           </Switch.Group>
         </div>
 
-        <div className={classNames('mt-2', showPreview && 'sr-only')}>
-          <TextareaMarkdown.Wrapper ref={ref}>
+        <div className={classNames('mt-2 relative', showPreview && 'sr-only')}>
+          <TextareaMarkdown.Wrapper
+            ref={textareaMarkdownRef}
+            commands={[
+              {
+                name: 'indent',
+                enable: false,
+              },
+            ]}
+          >
             <TextareaAutosize
               {...rest}
               value={value}
               onChange={(event) => onChange(event.target.value)}
+              onInput={(event) => {
+                const { keystrokeTriggered, triggerIdx, query } =
+                  getMentionData(event.currentTarget)
+
+                if (!keystrokeTriggered) {
+                  if (mentionState.isOpen) {
+                    closeMention()
+                  }
+                  return
+                }
+
+                if (mentionState.isOpen) {
+                  mentionDispatch({ type: 'updateQuery', payload: query })
+                } else {
+                  const coords = getCaretCoordinates(
+                    event.currentTarget,
+                    triggerIdx + 1
+                  )
+                  mentionDispatch({
+                    type: 'open',
+                    payload: {
+                      position: {
+                        top: coords.top + coords.height,
+                        left: coords.left,
+                      },
+                      triggerIdx,
+                      query,
+                    },
+                  })
+                }
+              }}
               onPaste={(event) => {
                 const filesArray = Array.from(event.clipboardData.files)
 
@@ -163,10 +264,174 @@ export function MarkdownEditor({
               minRows={minRows}
             />
           </TextareaMarkdown.Wrapper>
+
+          <Mention
+            state={mentionState}
+            onSelect={(name) => {
+              const preMention = value.slice(0, mentionState.triggerIdx!)
+              const postMention = value.slice(
+                textareaMarkdownRef.current?.selectionStart
+              )
+              const newValue = `${preMention}@${name} ${postMention}`
+
+              onChange(newValue)
+              closeMention()
+
+              setTimeout(() => {
+                const caretPosition = newValue.length - postMention.length
+
+                textareaMarkdownRef.current?.focus()
+                textareaMarkdownRef.current?.setSelectionRange(
+                  caretPosition,
+                  caretPosition
+                )
+              }, 0)
+            }}
+            onClose={closeMention}
+          />
         </div>
 
         {showPreview && <MarkdownPreview markdown={value} />}
       </div>
     </div>
+  )
+}
+
+function Mention({
+  state,
+  onSelect,
+  onClose,
+}: {
+  state: MentionState
+  onSelect: (name: string) => void
+  onClose: () => void
+}) {
+  const mentionListQuery = trpc.useQuery(['user.mentionList'])
+
+  const mentionList = mentionListQuery.data
+    ? state.query === ''
+      ? mentionListQuery.data
+      : mentionListQuery.data.filter((user) =>
+          user.name!.toLowerCase().includes(state.query.toLowerCase())
+        )
+    : []
+
+  if (!state.isOpen || !state.position || mentionList.length === 0) {
+    return null
+  }
+
+  return (
+    <MentionList
+      mentionList={mentionList}
+      position={state.position}
+      onSelect={onSelect}
+      onClose={onClose}
+    />
+  )
+}
+
+function MentionList({
+  mentionList,
+  position,
+  onSelect,
+  onClose,
+}: {
+  mentionList: InferQueryOutput<'user.mentionList'>
+  position: MentionPosition
+  onSelect: (name: string) => void
+  onClose: () => void
+}) {
+  const ref = useDetectClickOutside({ onTriggered: onClose })
+
+  const { moveHighlightedItem, selectHighlightedItem, useItem } = useItemList({
+    onSelect: (item) => {
+      onSelect(item.value)
+    },
+  })
+
+  React.useEffect(() => {
+    function handleKeydownEvent(event: KeyboardEvent) {
+      const { code } = event
+
+      const preventDefaultCodes = ['ArrowUp', 'ArrowDown', 'Enter', 'Tab']
+
+      if (preventDefaultCodes.includes(code)) {
+        event.preventDefault()
+      }
+
+      if (code === 'ArrowUp') {
+        moveHighlightedItem(-1)
+      }
+
+      if (code === 'ArrowDown') {
+        moveHighlightedItem(1)
+      }
+
+      if (code === 'Enter' || code === 'Tab') {
+        selectHighlightedItem()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeydownEvent)
+    return () => {
+      document.removeEventListener('keydown', handleKeydownEvent)
+    }
+  }, [moveHighlightedItem, selectHighlightedItem])
+
+  return (
+    <div
+      ref={ref}
+      className="absolute w-48 max-h-[286px] border rounded shadow-lg bg-primary overflow-y-auto"
+      style={{
+        top: position.top,
+        left: position.left,
+      }}
+    >
+      <ul role="listbox" className="divide-y divide-primary">
+        {mentionList.map((user) => (
+          <MentionItem key={user.name} useItem={useItem}>
+            {user.name!}
+          </MentionItem>
+        ))}
+      </ul>
+    </div>
+  )
+}
+function MentionItem({
+  useItem,
+  children,
+}: {
+  useItem: ({ ref, text, value, disabled }: ItemOptions) => {
+    id: string
+    index: number
+    highlight: () => void
+    select: () => void
+    selected: any
+    useHighlighted: () => Boolean
+  }
+  children: string
+}) {
+  const ref = React.useRef<HTMLLIElement>(null)
+  const { id, index, highlight, select, useHighlighted } = useItem({
+    ref,
+    value: children,
+  })
+  const highlighted = useHighlighted()
+
+  return (
+    <li
+      ref={ref}
+      id={id}
+      onMouseEnter={highlight}
+      onClick={select}
+      role="option"
+      aria-selected={highlighted ? 'true' : 'false'}
+      className={classNames(
+        'px-4 py-2 text-sm text-left transition-colors cursor-pointer ',
+        highlighted ? 'bg-blue-600 text-white' : 'text-primary'
+      )}
+    >
+      {children}
+    </li>
   )
 }
