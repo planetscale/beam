@@ -28,6 +28,11 @@ type MentionPosition = {
   left: number
 }
 
+type MentionUser = {
+  id: string
+  name: string
+}
+
 type MentionState = {
   isOpen: boolean
   position: MentionPosition | null
@@ -46,6 +51,24 @@ type MentionActionType =
     }
   | { type: 'close' }
   | { type: 'updateQuery'; payload: string }
+
+function mentionReducer(state: MentionState, action: MentionActionType) {
+  switch (action.type) {
+    case 'open':
+      return {
+        isOpen: true,
+        position: action.payload.position,
+        triggerIdx: action.payload.triggerIdx,
+        query: action.payload.query,
+      }
+    case 'close':
+      return { isOpen: false, position: null, triggerIdx: null, query: '' }
+    case 'updateQuery':
+      return { ...state, query: action.payload }
+    default:
+      throw new Error()
+  }
+}
 
 const TOOLBAR_ITEMS = [
   {
@@ -80,24 +103,6 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
       )}
     </div>
   )
-}
-
-function mentionReducer(state: MentionState, action: MentionActionType) {
-  switch (action.type) {
-    case 'open':
-      return {
-        isOpen: true,
-        position: action.payload.position,
-        triggerIdx: action.payload.triggerIdx,
-        query: action.payload.query,
-      }
-    case 'close':
-      return { isOpen: false, position: null, triggerIdx: null, query: '' }
-    case 'updateQuery':
-      return { ...state, query: action.payload }
-    default:
-      throw new Error()
-  }
 }
 
 export function MarkdownEditor({
@@ -267,12 +272,12 @@ export function MarkdownEditor({
 
           <Mention
             state={mentionState}
-            onSelect={(name) => {
+            onSelect={(user: MentionUser) => {
               const preMention = value.slice(0, mentionState.triggerIdx!)
               const postMention = value.slice(
                 textareaMarkdownRef.current?.selectionStart
               )
-              const newValue = `${preMention}@${name} ${postMention}`
+              const newValue = `${preMention}[${user.name}](/profile/${user.id}) ${postMention}`
 
               onChange(newValue)
               closeMention()
@@ -303,7 +308,7 @@ function Mention({
   onClose,
 }: {
   state: MentionState
-  onSelect: (name: string) => void
+  onSelect: (user: MentionUser) => void
   onClose: () => void
 }) {
   const mentionListQuery = trpc.useQuery(['user.mentionList'])
@@ -338,7 +343,7 @@ function MentionList({
 }: {
   mentionList: InferQueryOutput<'user.mentionList'>
   position: MentionPosition
-  onSelect: (name: string) => void
+  onSelect: (user: MentionUser) => void
   onClose: () => void
 }) {
   const ref = useDetectClickOutside({ onTriggered: onClose })
@@ -389,9 +394,11 @@ function MentionList({
     >
       <ul role="listbox" className="divide-y divide-primary">
         {mentionList.map((user) => (
-          <MentionItem key={user.name} useItem={useItem}>
-            {user.name!}
-          </MentionItem>
+          <MentionItem
+            key={user.name}
+            useItem={useItem}
+            user={{ id: user.id, name: user.name! }}
+          />
         ))}
       </ul>
     </div>
@@ -399,7 +406,7 @@ function MentionList({
 }
 function MentionItem({
   useItem,
-  children,
+  user,
 }: {
   useItem: ({ ref, text, value, disabled }: ItemOptions) => {
     id: string
@@ -409,12 +416,12 @@ function MentionItem({
     selected: any
     useHighlighted: () => Boolean
   }
-  children: string
+  user: MentionUser
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
   const { id, index, highlight, select, useHighlighted } = useItem({
     ref,
-    value: children,
+    value: user,
   })
   const highlighted = useHighlighted()
 
@@ -431,7 +438,7 @@ function MentionItem({
         highlighted ? 'bg-blue-600 text-white' : 'text-primary'
       )}
     >
-      {children}
+      {user.name}
     </li>
   )
 }

@@ -65,6 +65,7 @@ export const userRouter = createProtectedRouter()
     async resolve({ ctx }) {
       const users = await ctx.prisma.user.findMany({
         select: {
+          id: true,
           name: true,
         },
         orderBy: {
