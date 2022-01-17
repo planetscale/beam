@@ -3,6 +3,7 @@ import { ButtonLink } from '@/components/button-link'
 import { MarkdownIcon } from '@/components/icons'
 import { MarkdownEditor } from '@/components/markdown-editor'
 import { TextField } from '@/components/text-field'
+import { useLeaveConfirm } from '@/lib/form'
 import * as React from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 
@@ -24,9 +25,20 @@ export function PostForm({
   backTo,
   onSubmit,
 }: PostFormProps) {
-  const { control, register, handleSubmit } = useForm<FormData>({
-    defaultValues,
-  })
+  const { control, register, formState, getValues, reset, handleSubmit } =
+    useForm<FormData>({
+      defaultValues,
+    })
+
+  useLeaveConfirm({ formState })
+
+  const { isSubmitSuccessful } = formState
+
+  React.useEffect(() => {
+    if (isSubmitSuccessful) {
+      reset(getValues())
+    }
+  }, [formState])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -61,7 +73,7 @@ export function PostForm({
             isLoading={isSubmitting}
             loadingChildren={`${defaultValues ? 'Editing' : 'Publishing'} post`}
           >
-            {defaultValues ? 'Edit' : 'Publish'} post
+            {defaultValues?.title ? 'Edit' : 'Publish'} post
           </Button>
           <ButtonLink href={backTo} variant="secondary">
             Cancel
