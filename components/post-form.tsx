@@ -38,7 +38,7 @@ export function PostForm({
     if (isSubmitSuccessful) {
       reset(getValues())
     }
-  }, [formState])
+  }, [isSubmitSuccessful, reset, getValues])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

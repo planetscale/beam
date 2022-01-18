@@ -25,7 +25,7 @@ export function useLeaveConfirm<T>({
       }
       throw "Abort route change by user's confirmation."
     }
-  }, [isDirty])
+  }, [isDirty, message])
 
   React.useEffect(() => {
     Router.events.on('routeChangeStart', onRouteChangeStart)
@@ -33,7 +33,7 @@ export function useLeaveConfirm<T>({
     return () => {
       Router.events.off('routeChangeStart', onRouteChangeStart)
     }
-  }, [onRouteChangeStart])
+  }, [Router.events, onRouteChangeStart])
 
   useBeforeunload((event) => {
     if (isDirty) {
