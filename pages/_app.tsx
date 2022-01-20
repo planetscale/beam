@@ -4,6 +4,7 @@ import { AppRouter } from '@/server/routers/_app'
 import { httpBatchLink } from '@trpc/client/links/httpBatchLink'
 import { loggerLink } from '@trpc/client/links/loggerLink'
 import { withTRPC } from '@trpc/next'
+import { TRPCError } from '@trpc/server'
 import { SessionProvider, signIn, useSession } from 'next-auth/react'
 import { ThemeProvider } from 'next-themes'
 import type { AppProps } from 'next/app'
@@ -78,6 +79,22 @@ export default withTRPC<AppRouter>({
         }),
       ],
       transformer,
+      queryClientConfig: {
+        defaultOptions: {
+          queries: {
+            retry: (failureCount, error: any) => {
+              const trcpErrorCode = error?.data?.code as TRPCError['code']
+              if (trcpErrorCode === 'NOT_FOUND') {
+                return false
+              }
+              if (failureCount < 3) {
+                return true
+              }
+              return false
+            },
+          },
+        },
+      },
     }
   },
 })(MyApp)
