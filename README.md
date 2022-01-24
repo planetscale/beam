@@ -93,4 +93,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Deploy on Vercel
 
-TODO
+Deploy this application quickly to Vercel using the following Deploy button:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fflux-v2&env=DATABASE_URL,OKTA_CLIENT_ID,OKTA_CLIENT_SECRET,OKTA_ISSUER,NEXTAUTH_URL,NEXTAUTH_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET)
+
+After you deploy the app you need to update the callback URLs for the auth provider that you picked.
+
+For Okta you need to add the domain of the deployed app to `Sign-in redirect URIs` and `Sign-out redirect URIs`.
