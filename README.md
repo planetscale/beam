@@ -35,13 +35,13 @@ After creating an account, [create a database](https://docs.planetscale.com/tuto
 
 Create a [connection string](https://docs.planetscale.com/concepts/connection-strings#creating-a-password) to connect to your PlanetScale database, make sure you select the **Format** to be **Prisma**.
 
-Once you have the connection string is time to begin setting up the environment variables. Copy the .env.example file in this directory to .env.local (which will be ignored by Git):
+Once you have the connection string is time to begin setting up the environment variables. Copy the .env.example file in this directory to .env (which will be ignored by Git):
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Open .env.local and set the `DATABASE_URL` variable with the connection string from PlanetScale.
+Open `.env` and set the `DATABASE_URL` variable with the connection string from PlanetScale.
 
 Create the database schema by running:
 
@@ -63,7 +63,7 @@ For `Controlled access` you can pick **Allow everyone in your organization to ac
 
 Click `Save` and you should see a screen a the Okta app details.
 
-Open .env.local and set the following variables:
+Open `.env` and set the following variables:
 
 - `OKTA_CLIENT_ID` should be **Client ID**
 - `OKTA_CLIENT_SECRET` should be **Client secret**
@@ -77,7 +77,7 @@ If you don't already have a Cloudinary account, you can [sign up for a free one 
 
 Go to your Cloudinary dashboard, below account details you should see **Cloud Name**, **API Key**, **API Secret**.
 
-Open .env.local and set the following variables:
+Open `.env` and set the following variables:
 
 - `CLOUDINARY_CLOUD_NAME` should be **Cloud Name**
 - `CLOUDINARY_API_KEY` should be **API Key**
