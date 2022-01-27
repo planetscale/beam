@@ -1,13 +1,13 @@
 ---
-name: '@types/dompurify'
+name: "@types/dompurify"
 version: 2.3.3
 type: npm
 summary: TypeScript definitions for DOM Purify
 homepage: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/dompurify
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
         MIT License
 
         Copyright (c) Microsoft Corporation.

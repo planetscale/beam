@@ -2,15 +2,14 @@
 name: prisma
 version: 3.8.1
 type: npm
-summary:
-  Prisma is an open-source database toolkit. It includes a JavaScript/TypeScript
+summary: Prisma is an open-source database toolkit. It includes a JavaScript/TypeScript
   ORM for Node.js, migrations and a modern GUI to view and edit the data in your database.
   You can use Prisma in new projects or add it to an existing one.
 homepage: https://www.prisma.io
 license: apache-2.0
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
                                      Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/

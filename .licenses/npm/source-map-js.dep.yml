@@ -6,8 +6,8 @@ summary: Generates and consumes source maps
 homepage: https://github.com/7rulnik/source-map
 license: other
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
 
     Copyright (c) 2009-2011, Mozilla Foundation and contributors
     All rights reserved.

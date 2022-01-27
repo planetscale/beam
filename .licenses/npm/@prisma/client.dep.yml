@@ -1,16 +1,15 @@
 ---
-name: '@prisma/client'
+name: "@prisma/client"
 version: 3.8.1
 type: npm
-summary:
-  Prisma Client is an auto-generated, type-safe and modern JavaScript/TypeScript
+summary: Prisma Client is an auto-generated, type-safe and modern JavaScript/TypeScript
   ORM for Node.js that's tailored to your data. Supports MySQL, PostgreSQL, MariaDB,
   SQLite databases.
 homepage: https://www.prisma.io
 license: apache-2.0
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
                                      Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/

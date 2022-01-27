@@ -6,8 +6,8 @@ summary: A fully persistent balanced binary search tree
 homepage:
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
 
     The MIT License (MIT)
 

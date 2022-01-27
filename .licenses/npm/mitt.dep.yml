@@ -6,6 +6,6 @@ summary: Tiny 200b functional Event Emitter / pubsub.
 homepage: https://github.com/developit/mitt
 license: mit
 licenses:
-  - sources: README.md
-    text: '[MIT License](https://opensource.org/licenses/MIT) © [Jason Miller](https://jasonformat.com/)'
+- sources: README.md
+  text: "[MIT License](https://opensource.org/licenses/MIT) © [Jason Miller](https://jasonformat.com/)"
 notices: []

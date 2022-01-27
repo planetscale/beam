@@ -6,8 +6,8 @@ summary: Constants and utilities about visitor keys to traverse AST.
 homepage: https://github.com/eslint/eslint-visitor-keys#readme
 license: apache-2.0
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
                                      Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/

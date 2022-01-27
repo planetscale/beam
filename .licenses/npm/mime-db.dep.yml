@@ -6,8 +6,8 @@ summary: Media Type Database
 homepage:
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
 
     The MIT License (MIT)
 

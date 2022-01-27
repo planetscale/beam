@@ -1,13 +1,13 @@
 ---
-name: '@humanwhocodes/config-array'
+name: "@humanwhocodes/config-array"
 version: 0.9.2
 type: npm
 summary: Glob-based configuration matching.
 homepage: https://github.com/humanwhocodes/config-array#readme
 license: apache-2.0
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
                                      Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/
@@ -209,6 +209,6 @@ licenses:
        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
        See the License for the specific language governing permissions and
        limitations under the License.
-  - sources: README.md
-    text: Apache 2.0
+- sources: README.md
+  text: Apache 2.0
 notices: []

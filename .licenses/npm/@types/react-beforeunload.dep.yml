@@ -1,13 +1,13 @@
 ---
-name: '@types/react-beforeunload'
+name: "@types/react-beforeunload"
 version: 2.1.1
 type: npm
 summary: TypeScript definitions for react-beforeunload
 homepage: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-beforeunload
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
         MIT License
 
         Copyright (c) Microsoft Corporation.

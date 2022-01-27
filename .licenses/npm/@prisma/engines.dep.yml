@@ -1,13 +1,13 @@
 ---
-name: '@prisma/engines'
+name: "@prisma/engines"
 version: 3.8.0-43.34df67547cf5598f5a6cd3eb45f14ee70c3fb86f
 type: npm
 summary:
 homepage:
 license: apache-2.0
 licenses:
-  - sources: Auto-generated Apache-2.0 license text
-    text: |2
+- sources: Auto-generated Apache-2.0 license text
+  text: |2
                                      Apache License
                                Version 2.0, January 2004
                             http://www.apache.org/licenses/

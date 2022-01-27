@@ -6,11 +6,11 @@ summary: Safely get a dot-notated property within an object.
 homepage:
 license: mit
 licenses:
-  - sources: README.md
-    text: |-
-      [MIT](https://oss.ninja/mit/developit/)
+- sources: README.md
+  text: |-
+    [MIT](https://oss.ninja/mit/developit/)
 
 
-      [preact]: https://github.com/developit/preact
-      [tests]: https://github.com/developit/dlv/blob/master/test.js
+    [preact]: https://github.com/developit/preact
+    [tests]: https://github.com/developit/dlv/blob/master/test.js
 notices: []

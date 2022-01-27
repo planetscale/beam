@@ -1,13 +1,13 @@
 ---
-name: '@types/scheduler'
+name: "@types/scheduler"
 version: 0.16.2
 type: npm
 summary: TypeScript definitions for scheduler
 homepage: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/scheduler
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
         MIT License
 
         Copyright (c) Microsoft Corporation.

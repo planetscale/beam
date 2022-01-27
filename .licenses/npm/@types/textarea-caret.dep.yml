@@ -1,13 +1,13 @@
 ---
-name: '@types/textarea-caret'
+name: "@types/textarea-caret"
 version: 3.0.1
 type: npm
 summary: TypeScript definitions for textarea-caret
 homepage: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/textarea-caret
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
         MIT License
 
         Copyright (c) Microsoft Corporation.

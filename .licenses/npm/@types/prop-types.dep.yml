@@ -1,13 +1,13 @@
 ---
-name: '@types/prop-types'
+name: "@types/prop-types"
 version: 15.7.4
 type: npm
 summary: TypeScript definitions for prop-types
 homepage: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/prop-types
 license: mit
 licenses:
-  - sources: LICENSE
-    text: |2
+- sources: LICENSE
+  text: |2
         MIT License
 
         Copyright (c) Microsoft Corporation.
