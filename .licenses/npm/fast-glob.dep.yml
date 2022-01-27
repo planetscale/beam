@@ -1,0 +1,66 @@
+---
+name: fast-glob
+version: 3.2.11
+type: npm
+summary: It's a very fast and efficient glob library for Node.js
+homepage:
+license: mit
+licenses:
+  - sources: LICENSE
+    text: |
+      The MIT License (MIT)
+
+      Copyright (c) Denis Malinochkin
+
+      Permission is hereby granted, free of charge, to any person obtaining a copy
+      of this software and associated documentation files (the "Software"), to deal
+      in the Software without restriction, including without limitation the rights
+      to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+      copies of the Software, and to permit persons to whom the Software is
+      furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included in all
+      copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+      IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+      FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+      AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+      LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+      OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+      SOFTWARE.
+  - sources: README.md
+    text: |-
+      This software is released under the terms of the MIT license.
+
+      [bash_hackers_syntax_expansion_brace]: https://wiki.bash-hackers.org/syntax/expansion/brace
+      [github_gist_benchmark_nettop]: https://gist.github.com/mrmlnc/f06246b197f53c356895fa35355a367c#file-fg-benchmark-nettop-product-txt
+      [github_gist_benchmark_server]: https://gist.github.com/mrmlnc/f06246b197f53c356895fa35355a367c#file-fg-benchmark-server-product-txt
+      [github_releases]: https://github.com/mrmlnc/fast-glob/releases
+      [glob_definition]: https://en.wikipedia.org/wiki/Glob_(programming)
+      [glob_linux_man]: http://man7.org/linux/man-pages/man3/glob.3.html
+      [intel_ssd]: https://ark.intel.com/content/www/us/en/ark/products/93012/intel-ssd-dc-s3520-series-240gb-2-5in-sata-6gb-s-3d1-mlc.html
+      [micromatch_backslashes]: https://github.com/micromatch/micromatch#backslashes
+      [micromatch_braces]: https://github.com/micromatch/braces
+      [micromatch_extended_globbing]: https://github.com/micromatch/micromatch#extended-globbing
+      [micromatch_extglobs]: https://github.com/micromatch/micromatch#extglobs
+      [micromatch_regex_character_classes]: https://github.com/micromatch/micromatch#regex-character-classes
+      [micromatch]: https://github.com/micromatch/micromatch
+      [node_js_fs_class_fs_dirent]: https://nodejs.org/api/fs.html#fs_class_fs_dirent
+      [node_js_fs_class_fs_stats]: https://nodejs.org/api/fs.html#fs_class_fs_stats
+      [node_js_stream_readable_streams]: https://nodejs.org/api/stream.html#stream_readable_streams
+      [node_js]: https://nodejs.org/en
+      [nodelib_fs_scandir_old_and_modern_modern]: https://github.com/nodelib/nodelib/blob/master/packages/fs/fs.scandir/README.md#old-and-modern-mode
+      [npm_normalize_path]: https://www.npmjs.com/package/normalize-path
+      [npm_unixify]: https://www.npmjs.com/package/unixify
+      [paypal_mrmlnc]:https://paypal.me/mrmlnc
+      [picomatch_matching_behavior]: https://github.com/micromatch/picomatch#matching-behavior-vs-bash
+      [picomatch_matching_special_characters_as_literals]: https://github.com/micromatch/picomatch#matching-special-characters-as-literals
+      [picomatch_posix_brackets]: https://github.com/micromatch/picomatch#posix-brackets
+      [regular_expressions_brackets]: https://www.regular-expressions.info/brackets.html
+      [silicon_power_ssd]: https://www.silicon-power.com/web/product-1
+      [unc_path]: https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/62e862f4-2a51-452e-8eeb-dc4ff5ee33cc
+      [vultr_pricing_baremetal]: https://www.vultr.com/pricing/baremetal
+      [wikipedia_case_sensitivity]: https://en.wikipedia.org/wiki/Case_sensitivity
+      [zotac_bi323]: https://www.zotac.com/ee/product/mini_pcs/zbox-bi323
+notices: []
