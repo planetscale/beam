@@ -1,0 +1,16 @@
+---
+name: dlv
+version: 1.1.3
+type: npm
+summary: Safely get a dot-notated property within an object.
+homepage:
+license: mit
+licenses:
+- sources: README.md
+  text: |-
+    [MIT](https://oss.ninja/mit/developit/)
+
+
+    [preact]: https://github.com/developit/preact
+    [tests]: https://github.com/developit/dlv/blob/master/test.js
+notices: []

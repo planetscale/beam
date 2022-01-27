@@ -1,0 +1,46 @@
+---
+name: glob-parent
+version: 6.0.2
+type: npm
+summary: Extract the non-magic parent path from a glob string.
+homepage:
+license: isc
+licenses:
+- sources: LICENSE
+  text: |
+    The ISC License
+
+    Copyright (c) 2015, 2019 Elan Shanker, 2021 Blaine Bublitz <blaine.bublitz@gmail.com>, Eric Schoffstall <yo@contra.io> and other contributors
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+- sources: README.md
+  text: |-
+    ISC
+
+    <!-- prettier-ignore-start -->
+    [downloads-image]: https://img.shields.io/npm/dm/glob-parent.svg?style=flat-square
+    [npm-url]: https://www.npmjs.com/package/glob-parent
+    [npm-image]: https://img.shields.io/npm/v/glob-parent.svg?style=flat-square
+
+    [ci-url]: https://github.com/gulpjs/glob-parent/actions?query=workflow:dev
+    [ci-image]: https://img.shields.io/github/workflow/status/gulpjs/glob-parent/dev?style=flat-square
+
+    [coveralls-url]: https://coveralls.io/r/gulpjs/glob-parent
+    [coveralls-image]: https://img.shields.io/coveralls/gulpjs/glob-parent/master.svg?style=flat-square
+    <!-- prettier-ignore-end -->
+
+    <!-- prettier-ignore-start -->
+    [expand-braces]: https://github.com/jonschlinkert/expand-braces
+    [expand-brackets]: https://github.com/jonschlinkert/expand-brackets
+    <!-- prettier-ignore-end -->
+notices: []

@@ -1,0 +1,13 @@
+---
+name: natural-compare
+version: 1.4.0
+type: npm
+summary: Compare strings containing a mix of letters and numbers in the way a human
+  being would in sort order.
+homepage:
+license: mit
+licenses:
+- sources: README.md
+  text: "Copyright (c) 2012-2015 Lauri Rooden &lt;lauri@rooden.ee&gt;  \n[The MIT
+    License](http://lauri.rooden.ee/mit-license.txt)"
+notices: []

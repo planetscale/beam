@@ -1,0 +1,51 @@
+---
+name: glob-parent
+version: 5.1.2
+type: npm
+summary: Extract the non-magic parent path from a glob string.
+homepage:
+license: isc
+licenses:
+- sources: LICENSE
+  text: |
+    The ISC License
+
+    Copyright (c) 2015, 2019 Elan Shanker
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
+    IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+- sources: README.md
+  text: |-
+    ISC
+
+    [expand-braces]: https://github.com/jonschlinkert/expand-braces
+    [expand-brackets]: https://github.com/jonschlinkert/expand-brackets
+
+    [downloads-image]: https://img.shields.io/npm/dm/glob-parent.svg
+    [npm-url]: https://www.npmjs.com/package/glob-parent
+    [npm-image]: https://img.shields.io/npm/v/glob-parent.svg
+
+    [azure-pipelines-url]: https://dev.azure.com/gulpjs/gulp/_build/latest?definitionId=2&branchName=master
+    [azure-pipelines-image]: https://dev.azure.com/gulpjs/gulp/_apis/build/status/glob-parent?branchName=master
+
+    [travis-url]: https://travis-ci.org/gulpjs/glob-parent
+    [travis-image]: https://img.shields.io/travis/gulpjs/glob-parent.svg?label=travis-ci
+
+    [appveyor-url]: https://ci.appveyor.com/project/gulpjs/glob-parent
+    [appveyor-image]: https://img.shields.io/appveyor/ci/gulpjs/glob-parent.svg?label=appveyor
+
+    [coveralls-url]: https://coveralls.io/r/gulpjs/glob-parent
+    [coveralls-image]: https://img.shields.io/coveralls/gulpjs/glob-parent/master.svg
+
+    [gitter-url]: https://gitter.im/gulpjs/gulp
+    [gitter-image]: https://badges.gitter.im/gulpjs/gulp.svg
+notices: []
