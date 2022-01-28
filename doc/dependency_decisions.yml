@@ -1,0 +1,80 @@
+---
+- - :permit
+  - bsd-2-clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:20:57.834036000 Z
+- - :permit
+  - bsd-3-clause
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:20:58.143083000 Z
+- - :permit
+  - apache-2.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:20:58.412229000 Z
+- - :permit
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:20:58.679979000 Z
+- - :permit
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:20:58.944400000 Z
+- - :license
+  - '@headlessui/react'
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:22:39.175082000 Z
+- - :license
+  - '@radix-ui/react-tooltip'
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:23:05.264476000 Z
+- - :license
+  - cloudinary
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:23:16.913230000 Z
+- - :license
+  - next-themes
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:24:10.496257000 Z
+- - :license
+  - react-detect-click-outside
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:24:20.800824000 Z
+- - :license
+  - react-div-100vh
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:24:30.813003000 Z
+- - :license
+  - textarea-markdown-editor
+  - MIT
+  - :who:
+    :why:
+    :versions: []
+    :when: 2022-01-28 23:24:41.001580000 Z
