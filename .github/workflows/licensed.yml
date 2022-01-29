@@ -17,10 +17,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: jonabc/setup-licensed@v1
-        with:
-          version: '3.x'
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
+      - run: sudo gem install license_finder
       - run: npm install
-      - run: licensed cache
-      - run: licensed status
+      - run: license_finder
