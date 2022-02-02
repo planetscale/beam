@@ -21,7 +21,7 @@ const SignIn = ({
       </Head>
 
       <Div100vh>
-        <main className="relative flex items-center justify-center h-full bg-center bg-square-grid dark:bg-square-grid-dark">
+        <main className="relative flex items-center justify-center h-full bg-center bg-circle-grid dark:bg-circle-grid-dark">
           <div className="relative bottom-16">
             <Logo className="w-[326px] text-red h-[94px] mb-8 bg-primary" />
             <div className="w-full space-y-4 text-center bg-primary">
