@@ -117,7 +117,7 @@ function ProfileInfo() {
             )}
 
             <div className="flex-1">
-              <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              <h1 className="bg-primary text-2xl font-semibold tracking-tight md:text-3xl">
                 {profileQuery.data.name}
               </h1>
               {profileQuery.data.title && (
@@ -333,11 +333,10 @@ function DotPattern() {
           height={31.5}
           patternUnits="userSpaceOnUse"
         >
-          <rect
-            x={0}
-            y={0}
-            width={3}
-            height={3}
+          <circle
+            cx={1.5}
+            cy={1.5}
+            r={1.5}
             className="text-gray-100 dark:text-gray-700"
             fill="currentColor"
           />
