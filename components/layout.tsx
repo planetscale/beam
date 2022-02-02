@@ -32,7 +32,7 @@ export function Layout({ children }: LayoutProps) {
       <header className="flex items-center justify-between gap-4 py-12 md:py-20">
         <Link href="/">
           <a>
-            <Logo className="w-auto text-red h-[34px]" />
+            <Logo className="w-auto text-red-light h-[34px]" />
           </a>
         </Link>
         <div className="flex items-center gap-2 md:gap-4">
