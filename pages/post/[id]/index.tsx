@@ -120,7 +120,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
     return (
       <>
         <Head>
-          <title>{postQuery.data.title} - Flux</title>
+          <title>{postQuery.data.title} - Beam</title>
         </Head>
 
         <div className="divide-y divide-primary">

@@ -17,7 +17,7 @@ const SignIn = ({
   return (
     <>
       <Head>
-        <title>Sign In - Flux</title>
+        <title>Sign In - Beam</title>
       </Head>
 
       <Div100vh>

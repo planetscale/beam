@@ -95,7 +95,7 @@ const Home: NextPageWithAuthAndLayout = () => {
     return (
       <>
         <Head>
-          <title>Flux</title>
+          <title>Beam</title>
         </Head>
 
         {feedQuery.data.postCount === 0 ? (
