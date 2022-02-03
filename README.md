@@ -100,3 +100,4 @@ Deploy this application quickly to Vercel using the following Deploy button:
 After you deploy the app you need to update the callback URLs for the auth provider that you picked.
 
 For Okta you need to add the domain of the deployed app to `Sign-in redirect URIs` and `Sign-out redirect URIs`.
+
