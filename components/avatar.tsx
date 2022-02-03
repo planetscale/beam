@@ -1,7 +1,6 @@
-import { classNames } from '@/lib/classnames'
+import { isCharacterALetter } from '@/lib/text'
 import Image from 'next/image'
 import * as React from 'react'
-import * as pixelLetters from './pixel-letters'
 
 type AvatarSize = 'sm' | 'md' | 'lg'
 
@@ -18,19 +17,13 @@ const dimension: Record<AvatarSize, number> = {
 }
 
 const initialSize: Record<AvatarSize, string> = {
-  sm: 'w-4 h-4',
-  md: 'w-5 h-5',
-  lg: 'w-14 h-14',
-}
-
-function UnknownLetter() {
-  return null
+  sm: 'w-5 h-5',
+  md: 'w-6 h-6',
+  lg: 'w-16 h-16',
 }
 
 export function Avatar({ size = 'md', name, src }: AvatarProps) {
-  const Initial =
-    pixelLetters[name.charAt(0).toUpperCase() as keyof typeof pixelLetters] ||
-    UnknownLetter
+  const initial = name.charAt(0).toLocaleLowerCase()
 
   return (
     <div className="relative inline-flex flex-shrink-0 rounded-full">
@@ -57,9 +50,16 @@ export function Avatar({ size = 'md', name, src }: AvatarProps) {
               height={dimension[size]}
             />
           </div>
-          <div className="relative flex items-center justify-center col-start-1 col-end-1 row-start-1 row-end-1">
-            <Initial className={classNames('text-white', initialSize[size])} />
-          </div>
+          {isCharacterALetter(initial) && (
+            <div className="relative flex items-center justify-center col-start-1 col-end-1 row-start-1 row-end-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/images/letters/${initial}.svg`}
+                className={initialSize[size]}
+                alt=""
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
