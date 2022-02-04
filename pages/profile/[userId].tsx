@@ -268,7 +268,9 @@ function ProfileFeed() {
       <>
         <div className="flow-root mt-28">
           {profileFeedQuery.data.postCount === 0 ? (
-            <div className="text-lg text-center">No posts</div>
+            <div className="text-center text-secondary border rounded py-20">
+              This user hasn&apos;t published any posts yet.
+            </div>
           ) : (
             <ul className="-my-12 divide-y divide-primary">
               {profileFeedQuery.data.posts.map((post) => (
