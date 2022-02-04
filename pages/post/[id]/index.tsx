@@ -113,6 +113,22 @@ const PostPage: NextPageWithAuthAndLayout = () => {
   const [isConfirmUnhideDialogOpen, setIsConfirmUnhideDialogOpen] =
     React.useState(false)
 
+  function handleHide() {
+    setIsConfirmHideDialogOpen(true)
+  }
+
+  function handleUnhide() {
+    setIsConfirmUnhideDialogOpen(true)
+  }
+
+  function handleEdit() {
+    router.push(`/post/${postQuery.data?.id}/edit`)
+  }
+
+  function handleDelete() {
+    setIsConfirmDeleteDialogOpen(true)
+  }
+
   if (postQuery.data) {
     const isUserAdmin = session!.user.role === 'ADMIN'
     const postBelongsToUser = postQuery.data.author.id === session!.user.id
@@ -136,52 +152,85 @@ const PostPage: NextPageWithAuthAndLayout = () => {
                 {postQuery.data.title}
               </h1>
               {(postBelongsToUser || isUserAdmin) && (
-                <div className="flex gap-4">
-                  {isUserAdmin &&
-                    (postQuery.data.hidden ? (
-                      <IconButton
+                <>
+                  <div className="flex md:hidden">
+                    <Menu>
+                      <MenuButton
+                        as={IconButton}
                         variant="secondary"
-                        title="Unhide"
-                        onClick={() => {
-                          setIsConfirmUnhideDialogOpen(true)
-                        }}
+                        title="More"
                       >
-                        <EyeIcon className="w-4 h-4" />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        variant="secondary"
-                        title="Hide"
-                        onClick={() => {
-                          setIsConfirmHideDialogOpen(true)
-                        }}
-                      >
-                        <EyeClosedIcon className="w-4 h-4" />
-                      </IconButton>
-                    ))}
-                  {postBelongsToUser && (
-                    <>
-                      <IconButton
-                        variant="secondary"
-                        title="Edit"
-                        onClick={() => {
-                          router.push(`/post/${postQuery.data.id}/edit`)
-                        }}
-                      >
-                        <EditIcon className="w-4 h-4" />
-                      </IconButton>
-                      <IconButton
-                        variant="secondary"
-                        title="Delete"
-                        onClick={() => {
-                          setIsConfirmDeleteDialogOpen(true)
-                        }}
-                      >
-                        <TrashIcon className="w-4 h-4 text-red" />
-                      </IconButton>
-                    </>
-                  )}
-                </div>
+                        <DotsIcon className="w-4 h-4" />
+                      </MenuButton>
+
+                      <MenuItems className="w-28">
+                        <MenuItemsContent>
+                          {isUserAdmin &&
+                            (postQuery.data.hidden ? (
+                              <MenuItemButton onClick={handleUnhide}>
+                                Unhide
+                              </MenuItemButton>
+                            ) : (
+                              <MenuItemButton onClick={handleHide}>
+                                Hide
+                              </MenuItemButton>
+                            ))}
+                          {postBelongsToUser && (
+                            <>
+                              <MenuItemButton onClick={handleEdit}>
+                                Edit
+                              </MenuItemButton>
+                              <MenuItemButton
+                                className="!text-red"
+                                onClick={handleDelete}
+                              >
+                                Delete
+                              </MenuItemButton>
+                            </>
+                          )}
+                        </MenuItemsContent>
+                      </MenuItems>
+                    </Menu>
+                  </div>
+                  <div className="hidden md:flex md:gap-4">
+                    {isUserAdmin &&
+                      (postQuery.data.hidden ? (
+                        <IconButton
+                          variant="secondary"
+                          title="Unhide"
+                          onClick={handleUnhide}
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                        </IconButton>
+                      ) : (
+                        <IconButton
+                          variant="secondary"
+                          title="Hide"
+                          onClick={handleHide}
+                        >
+                          <EyeClosedIcon className="w-4 h-4" />
+                        </IconButton>
+                      ))}
+                    {postBelongsToUser && (
+                      <>
+                        <IconButton
+                          variant="secondary"
+                          title="Edit"
+                          onClick={handleEdit}
+                        >
+                          <EditIcon className="w-4 h-4" />
+                        </IconButton>
+                        <IconButton
+                          variant="secondary"
+                          title="Delete"
+                          onClick={handleDelete}
+                        >
+                          <TrashIcon className="w-4 h-4 text-red" />
+                        </IconButton>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
             </div>
             <div className="mt-6">
