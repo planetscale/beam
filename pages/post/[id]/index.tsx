@@ -391,6 +391,7 @@ type CommentFormData = {
 }
 
 function AddCommentForm({ postId }: { postId: number }) {
+  const [markdownEditorKey, setMarkdownEditorKey] = React.useState(0)
   const utils = trpc.useContext()
   const addCommentMutation = trpc.useMutation('comment.add', {
     onSuccess: () => {
@@ -411,6 +412,7 @@ function AddCommentForm({ postId }: { postId: number }) {
       {
         onSuccess: () => {
           reset({ content: '' })
+          setMarkdownEditorKey((markdownEditorKey) => markdownEditorKey + 1)
         },
       }
     )
@@ -424,6 +426,7 @@ function AddCommentForm({ postId }: { postId: number }) {
         rules={{ required: true }}
         render={({ field }) => (
           <MarkdownEditor
+            key={markdownEditorKey}
             value={field.value}
             onChange={field.onChange}
             required
