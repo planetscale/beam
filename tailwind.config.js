@@ -210,26 +210,27 @@ module.exports = {
             h2: {
               fontWeight: '600',
               fontSize: '24px',
-              lineHeight: '20px',
+              lineHeight: '28px',
               marginTop: '1em',
             },
             h3: {
               fontSize: '20px',
-              lineHeight: '16px',
+              lineHeight: '24px',
             },
             h4: {
               fontSize: '16px',
-              lineHeight: '12px',
+              lineHeight: '24px',
             },
             h5: {
               fontSize: '16px',
-              lineHeight: '12px',
+              lineHeight: '24px',
             },
             h6: {
               fontSize: '16px',
-              lineHeight: '12px',
+              lineHeight: '24px',
             },
             li: {
+              lineHeight: '24px',
               marginTop: '0.25em',
               marginBottom: '0.25em',
             },

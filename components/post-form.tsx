@@ -71,23 +71,25 @@ export function PostForm({
           <Button
             type="submit"
             isLoading={isSubmitting}
-            loadingChildren={`${defaultValues ? 'Editing' : 'Publishing'} post`}
+            loadingChildren={`${defaultValues ? 'Saving' : 'Publishing'}`}
           >
-            {defaultValues?.title ? 'Edit' : 'Publish'} post
+            {defaultValues?.title ? 'Save' : 'Publish'}
           </Button>
           <ButtonLink href={backTo} variant="secondary">
             Cancel
           </ButtonLink>
         </div>
-        <a
-          href="https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-2 transition-colors text-secondary hover:text-blue"
-        >
-          <MarkdownIcon />
-          <span className="text-xs">Markdown supported</span>
-        </a>
+        {!isSubmitting && (
+          <a
+            href="https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 transition-colors text-secondary hover:text-blue"
+          >
+            <MarkdownIcon />
+            <span className="text-xs">Markdown supported</span>
+          </a>
+        )}
       </div>
     </form>
   )
