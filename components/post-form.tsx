@@ -71,9 +71,9 @@ export function PostForm({
           <Button
             type="submit"
             isLoading={isSubmitting}
-            loadingChildren={`${defaultValues ? 'Editing' : 'Publishing'} post`}
+            loadingChildren={`${defaultValues ? 'Saving' : 'Publishing'}`}
           >
-            {defaultValues?.title ? 'Edit' : 'Publish'} post
+            {defaultValues?.title ? 'Save' : 'Publish'}
           </Button>
           <ButtonLink href={backTo} variant="secondary">
             Cancel
