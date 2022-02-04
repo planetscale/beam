@@ -163,7 +163,7 @@ export function MarkdownEditor({
               }}
               className={classNames(
                 showPreview ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700',
-                'relative inline-flex flex-shrink-0 items-center h-[18px] w-8 rounded-full transition-colors ease-in-out duration-200 focus-ring focus:border'
+                'relative inline-flex flex-shrink-0 items-center h-[18px] w-8 rounded-full transition-colors ease-in-out duration-200 focus-ring'
               )}
             >
               <span
