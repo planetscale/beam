@@ -99,7 +99,7 @@ const Home: NextPageWithAuthAndLayout = () => {
         </Head>
 
         {feedQuery.data.postCount === 0 ? (
-          <div className="text-center text-secondary border rounded py-20">
+          <div className="text-center text-secondary border rounded py-20 px-10">
             There are no published posts to show yet.
           </div>
         ) : (

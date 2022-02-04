@@ -268,7 +268,7 @@ function ProfileFeed() {
       <>
         <div className="flow-root mt-28">
           {profileFeedQuery.data.postCount === 0 ? (
-            <div className="text-center text-secondary border rounded py-20">
+            <div className="text-center text-secondary border rounded py-20 px-10">
               This user hasn&apos;t published any posts yet.
             </div>
           ) : (
