@@ -19,13 +19,10 @@ class MyDocument extends Document {
             href="/fonts/inter-italic.var.woff2"
             crossOrigin="anonymous"
           />
-          <link rel="mask-icon" href="/favicon.svg" color="#ff455d" />
-          <link
-            rel="shortcut icon"
-            href="/favicon.svg"
-            sizes="any"
-            type="image/svg+xml"
-          />
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link rel="manifest" href="/manifest.webmanifest" />
         </Head>
         <body>
           <Main />
