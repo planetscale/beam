@@ -101,3 +101,7 @@ After you deploy the app you need to update the callback URLs for the auth provi
 
 For Okta you need to add the domain of the deployed app to `Sign-in redirect URIs` and `Sign-out redirect URIs`.
 
+## Changelog
+
+February 8, 2022 - Added logging via Logflare
+                 - Added Slack notifications via custom application
