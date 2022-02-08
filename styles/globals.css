@@ -161,6 +161,7 @@
 
   a {
     @apply focus-visible-ring;
+    @apply break-words;
   }
 
   b,
