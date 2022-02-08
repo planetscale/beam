@@ -103,5 +103,9 @@ For Okta you need to add the domain of the deployed app to `Sign-in redirect URI
 
 ## Changelog
 
-February 8, 2022 - Added logging via Logflare
-                 - Added Slack notifications via custom application
+### 1.0.0
+
+#### February 8, 2022
+
+- Added logging via Logflare
+- Added Slack notifications via custom application
