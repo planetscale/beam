@@ -22,8 +22,18 @@ export function postToSlackIfEnabled({
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `<${process.env.NEXT_PUBLIC_URL}/post/${post.id}|${post.title}> by ${authorName}`,
+              text: `*<${process.env.NEXT_PUBLIC_URL}/post/${post.id}|${post.title}>*`,
             },
+          },
+          {
+            type: 'context',
+            elements: [
+              {
+                type: 'plain_text',
+                text: authorName,
+                emoji: true,
+              },
+            ],
           },
         ],
       }),
