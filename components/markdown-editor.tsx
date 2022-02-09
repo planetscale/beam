@@ -21,7 +21,11 @@ type MarkdownEditorProps = {
   label?: string
   value: string
   onChange: (value: string) => void
-} & Omit<TextareaAutosizeProps, 'value' | 'onChange'>
+  onTriggerSubmit?: () => void
+} & Omit<
+  TextareaAutosizeProps,
+  'value' | 'onChange' | 'onKeyDown' | 'onInput' | 'onPaste' | 'onDrop'
+>
 
 type MentionPosition = {
   top: number
@@ -110,6 +114,7 @@ export function MarkdownEditor({
   value,
   minRows = 15,
   onChange,
+  onTriggerSubmit,
   ...rest
 }: MarkdownEditorProps) {
   const textareaMarkdownRef = React.useRef<TextareaMarkdownRef>(null)
@@ -196,6 +201,12 @@ export function MarkdownEditor({
               {...rest}
               value={value}
               onChange={(event) => onChange(event.target.value)}
+              onKeyDown={(event) => {
+                const { code, metaKey } = event
+                if (code === 'Enter' && metaKey) {
+                  onTriggerSubmit?.()
+                }
+              }}
               onInput={(event) => {
                 const { keystrokeTriggered, triggerIdx, query } =
                   getMentionData(event.currentTarget)

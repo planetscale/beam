@@ -60,6 +60,7 @@ export function PostForm({
               label="Post"
               value={field.value}
               onChange={field.onChange}
+              onTriggerSubmit={handleSubmit(onSubmit)}
               required
             />
           )}

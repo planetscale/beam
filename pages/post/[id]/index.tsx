@@ -478,6 +478,7 @@ function AddCommentForm({ postId }: { postId: number }) {
             key={markdownEditorKey}
             value={field.value}
             onChange={field.onChange}
+            onTriggerSubmit={handleSubmit(onSubmit)}
             required
             placeholder="Comment"
             minRows={4}
@@ -545,6 +546,7 @@ function EditCommentForm({
           <MarkdownEditor
             value={field.value}
             onChange={field.onChange}
+            onTriggerSubmit={handleSubmit(onSubmit)}
             required
             placeholder="Comment"
             minRows={4}
