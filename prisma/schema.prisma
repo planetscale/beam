@@ -23,15 +23,15 @@ model Account {
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?
-  access_token       String? @db.VarChar(1000)
+  refresh_token      String? @db.VarChar(2000)
+  access_token       String? @db.VarChar(2000)
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String? @db.VarChar(1000)
-  session_state      String?
-  oauth_token_secret String?
-  oauth_token        String?
+  id_token           String? @db.VarChar(2000)
+  session_state      String? @db.VarChar(2000)
+  oauth_token_secret String? @db.VarChar(2000)
+  oauth_token        String? @db.VarChar(2000)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
