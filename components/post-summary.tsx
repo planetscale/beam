@@ -83,6 +83,7 @@ export function PostSummary({
             <LikeButton
               likedBy={post.likedBy}
               responsive
+              readonly
               onLike={onLike}
               onUnlike={onUnlike}
             />
