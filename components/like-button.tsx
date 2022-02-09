@@ -16,6 +16,7 @@ type LikeButtonProps = {
     }
   }[]
   responsive?: boolean
+  readonly?: boolean
   onLike: () => void
   onUnlike: () => void
 }
@@ -23,13 +24,14 @@ type LikeButtonProps = {
 export function LikeButton({
   likedBy,
   responsive,
+  readonly,
   onLike,
   onUnlike,
 }: LikeButtonProps) {
   const [isLikingAnimation, setIsLikingAnimation] = useState(false)
 
   function handleClick() {
-    if (isLikingAnimation) {
+    if (readonly || isLikingAnimation) {
       return
     }
 
@@ -67,6 +69,7 @@ export function LikeButton({
           responsive={responsive}
           className={classNames(
             'transition-colors overflow-hidden [transform:translateZ(0)] space-x-1.5',
+            readonly && 'cursor-default',
             isLikedByCurrentUser &&
               'border-red-300 !bg-red-100 dark:!bg-red-900 dark:border-red-700',
             isLikingAnimation && '!border-red-600 !bg-red-600 dark:!bg-red-600'
