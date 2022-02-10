@@ -67,3 +67,12 @@ One-click deploy:
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fbeam&env=DATABASE_URL,OKTA_CLIENT_ID,OKTA_CLIENT_SECRET,OKTA_ISSUER,NEXTAUTH_URL,NEXTAUTH_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET)
 
 After deploying, update the callback URLs for your preferred auth provider.
+
+## Built on open source
+
+- [Next.js](https://nextjs.org/) as the React framework
+- [Tailwind](https://tailwindcss.com/) for CSS styling
+- [Prisma](https://prisma.io/) as the ORM for database access
+- [PlanetScale](https://planetscale.com/) as the database (MySQL)
+- [NextAuth.js](https://next-auth.js.org/) for authentication
+- [Vercel](http://vercel.com/) for deployment
