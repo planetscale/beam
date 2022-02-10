@@ -1,23 +1,18 @@
-# Beam
+<img src="public/images/logo.svg" />
 
-Changelog for organizations.
+Beam is a simple tool that allows members to write posts to share across your organization. Think of it like a lightweight internal blog.
+
 
 ## Features
 
+- Reactions and comments
 - User profiles
-- Responsive
-- Dark Mode Support
+- Responsive design
+- Dark mode support
 - Search
 - Admin role for hiding posts
 
-## Built on open source
-
-- [Next.js](https://nextjs.org/) as the React framework
-- [Tailwind](https://tailwindcss.com/) for CSS styling
-- [Prisma](https://prisma.io/) as the ORM for database access
-- [PlanetScale](https://planetscale.com/) as the database (MySQL)
-- [NextAuth.js](https://next-auth.js.org/) for authentication
-- [Vercel](http://vercel.com/) for deployment
+[TODO: SCREENSHOT HERE]
 
 ## Setup
 
@@ -29,83 +24,46 @@ npm install
 
 ### 1. PlanetScale database
 
-If you don't already have a PlanetScale account, you can [sign up for a free one here](https://auth.planetscale.com/sign-up).
-
-After creating an account, [create a database](https://docs.planetscale.com/tutorials/planetscale-quick-start-guide#create-a-database).
-
-Create a [connection string](https://docs.planetscale.com/concepts/connection-strings#creating-a-password) to connect to your PlanetScale database, make sure you select the **Format** to be **Prisma**.
-
-Once you have the connection string is time to begin setting up the environment variables. Copy the .env.example file in this directory to .env (which will be ignored by Git):
-
+* [Create a PlanetScale database](https://docs.planetscale.com/tutorials/planetscale-quick-start-guide#create-a-database).
+* Create a [connection string](https://docs.planetscale.com/concepts/connection-strings#creating-a-password) to connect to your database. Choose **Prisma** for the format.
+* Set up the environment variables:
 ```bash
 cp .env.example .env
 ```
-
-Open `.env` and set the `DATABASE_URL` variable with the connection string from PlanetScale.
-
-Create the database schema by running:
-
+* Open `.env` and set the `DATABASE_URL` variable with the connection string from PlanetScale.
+* Create the database schema:
 ```bash
 npx prisma db push
 ```
 
 ### 2. Authentication provider
 
-Beam comes by default with an Okta integration, but you can easily change it because of the next-auth [provider](https://next-auth.js.org/configuration/providers/oauth) ecosystem.
+By default Beam uses GitHub for authentication, but you can use Okta if you prefer. View the [Okta setup instructions](docs/okta_setup.md).
 
-Create an [Okta account](https://login.okta.com/signin/register/) if you don't have one and go to the **Applications** page in your account.
-
-Click `Create App Integration`, for the `Sign-in method` pick **OIDC - OpenID Connect** and for the `Application type` pick **Web Application**, then click `Next`.
-
-Change `Sign-in redirect URIs` to be **http://localhost:3000/api/auth/callback/okta** and `Sign-out redirect URIs` to be **http://localhost:3000**.
-
-For `Controlled access` you can pick **Allow everyone in your organization to access** if you don't have other preference.
-
-Click `Save` and you should see a screen a the Okta app details.
-
-Open `.env` and set the following variables:
-
-- `OKTA_CLIENT_ID` should be **Client ID**
-- `OKTA_CLIENT_SECRET` should be **Client secret**
-- `OKTA_ISSUER` should be **Okta domain** prefixed with `https://` (for example https://dev-1234.okta.com)
-- `NEXTAUTH_URL` should be **http://localhost:3000**
-- `NEXTAUTH_SECRET` should be a random secret, you can grab one from [https://generate-secret.now.sh/32](https://generate-secret.now.sh/32)
+[TODO: GitHub auth instructions]
 
 ### 3. Cloudinary
 
-If you don't already have a Cloudinary account, you can [sign up for a free one here](https://cloudinary.com/users/register/free).
+Beam uses Cloudinary for storing uploaded images. You can [sign up for a free account](https://cloudinary.com/users/register/free).
 
-Go to your Cloudinary dashboard, below account details you should see **Cloud Name**, **API Key**, **API Secret**.
+* On your Cloudinary dashboard, look for these values under your account settings: **Cloud Name**, **API Key**, **API Secret**.
+* Update `.env` with the following variables:
+  - `CLOUDINARY_CLOUD_NAME`: **Cloud Name**
+  - `CLOUDINARY_API_KEY`: **API Key**
+  - `CLOUDINARY_API_SECRET`: **API Secret**
 
-Open `.env` and set the following variables:
-
-- `CLOUDINARY_CLOUD_NAME` should be **Cloud Name**
-- `CLOUDINARY_API_KEY` should be **API Key**
-- `CLOUDINARY_API_SECRET` should be **API Secret**
-
-## Run the app locally
+## Running the app locally
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deploy on Vercel
+## Deploying to Vercel
 
-Deploy this application quickly to Vercel using the following Deploy button:
+One-click deploy:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fbeam&env=DATABASE_URL,OKTA_CLIENT_ID,OKTA_CLIENT_SECRET,OKTA_ISSUER,NEXTAUTH_URL,NEXTAUTH_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET)
 
-After you deploy the app you need to update the callback URLs for the auth provider that you picked.
-
-For Okta you need to add the domain of the deployed app to `Sign-in redirect URIs` and `Sign-out redirect URIs`.
-
-## Changelog
-
-### 1.0.0
-
-#### February 8, 2022
-
-- Added logging via Logflare
-- Added Slack notifications via custom application
+After deploying, update the callback URLs for your preferred auth provider.
