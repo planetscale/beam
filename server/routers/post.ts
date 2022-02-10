@@ -155,14 +155,8 @@ export const postRouter = createProtectedRouter()
         take: 10,
         where: {
           hidden: false,
-          OR: [
-            {
-              title: { contains: input.query },
-            },
-            {
-              content: { contains: input.query },
-            },
-          ],
+          title: { search: input.query },
+          content: { search: input.query },
         },
         select: {
           id: true,

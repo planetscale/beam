@@ -153,6 +153,11 @@ function SearchField({ onSelect }: { onSelect: () => void }) {
             No results. Try something else
           </div>
         ))}
+      {feedQuery.isError && (
+        <div className="border-t py-3.5 px-3 text-center leading-tight">
+          Error: {feedQuery.error.message}
+        </div>
+      )}
     </div>
   )
 }
