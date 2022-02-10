@@ -23,7 +23,7 @@ function MyApp({
   const getLayout = Component.getLayout ?? ((page) => page)
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session} refetchOnWindowFocus={false}>
       <ThemeProvider attribute="class" disableTransitionOnChange>
         {Component.auth ? (
           <Auth>{getLayout(<Component {...pageProps} />)}</Auth>
