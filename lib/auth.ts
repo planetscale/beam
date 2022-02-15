@@ -43,14 +43,15 @@ export const authOptions: NextAuthOptions = {
                   }
                 }
 
-                const orgs = await (
+                const userOrgs = await (
                   await fetch('https://api.github.com/user/orgs', {
                     headers: { Authorization: `token ${tokens.access_token}` },
                   })
                 ).json()
 
+                // Set flag to deny signIn if allowed org is not found in the user organizations
                 if (
-                  !orgs.find(
+                  !userOrgs.find(
                     (org: any) => org.login === serverEnv.GITHUB_ALLOWED_ORG
                   )
                 ) {
@@ -75,10 +76,10 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log(user, account, profile)
       if (profile.notAllowed) {
         return false
       }
+
       return true
     },
     async session({ session, user }) {
