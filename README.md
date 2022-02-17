@@ -1,16 +1,6 @@
 <img src="public/images/logo.svg" />
 
-Beam is a simple tool that allows members to write posts to share across your organization. Think of it like a lightweight internal blog.
-
-
-## Features
-
-- Reactions and comments
-- User profiles
-- Responsive design
-- Dark mode support
-- Search
-- Admin role for hiding posts
+Beam is a simple tool that allows members to write posts to share across your organization. Think of it like a lightweight internal blog. Features include a simple **Markdown-based** editor with preview, comments and likes, **search**, a clean responsive layout with **dark mode support**, and an admin role for hiding posts.
 
 [TODO: SCREENSHOT HERE]
 
