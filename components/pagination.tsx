@@ -1,5 +1,5 @@
 import { ButtonLink } from '@/components/button-link'
-import { ChevronRightIcon } from '@/components/icons'
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { useRouter } from 'next/router'
 
 type PaginationProps = {
@@ -46,8 +46,8 @@ export function Pagination({
           currentPageNumber === 1 ? 'pointer-events-none opacity-50' : ''
         }
       >
-        <span className="mr-1 rotate-180">
-          <ChevronRightIcon />
+        <span className="mr-1">
+          <ChevronLeftIcon />
         </span>
         Newer posts
       </ButtonLink>
