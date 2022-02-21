@@ -14,6 +14,7 @@ import { getQueryPaginationInput, Pagination } from '@/components/pagination'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { TextField } from '@/components/text-field'
+import { browserEnv } from '@/env/browser'
 import { uploadImage } from '@/lib/cloudinary'
 import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
@@ -90,7 +91,8 @@ function ProfileInfo() {
 
         <div className="relative flex items-center gap-4 py-8 overflow-hidden">
           <div className="flex items-center gap-8">
-            {profileBelongsToUser ? (
+            {browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD &&
+            profileBelongsToUser ? (
               <button
                 type="button"
                 className="relative inline-flex group"

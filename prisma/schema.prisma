@@ -18,20 +18,21 @@ enum Role {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.VarChar(2000)
-  access_token       String? @db.VarChar(2000)
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.VarChar(2000)
-  session_state      String? @db.VarChar(2000)
-  oauth_token_secret String? @db.VarChar(2000)
-  oauth_token        String? @db.VarChar(2000)
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? @db.VarChar(2000)
+  refresh_token_expires_in Int?
+  access_token             String? @db.VarChar(2000)
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? @db.VarChar(2000)
+  session_state            String? @db.VarChar(2000)
+  oauth_token_secret       String? @db.VarChar(2000)
+  oauth_token              String? @db.VarChar(2000)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

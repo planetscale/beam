@@ -21,6 +21,7 @@
     "cloudinary": "^1.27.1",
     "crypto-hash": "^2.0.1",
     "date-fns": "^2.28.0",
+    "envsafe": "^2.0.3",
     "gemoji": "^7.1.0",
     "isomorphic-dompurify": "^0.18.0",
     "marked": "^4.0.12",

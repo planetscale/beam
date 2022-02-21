@@ -1,5 +1,6 @@
 import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
+import { browserEnv } from '@/env/browser'
 import { classNames } from '@/lib/classnames'
 import {
   getSuggestionData,
@@ -261,42 +262,46 @@ export function MarkdownEditor({
                 }
               }}
               onPaste={(event) => {
-                const filesArray = Array.from(event.clipboardData.files)
+                if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
+                  const filesArray = Array.from(event.clipboardData.files)
 
-                if (filesArray.length === 0) {
-                  return
+                  if (filesArray.length === 0) {
+                    return
+                  }
+
+                  const imageFiles = filesArray.filter((file) =>
+                    /image/i.test(file.type)
+                  )
+
+                  if (imageFiles.length === 0) {
+                    return
+                  }
+
+                  event.preventDefault()
+
+                  handleUploadImages(event.currentTarget, imageFiles)
                 }
-
-                const imageFiles = filesArray.filter((file) =>
-                  /image/i.test(file.type)
-                )
-
-                if (imageFiles.length === 0) {
-                  return
-                }
-
-                event.preventDefault()
-
-                handleUploadImages(event.currentTarget, imageFiles)
               }}
               onDrop={(event) => {
-                const filesArray = Array.from(event.dataTransfer.files)
+                if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
+                  const filesArray = Array.from(event.dataTransfer.files)
 
-                if (filesArray.length === 0) {
-                  return
+                  if (filesArray.length === 0) {
+                    return
+                  }
+
+                  const imageFiles = filesArray.filter((file) =>
+                    /image/i.test(file.type)
+                  )
+
+                  if (imageFiles.length === 0) {
+                    return
+                  }
+
+                  event.preventDefault()
+
+                  handleUploadImages(event.currentTarget, imageFiles)
                 }
-
-                const imageFiles = filesArray.filter((file) =>
-                  /image/i.test(file.type)
-                )
-
-                if (imageFiles.length === 0) {
-                  return
-                }
-
-                event.preventDefault()
-
-                handleUploadImages(event.currentTarget, imageFiles)
               }}
               className="block w-full rounded shadow-sm bg-secondary border-secondary focus-ring"
               minRows={minRows}
