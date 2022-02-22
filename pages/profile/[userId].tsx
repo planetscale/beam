@@ -34,13 +34,6 @@ const PostSummary = dynamic<PostSummaryProps>(
 
 const POSTS_PER_PAGE = 20
 
-// This is a hack until next-auth has proper way of reloading the session
-// https://github.com/nextauthjs/next-auth/issues/596#issuecomment-943453568
-export function reloadSession() {
-  const event = new Event('visibilitychange')
-  document.dispatchEvent(event)
-}
-
 function getProfileQueryPathAndInput(
   id: string
 ): InferQueryPathAndInput<'user.profile'> {
@@ -378,7 +371,7 @@ function EditProfileDialog({
   const utils = trpc.useContext()
   const editUserMutation = trpc.useMutation('user.edit', {
     onSuccess: () => {
-      reloadSession()
+      window.location.reload()
       return utils.invalidateQueries(
         getProfileQueryPathAndInput(String(router.query.userId))
       )
@@ -452,22 +445,24 @@ function UpdateAvatarDialog({
 }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [uploadedImage, setUploadedImage] = React.useState(user.image)
-  const router = useRouter()
-  const utils = trpc.useContext()
   const updateUserAvatarMutation = trpc.useMutation('user.update-avatar', {
     onSuccess: () => {
-      reloadSession()
-      return utils.invalidateQueries(
-        getProfileQueryPathAndInput(String(router.query.userId))
-      )
+      window.location.reload()
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
     },
   })
-  const uploadImageMutation = useMutation((file: File) => {
-    return uploadImage(file)
-  })
+  const uploadImageMutation = useMutation(
+    (file: File) => {
+      return uploadImage(file)
+    },
+    {
+      onError: (error: any) => {
+        toast.error(`Error uploading image: ${error.message}`)
+      },
+    }
+  )
 
   function handleClose() {
     onClose()
@@ -545,29 +540,21 @@ function UpdateAvatarDialog({
             if (user.image === uploadedImage) {
               handleClose()
             } else {
-              let image = null
-
               const files = fileInputRef.current?.files
-              if (files && files.length > 0) {
-                try {
-                  const uploadedImage = await uploadImageMutation.mutateAsync(
-                    files[0]
-                  )
-                  image = uploadedImage.url
-                } catch (error: any) {
-                  console.log(error)
-                  toast.error(`Error uploading image: ${error.message}`)
-                }
-              }
 
-              updateUserAvatarMutation.mutate(
-                {
-                  image,
-                },
-                {
-                  onSuccess: () => handleClose(),
-                }
-              )
+              if (files && files.length > 0) {
+                uploadImageMutation.mutate(files[0], {
+                  onSuccess: (uploadedImage) => {
+                    updateUserAvatarMutation.mutate({
+                      image: uploadedImage.url,
+                    })
+                  },
+                })
+              } else {
+                updateUserAvatarMutation.mutate({
+                  image: null,
+                })
+              }
             }
           }}
         >
