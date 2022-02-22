@@ -6,13 +6,13 @@ Beam is a simple tool that allows members to write posts to share across your or
 
 ## Setup
 
-### 0. Install dependencies
+### Install dependencies
 
 ```bash
 npm install
 ```
 
-### 1. PlanetScale database
+### Create a database
 
 - [Create a PlanetScale database](https://docs.planetscale.com/tutorials/planetscale-quick-start-guide#create-a-database)
 - Create a [connection string](https://docs.planetscale.com/concepts/connection-strings#creating-a-password) to connect to your database. Choose **Prisma** for the format
@@ -29,7 +29,7 @@ cp .env.example .env
 npx prisma db push
 ```
 
-### 2. Authentication provider
+### Configure authentication
 
 By default Beam uses GitHub for authentication, but you can use Okta if you prefer. [Okta setup instructions](doc/okta_setup.md).
 
@@ -45,7 +45,7 @@ By default Beam uses GitHub for authentication, but you can use Okta if you pref
   - Set `GITHUB_ALLOWED_ORG` to the GitHub organization name your Beam members must belong to
   - Set `NEXTAUTH_SECRET` to be a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
 
-### 3. Image upload (optional)
+### Enable image uploads (optional)
 
 To enable image uploads, set the environment variable `NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD` to `true`.
 
