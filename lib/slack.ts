@@ -1,3 +1,4 @@
+import { serverEnv } from '@/env/server'
 import type { Post } from '@prisma/client'
 
 export function postToSlackIfEnabled({
@@ -7,11 +8,8 @@ export function postToSlackIfEnabled({
   post: Post
   authorName: string
 }) {
-  if (
-    process.env.ENABLE_SLACK_POSTING === 'true' &&
-    process.env.SLACK_WEBHOOK_URL
-  ) {
-    return fetch(process.env.SLACK_WEBHOOK_URL, {
+  if (serverEnv.ENABLE_SLACK_POSTING && serverEnv.SLACK_WEBHOOK_URL) {
+    return fetch(serverEnv.SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -22,7 +20,7 @@ export function postToSlackIfEnabled({
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `*<${process.env.NEXT_PUBLIC_URL}/post/${post.id}|${post.title}>*`,
+              text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
             },
           },
           {

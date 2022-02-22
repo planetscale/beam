@@ -1,4 +1,5 @@
 import { ButtonLink } from '@/components/button-link'
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons'
 import { useRouter } from 'next/router'
 
 type PaginationProps = {
@@ -45,7 +46,10 @@ export function Pagination({
           currentPageNumber === 1 ? 'pointer-events-none opacity-50' : ''
         }
       >
-        Previous
+        <span className="mr-1">
+          <ChevronLeftIcon />
+        </span>
+        Newer posts
       </ButtonLink>
       <ButtonLink
         href={{
@@ -59,7 +63,10 @@ export function Pagination({
             : ''
         }
       >
-        Next
+        Older posts{' '}
+        <span className="ml-1">
+          <ChevronRightIcon />
+        </span>
       </ButtonLink>
     </div>
   )

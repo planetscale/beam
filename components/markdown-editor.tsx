@@ -1,15 +1,18 @@
 import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
+import { browserEnv } from '@/env/browser'
 import { classNames } from '@/lib/classnames'
 import {
-  getMentionData,
+  getSuggestionData,
   handleUploadImages,
   markdownToHtml,
 } from '@/lib/editor'
-import { InferQueryOutput, trpc } from '@/lib/trpc'
+import { trpc } from '@/lib/trpc'
 import { Switch } from '@headlessui/react'
+import { matchSorter } from 'match-sorter'
 import * as React from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside'
+import { useQuery } from 'react-query'
 import TextareaAutosize, {
   TextareaAutosizeProps,
 } from 'react-textarea-autosize'
@@ -27,28 +30,32 @@ type MarkdownEditorProps = {
   'value' | 'onChange' | 'onKeyDown' | 'onInput' | 'onPaste' | 'onDrop'
 >
 
-type MentionPosition = {
+type SuggestionResult = {
+  label: string
+  value: string
+}
+
+type SuggestionPosition = {
   top: number
   left: number
 }
 
-type MentionUser = {
-  id: string
-  name: string
-}
+type SuggestionType = 'mention' | 'emoji'
 
-type MentionState = {
+type SuggestionState = {
   isOpen: boolean
-  position: MentionPosition | null
+  type: SuggestionType | null
+  position: SuggestionPosition | null
   triggerIdx: number | null
   query: string
 }
 
-type MentionActionType =
+type SuggestionActionType =
   | {
       type: 'open'
       payload: {
-        position: MentionPosition
+        type: SuggestionType
+        position: SuggestionPosition
         triggerIdx: number
         query: string
       }
@@ -56,17 +63,27 @@ type MentionActionType =
   | { type: 'close' }
   | { type: 'updateQuery'; payload: string }
 
-function mentionReducer(state: MentionState, action: MentionActionType) {
+function suggestionReducer(
+  state: SuggestionState,
+  action: SuggestionActionType
+) {
   switch (action.type) {
     case 'open':
       return {
         isOpen: true,
+        type: action.payload.type,
         position: action.payload.position,
         triggerIdx: action.payload.triggerIdx,
         query: action.payload.query,
       }
     case 'close':
-      return { isOpen: false, position: null, triggerIdx: null, query: '' }
+      return {
+        isOpen: false,
+        type: null,
+        position: null,
+        triggerIdx: null,
+        query: '',
+      }
     case 'updateQuery':
       return { ...state, query: action.payload }
     default:
@@ -119,15 +136,19 @@ export function MarkdownEditor({
 }: MarkdownEditorProps) {
   const textareaMarkdownRef = React.useRef<TextareaMarkdownRef>(null)
   const [showPreview, setShowPreview] = React.useState(false)
-  const [mentionState, mentionDispatch] = React.useReducer(mentionReducer, {
-    isOpen: false,
-    position: null,
-    triggerIdx: null,
-    query: '',
-  })
+  const [suggestionState, suggestionDispatch] = React.useReducer(
+    suggestionReducer,
+    {
+      isOpen: false,
+      type: null,
+      position: null,
+      triggerIdx: null,
+      query: '',
+    }
+  )
 
-  function closeMention() {
-    mentionDispatch({ type: 'close' })
+  function closeSuggestion() {
+    suggestionDispatch({ type: 'close' })
   }
 
   return (
@@ -200,34 +221,30 @@ export function MarkdownEditor({
             <TextareaAutosize
               {...rest}
               value={value}
-              onChange={(event) => onChange(event.target.value)}
-              onKeyDown={(event) => {
-                const { code, metaKey } = event
-                if (code === 'Enter' && metaKey) {
-                  onTriggerSubmit?.()
-                }
-              }}
-              onInput={(event) => {
-                const { keystrokeTriggered, triggerIdx, query } =
-                  getMentionData(event.currentTarget)
+              onChange={(event) => {
+                onChange(event.target.value)
+
+                const { keystrokeTriggered, triggerIdx, type, query } =
+                  getSuggestionData(event.currentTarget)
 
                 if (!keystrokeTriggered) {
-                  if (mentionState.isOpen) {
-                    closeMention()
+                  if (suggestionState.isOpen) {
+                    closeSuggestion()
                   }
                   return
                 }
 
-                if (mentionState.isOpen) {
-                  mentionDispatch({ type: 'updateQuery', payload: query })
+                if (suggestionState.isOpen) {
+                  suggestionDispatch({ type: 'updateQuery', payload: query })
                 } else {
                   const coords = getCaretCoordinates(
                     event.currentTarget,
                     triggerIdx + 1
                   )
-                  mentionDispatch({
+                  suggestionDispatch({
                     type: 'open',
                     payload: {
+                      type,
                       position: {
                         top: coords.top + coords.height,
                         left: coords.left,
@@ -238,63 +255,85 @@ export function MarkdownEditor({
                   })
                 }
               }}
+              onKeyDown={(event) => {
+                const { code, metaKey } = event
+                if (code === 'Enter' && metaKey) {
+                  onTriggerSubmit?.()
+                }
+              }}
               onPaste={(event) => {
-                const filesArray = Array.from(event.clipboardData.files)
+                if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
+                  const filesArray = Array.from(event.clipboardData.files)
 
-                if (filesArray.length === 0) {
-                  return
+                  if (filesArray.length === 0) {
+                    return
+                  }
+
+                  const imageFiles = filesArray.filter((file) =>
+                    /image/i.test(file.type)
+                  )
+
+                  if (imageFiles.length === 0) {
+                    return
+                  }
+
+                  event.preventDefault()
+
+                  handleUploadImages(event.currentTarget, imageFiles)
                 }
-
-                const imageFiles = filesArray.filter((file) =>
-                  /image/i.test(file.type)
-                )
-
-                if (imageFiles.length === 0) {
-                  return
-                }
-
-                event.preventDefault()
-
-                handleUploadImages(event.currentTarget, imageFiles)
               }}
               onDrop={(event) => {
-                const filesArray = Array.from(event.dataTransfer.files)
+                if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
+                  const filesArray = Array.from(event.dataTransfer.files)
 
-                if (filesArray.length === 0) {
-                  return
+                  if (filesArray.length === 0) {
+                    return
+                  }
+
+                  const imageFiles = filesArray.filter((file) =>
+                    /image/i.test(file.type)
+                  )
+
+                  if (imageFiles.length === 0) {
+                    return
+                  }
+
+                  event.preventDefault()
+
+                  handleUploadImages(event.currentTarget, imageFiles)
                 }
-
-                const imageFiles = filesArray.filter((file) =>
-                  /image/i.test(file.type)
-                )
-
-                if (imageFiles.length === 0) {
-                  return
-                }
-
-                event.preventDefault()
-
-                handleUploadImages(event.currentTarget, imageFiles)
               }}
               className="block w-full rounded shadow-sm bg-secondary border-secondary focus-ring"
               minRows={minRows}
             />
           </TextareaMarkdown.Wrapper>
 
-          <Mention
-            state={mentionState}
-            onSelect={(user: MentionUser) => {
-              const preMention = value.slice(0, mentionState.triggerIdx!)
-              const postMention = value.slice(
+          <Suggestion
+            state={suggestionState}
+            onSelect={(suggestionResult: SuggestionResult) => {
+              const preSuggestion = value.slice(0, suggestionState.triggerIdx!)
+              const postSuggestion = value.slice(
                 textareaMarkdownRef.current?.selectionStart
               )
-              const newValue = `${preMention}[${user.name}](/profile/${user.id}) ${postMention}`
 
-              onChange(newValue)
-              closeMention()
+              let suggestionInsertion = ''
+
+              if (suggestionState.type === 'mention') {
+                suggestionInsertion = `[${suggestionResult.label}](/profile/${suggestionResult.value})`
+              }
+
+              if (suggestionState.type === 'emoji') {
+                suggestionInsertion = suggestionResult.value
+              }
+
+              const newEditorValue = `${preSuggestion}${suggestionInsertion} ${postSuggestion}`
+
+              onChange(newEditorValue)
+              closeSuggestion()
 
               setTimeout(() => {
-                const caretPosition = newValue.length - postMention.length
+                const caretPosition =
+                  newEditorValue.length - postSuggestion.length
 
                 textareaMarkdownRef.current?.focus()
                 textareaMarkdownRef.current?.setSelectionRange(
@@ -303,7 +342,7 @@ export function MarkdownEditor({
                 )
               }, 0)
             }}
-            onClose={closeMention}
+            onClose={closeSuggestion}
           />
         </div>
 
@@ -313,32 +352,64 @@ export function MarkdownEditor({
   )
 }
 
-function Mention({
+function Suggestion({
   state,
   onSelect,
   onClose,
 }: {
-  state: MentionState
-  onSelect: (user: MentionUser) => void
+  state: SuggestionState
+  onSelect: (suggestionResult: SuggestionResult) => void
   onClose: () => void
 }) {
-  const mentionListQuery = trpc.useQuery(['user.mentionList'])
+  const isMentionType = state.type === 'mention'
+  const isEmojiType = state.type === 'emoji'
 
-  const mentionList = mentionListQuery.data
-    ? state.query === ''
-      ? mentionListQuery.data
-      : mentionListQuery.data.filter((user) =>
-          user.name!.toLowerCase().includes(state.query.toLowerCase())
-        )
-    : []
+  const emojiListQuery = useQuery(
+    'emojiList',
+    async () => {
+      const gemoji = (await import('gemoji')).gemoji
+      return gemoji
+    },
+    {
+      enabled: state.isOpen && isEmojiType,
+      staleTime: Infinity,
+    }
+  )
 
-  if (!state.isOpen || !state.position || mentionList.length === 0) {
+  const mentionListQuery = trpc.useQuery(['user.mentionList'], {
+    enabled: state.isOpen && isMentionType,
+    staleTime: 5 * 60 * 1000,
+  })
+
+  let suggestionList: SuggestionResult[] = []
+
+  if (isMentionType && mentionListQuery.data) {
+    suggestionList = matchSorter(mentionListQuery.data, state.query, {
+      keys: ['name'],
+    })
+      .slice(0, 5)
+      .map((item) => ({ label: item.name!, value: item.id }))
+  }
+
+  if (isEmojiType && emojiListQuery.data) {
+    suggestionList = matchSorter(emojiListQuery.data, state.query, {
+      keys: ['names', 'tags'],
+      threshold: matchSorter.rankings.STARTS_WITH,
+    })
+      .slice(0, 5)
+      .map((item) => ({
+        label: `${item.emoji} ${item.names[0]}`,
+        value: item.emoji,
+      }))
+  }
+
+  if (!state.isOpen || !state.position || suggestionList.length === 0) {
     return null
   }
 
   return (
-    <MentionList
-      mentionList={mentionList}
+    <SuggestionList
+      suggestionList={suggestionList}
       position={state.position}
       onSelect={onSelect}
       onClose={onClose}
@@ -346,15 +417,15 @@ function Mention({
   )
 }
 
-function MentionList({
-  mentionList,
+function SuggestionList({
+  suggestionList,
   position,
   onSelect,
   onClose,
 }: {
-  mentionList: InferQueryOutput<'user.mentionList'>
-  position: MentionPosition
-  onSelect: (user: MentionUser) => void
+  suggestionList: SuggestionResult[]
+  position: SuggestionPosition
+  onSelect: (suggestionResult: SuggestionResult) => void
   onClose: () => void
 }) {
   const ref = useDetectClickOutside({ onTriggered: onClose })
@@ -397,27 +468,27 @@ function MentionList({
   return (
     <div
       ref={ref}
-      className="absolute w-48 max-h-[286px] border rounded shadow-lg bg-primary overflow-y-auto"
+      className="absolute w-56 max-h-[286px] border rounded shadow-lg bg-primary overflow-y-auto"
       style={{
         top: position.top,
         left: position.left,
       }}
     >
       <ul role="listbox" className="divide-y divide-primary">
-        {mentionList.map((user) => (
-          <MentionItem
-            key={user.name}
+        {suggestionList.map((suggestionResult) => (
+          <SuggestionResult
+            key={suggestionResult.value}
             useItem={useItem}
-            user={{ id: user.id, name: user.name! }}
+            suggestionResult={suggestionResult}
           />
         ))}
       </ul>
     </div>
   )
 }
-function MentionItem({
+function SuggestionResult({
   useItem,
-  user,
+  suggestionResult,
 }: {
   useItem: ({ ref, text, value, disabled }: ItemOptions) => {
     id: string
@@ -427,12 +498,12 @@ function MentionItem({
     selected: any
     useHighlighted: () => Boolean
   }
-  user: MentionUser
+  suggestionResult: SuggestionResult
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
   const { id, index, highlight, select, useHighlighted } = useItem({
     ref,
-    value: user,
+    value: suggestionResult,
   })
   const highlighted = useHighlighted()
 
@@ -449,7 +520,7 @@ function MentionItem({
         highlighted ? 'bg-blue-600 text-white' : 'text-primary'
       )}
     >
-      {user.name}
+      {suggestionResult.label}
     </li>
   )
 }
