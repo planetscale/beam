@@ -37,9 +37,9 @@ By default Beam uses GitHub for authentication, but you can use Okta if you pref
 
 - Create an OAuth app on GitHub
   - Go to [Developer Settings](https://github.com/settings/developers)
-  - Click on "New OAuth App"
-  - For "Callback URL", enter http://localhost:3000/api/auth/callback/github
-  - Once the app is created, click "Generate a new client secret"
+  - Click on **New OAuth App**
+  - For **Callback URL**, enter http://localhost:3000/api/auth/callback/github
+  - Once the app is created, click **Generate a new client secret**
 - Set environment variables in `.env`
   - Set `AUTH_PROVIDER` to `github`
   - Set `GITHUB_SECRET` to the secret value generated above
