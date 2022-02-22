@@ -25,10 +25,6 @@ export function PostSummarySkeleton({ hideAuthor }: PostSummarySkeletonProps) {
             )}
           </div>
         </div>
-        <div className="flex gap-4">
-          <div className="w-16 border rounded-full h-button border-secondary" />
-          <div className="w-16 border rounded-full h-button border-secondary" />
-        </div>
       </div>
       <div className="space-y-3 mt-7">
         <div className="grid grid-cols-3 gap-4">
