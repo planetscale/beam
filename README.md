@@ -31,7 +31,7 @@ npx prisma db push
 
 ### 2. Authentication provider
 
-By default Beam uses GitHub for authentication, but you can use Okta if you prefer. View the [Okta setup instructions](docs/okta_setup.md).
+By default Beam uses GitHub for authentication, but you can use Okta if you prefer. View the [Okta setup instructions](doc/okta_setup.md).
 
 You can switch between the two using the `AUTH_PROVIDER` environment variable.
 
