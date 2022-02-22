@@ -43,7 +43,7 @@ By default Beam uses GitHub for authentication, but [you can use Okta](doc/okta_
   - Set `GITHUB_SECRET` to the secret value generated above
   - Set `GITHUB_ID` to the Client ID value
   - Set `GITHUB_ALLOWED_ORG` to the GitHub organization name your Beam members must belong to
-  - Set `NEXTAUTH_SECRET` to be a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
+  - Set `NEXTAUTH_SECRET` to a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
 
 ### Enable image uploads (optional)
 
@@ -71,4 +71,4 @@ One-click deploy:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fbeam&env=DATABASE_URL,OKTA_CLIENT_ID,OKTA_CLIENT_SECRET,OKTA_ISSUER,NEXTAUTH_URL,NEXTAUTH_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET)
 
-After deploying, update the callback URLs for your preferred auth provider.
+⚠️ Remember to update your callback URLs after deploying.

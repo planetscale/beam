@@ -1,21 +1,20 @@
 # Okta setup
 
-Create an [Okta account](https://login.okta.com/signin/register/) if you don't have one and go to the **Applications** page in your account.
+- Create an [Okta account](https://login.okta.com/signin/register/) if you don't have one and go to the **Applications** page
+- **Create an integration**
+  - Click **Create App Integration**
+  - For the **Sign-in method**, select **OIDC - OpenID Connect**
+  - For the **Application type**, pick **Web Application**
+  - Click **Next**
+  - Set **Sign-in redirect URIs** to http://localhost:3000/api/auth/callback/okta
+  - Set **Sign-out redirect URIs** to http://localhost:3000
+  - Click **Save**
 
-Click `Create App Integration`, for the `Sign-in method` pick **OIDC - OpenID Connect** and for the `Application type` pick **Web Application**, then click `Next`.
+⚠️ Remember to update `Sign-in redirect URIs` and `Sign-out redirect URIs` when deploying your app to production.
 
-Change `Sign-in redirect URIs` to be **http://localhost:3000/api/auth/callback/okta** and `Sign-out redirect URIs` to be **http://localhost:3000**.
-
-Remember to update `Sign-in redirect URIs` and `Sign-out redirect URIs` when deploying your app to production.
-
-For `Controlled access` you can pick **Allow everyone in your organization to access** if you don't have other preference.
-
-Click `Save` and you should see a screen a the Okta app details.
-
-Open `.env` and set the following variables:
-
-- `AUTH_PROVIDER` should be **okta**
-- `OKTA_CLIENT_ID` should be **Client ID**
-- `OKTA_CLIENT_SECRET` should be **Client secret**
-- `OKTA_ISSUER` should be **Okta domain** prefixed with `https://` (for example https://dev-1234.okta.com)
-- `NEXTAUTH_SECRET` should be a random secret, you can grab one from [https://generate-secret.now.sh/32](https://generate-secret.now.sh/32)
+- **Set environment variables in `.env`**
+  - Set `AUTH_PROVIDER` to **okta**
+  - Set `OKTA_CLIENT_ID` to **Client ID**
+  - Set `OKTA_CLIENT_SECRET` to **Client secret**
+  - Set `OKTA_ISSUER` to **Okta domain** (including `https://` prefix)
+  - Set `NEXTAUTH_SECRET` to a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
