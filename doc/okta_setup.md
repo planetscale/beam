@@ -6,8 +6,8 @@
   - For the **Sign-in method**, select **OIDC - OpenID Connect**
   - For the **Application type**, pick **Web Application**
   - Click **Next**
-  - Set **Sign-in redirect URIs** to http://localhost:3000/api/auth/callback/okta
-  - Set **Sign-out redirect URIs** to http://localhost:3000
+  - Set **Sign-in redirect URIs** to `http://localhost:3000/api/auth/callback/okta`
+  - Set **Sign-out redirect URIs** to `http://localhost:3000`
   - Click **Save**
 
 ⚠️ Remember to update `Sign-in redirect URIs` and `Sign-out redirect URIs` when deploying your app to production.
