@@ -40,8 +40,8 @@ By default Beam uses GitHub for authentication, but [you can use Okta](doc/okta_
   - Once the app is created, click **Generate a new client secret**
 - **Set environment variables in `.env`**
   - Set `AUTH_PROVIDER` to `github`
-  - Set `GITHUB_SECRET` to the secret value generated above
   - Set `GITHUB_ID` to the Client ID value
+  - Set `GITHUB_SECRET` to the secret value generated above
   - Set `GITHUB_ALLOWED_ORG` to the GitHub organization name your Beam members must belong to
   - Set `NEXTAUTH_SECRET` to a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
 
