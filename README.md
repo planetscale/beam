@@ -2,7 +2,7 @@
 
 Beam is a simple tool that allows members to write posts to share across your organization. Think of it like a lightweight internal blog. Features include a simple **Markdown-based** editor with preview, comments and likes, **search**, a clean responsive layout with **dark mode support**, and an admin role for hiding posts.
 
-<img src="public/images/screenshot@2x.png" width="652" />
+<img src="public/images/screenshot.png" width="690" />
 
 ## Setup
 
