@@ -28,6 +28,13 @@ const oktaParser = makeValidator<string>((input) => {
   return input
 })
 
+const googleParser = makeValidator<string>((input) => {
+  if (process.env.AUTH_PROVIDER === 'google' && input === '') {
+    throw invalidEnvError('google config', input)
+  }
+  return input
+})
+
 const cloudinaryParser = makeValidator<string>((input) => {
   if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && input === '') {
     throw invalidEnvError('cloudinary config', input)
@@ -53,7 +60,7 @@ export const serverEnv = {
       devDefault: 'xxx',
     }),
     AUTH_PROVIDER: str({
-      choices: ['github', 'okta'],
+      choices: ['github', 'okta', 'google'],
     }),
     GITHUB_ID: githubParser({ allowEmpty: true, default: '' }),
     GITHUB_SECRET: githubParser({ allowEmpty: true, default: '' }),
@@ -61,6 +68,8 @@ export const serverEnv = {
     OKTA_CLIENT_ID: oktaParser({ allowEmpty: true, default: '' }),
     OKTA_CLIENT_SECRET: oktaParser({ allowEmpty: true, default: '' }),
     OKTA_ISSUER: oktaParser({ allowEmpty: true, default: '' }),
+    GOOGLE_CLIENT_ID: googleParser({ allowEmpty: true, default: '' }),
+    GOOGLE_CLIENT_SECRET: googleParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_CLOUD_NAME: cloudinaryParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_API_KEY: cloudinaryParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_API_SECRET: cloudinaryParser({ allowEmpty: true, default: '' }),
