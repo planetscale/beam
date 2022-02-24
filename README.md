@@ -57,6 +57,10 @@ Beam uses Cloudinary for storing uploaded images. You can [sign up for a free ac
   - `CLOUDINARY_API_KEY`: **API Key**
   - `CLOUDINARY_API_SECRET`: **API Secret**
 
+### Configure Slack notifications (optional)
+
+If you'd like to have new Beam posts published to a Slack channel, follow [these instructions](doc/slack_setup.md).
+
 ## Running the app locally
 
 ```bash
