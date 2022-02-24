@@ -1,7 +1,8 @@
 import { serverEnv } from '@/env/server'
 import type { Post } from '@prisma/client'
+import { markdownToBlocks } from '@instantish/mack'
 
-export function postToSlackIfEnabled({
+export async function postToSlackIfEnabled({
   post,
   authorName,
 }: {
@@ -9,6 +10,11 @@ export function postToSlackIfEnabled({
   authorName: string
 }) {
   if (serverEnv.ENABLE_SLACK_POSTING && serverEnv.SLACK_WEBHOOK_URL) {
+    const bodyBlocks = await markdownToBlocks(post.content, {
+      lists: {
+        checkboxPrefix: (checked) => (checked ? '☑︎' : '☐'),
+      },
+    })
     return fetch(serverEnv.SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -23,6 +29,8 @@ export function postToSlackIfEnabled({
               text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
             },
           },
+          ...bodyBlocks,
+          { type: 'divider' },
           {
             type: 'context',
             elements: [
