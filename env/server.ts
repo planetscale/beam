@@ -49,6 +49,13 @@ const slackParser = makeValidator<string>((input) => {
   return input
 })
 
+const telegramParser = makeValidator<string>((input) => {
+  if (process.env.ENABLE_TELEGRAM_POSTING && input === '') {
+    throw invalidEnvError('telegram config', input)
+  }
+  return input
+})
+
 export const serverEnv = {
   ...browserEnv,
   ...envsafe({
@@ -75,5 +82,8 @@ export const serverEnv = {
     CLOUDINARY_API_SECRET: cloudinaryParser({ allowEmpty: true, default: '' }),
     ENABLE_SLACK_POSTING: bool({ default: false }),
     SLACK_WEBHOOK_URL: slackParser({ allowEmpty: true, default: '' }),
+    ENABLE_TELEGRAM_POSTING: bool({ default: false }),
+    TELEGRAM_BOT_TOKEN: telegramParser({ allowEmpty: true, default: '' }),
+    TELEGRAM_CHAT_ID: telegramParser({ allowEmpty: true, default: '' }),
   }),
 }

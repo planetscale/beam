@@ -1,5 +1,6 @@
 import { markdownToHtml } from '@/lib/editor'
 import { postToSlackIfEnabled } from '@/lib/slack'
+import { postToTelegramIfEnabled } from '@/lib/telegram'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { createProtectedRouter } from '../create-protected-router'
@@ -187,6 +188,7 @@ export const postRouter = createProtectedRouter()
       })
 
       postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
+      postToTelegramIfEnabled({ post, authorName: ctx.session.user.name })
 
       return post
     },
