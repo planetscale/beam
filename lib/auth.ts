@@ -4,6 +4,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { Role } from '@prisma/client'
 import type { NextAuthOptions } from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 import OktaProvider from 'next-auth/providers/okta'
 
 export const authOptions: NextAuthOptions = {
@@ -73,13 +74,26 @@ export const authOptions: NextAuthOptions = {
           }),
         ]
       : []),
+    ...(serverEnv.AUTH_PROVIDER === 'google'
+      ? [
+          GoogleProvider({
+            clientId: serverEnv.GOOGLE_CLIENT_ID,
+            clientSecret: serverEnv.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
       if (profile.notAllowed) {
         return false
       }
-
+      if (
+        account.provider === 'google' &&
+        serverEnv.GOOGLE_ALLOWED_DOMAIN !== ''
+      ) {
+        return profile.email!.endsWith(`@${serverEnv.GOOGLE_ALLOWED_DOMAIN}`)
+      }
       return true
     },
     async session({ session, user }) {
