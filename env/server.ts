@@ -70,7 +70,7 @@ export const serverEnv = {
     OKTA_ISSUER: oktaParser({ allowEmpty: true, default: '' }),
     GOOGLE_CLIENT_ID: googleParser({ allowEmpty: true, default: '' }),
     GOOGLE_CLIENT_SECRET: googleParser({ allowEmpty: true, default: '' }),
-    GOOGLE_ALLOWED_DOMAIN: googleParser({ allowEmpty: true, default: '' }),
+    GOOGLE_ALLOWED_DOMAIN: str({ allowEmpty: true, default: '' }),
     CLOUDINARY_CLOUD_NAME: cloudinaryParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_API_KEY: cloudinaryParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_API_SECRET: cloudinaryParser({ allowEmpty: true, default: '' }),
