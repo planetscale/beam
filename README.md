@@ -36,8 +36,7 @@ GitHub and Okta authentication settings are available as defaults, but thanks to
 - [Configuring GitHub authentication](doc/github_setup.md)
 - [Configuring Okta authentication](doc/okta_setup.md)
 
-Beam uses [NextAuth.js](https://next-auth.js.org/) under the hood, so you have access to all the [authentication providers](https://next-auth.js.org/providers/) that it has. You can modify the [`lib/auth.ts`](/lib/auth.ts#L11) file to add your own providers.
-
+Beam uses [NextAuth.js](https://next-auth.js.org/), so if you prefer to use one of the [many providers](https://next-auth.js.org/providers/) it supports, you can customize your own installation. Simply update the [`lib/auth.ts`](/lib/auth.ts#L11) file to add your own provider.
 
 ### Enable image uploads (optional)
 
