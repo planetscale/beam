@@ -14,4 +14,4 @@
 
 ⚠️ If you're using a GitHub OAuth app for authentication, you'll need to Request (if you're an organization member) or Grant (if you're an organization owner) access to the organization specified in `GITHUB_ALLOWED_ORG` on the GitHub authorization screen. Failure to provide access to the organization will result in an "Access Denied" error screen with the message "You do not have permission to sign in."
 
-![Github app authorization organizations list](https://user-images.githubusercontent.com/1954752/155861462-924247cc-545c-4654-aec6-a30940a38882.png)
+<img src="public/images/github-org-access.png" width="378" />
