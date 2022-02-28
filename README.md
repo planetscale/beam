@@ -31,19 +31,12 @@ npx prisma db push
 
 ### Configure authentication
 
-By default Beam uses GitHub for authentication, but [you can use Okta](doc/okta_setup.md) if you prefer.
+GitHub and Okta authentication settings are available as defaults, but thanks to NextAuth.js, you can configure your Beam instance with most other common authentication providers.
 
-- **Create an OAuth app on GitHub** (_Note that a separate app must be created for production use_)
-  - Go to [Developer Settings](https://github.com/settings/developers)
-  - Click on **New OAuth App**
-  - For **Callback URL**, enter `http://localhost:3000/api/auth/callback/github`
-  - Once the app is created, click **Generate a new client secret**
-- **Set environment variables in `.env`**
-  - Set `AUTH_PROVIDER` to `github`
-  - Set `GITHUB_ID` to the Client ID value
-  - Set `GITHUB_SECRET` to the secret value generated above
-  - Set `GITHUB_ALLOWED_ORG` to the GitHub organization name your Beam members must belong to
-  - Set `NEXTAUTH_SECRET` to a random secret. [This](https://generate-secret.now.sh/32) is a good resource.
+- [Configuring GitHub authentication](doc/github_setup.md)
+- [Configuring Okta authentication](doc/okta_setup.md)
+
+Beam uses [NextAuth.js](https://next-auth.js.org/), so if you prefer to use one of the [many providers](https://next-auth.js.org/providers/) it supports, you can customize your own installation. Simply update the [`lib/auth.ts`](/lib/auth.ts#L11) file to add your own provider.
 
 ### Enable image uploads (optional)
 
@@ -70,10 +63,6 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Authenticating with GitHub
-
-If you're using a GitHub OAuth app for authentication, you'll need to Request (if you're an organization member) or Grant (if you're an organization owner) access to the organization specified in `GITHUB_ALLOWED_ORG` on the GitHub authorization screen. Failure to provide access to the organization will result in an "Access Denied" error screen with the message "You do not have permission to sign in."
-
-![Github app authorization organizations list](https://user-images.githubusercontent.com/1954752/155861462-924247cc-545c-4654-aec6-a30940a38882.png)
 
 ## Deploying to Vercel
 
