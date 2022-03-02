@@ -190,6 +190,8 @@ module.exports = {
             '--tw-prose-quotes': 'var(--text-primary)',
             '--tw-prose-quote-borders': 'var(--border-secondary)',
             '--tw-prose-code': 'var(--text-primary)',
+            '--tw-prose-th-borders': 'var(--border-secondary)',
+            '--tw-prose-td-borders': 'var(--border-primary)',
             p: {
               lineHeight: '24px',
               marginBottom: '1em',
