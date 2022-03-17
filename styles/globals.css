@@ -97,6 +97,7 @@
   --border-secondary: var(--color-gray-200);
   --border-green: var(--color-green-600);
   --border-yellow-light: var(--color-yellow-200);
+  --logo-primary: var(--text-black);
   --text-primary: var(--color-gray-900);
   --text-primary-inverse: var(--color-white);
   --text-secondary: var(--color-gray-600);
@@ -122,6 +123,7 @@
   --border-green: var(--color-green-500);
   --border-green-light: var(--color-green-700);
   --border-yellow-light: var(--color-yellow-700);
+  --logo-primary: var(--text-white);
   --text-primary: var(--color-gray-050);
   --text-primary-inverse: var(--color-gray-900);
   --text-secondary: var(--color-gray-300);
