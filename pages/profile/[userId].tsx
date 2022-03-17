@@ -79,7 +79,7 @@ function ProfileInfo() {
     return (
       <>
         <Head>
-          <title>{profileQuery.data.name} - Beam</title>
+          <title>{profileQuery.data.name} - Sink</title>
         </Head>
 
         <div className="relative flex items-center gap-4 py-8 overflow-hidden">

@@ -5,6 +5,7 @@ import { Role } from '@prisma/client'
 import type { NextAuthOptions } from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 import OktaProvider from 'next-auth/providers/okta'
+import GoogleProvider from 'next-auth/providers/google'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -70,6 +71,14 @@ export const authOptions: NextAuthOptions = {
             clientId: serverEnv.OKTA_CLIENT_ID!,
             clientSecret: serverEnv.OKTA_CLIENT_SECRET!,
             issuer: serverEnv.OKTA_ISSUER!,
+          }),
+        ]
+      : []),
+    ...(serverEnv.AUTH_PROVIDER == 'google'
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
           }),
         ]
       : []),
