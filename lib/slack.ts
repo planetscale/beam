@@ -1,7 +1,9 @@
 import { serverEnv } from '@/env/server'
 import type { Post } from '@prisma/client'
+import { markdownToBlocks } from '@instantish/mack'
+import { marked } from 'marked'
 
-export function postToSlackIfEnabled({
+export async function postToSlackIfEnabled({
   post,
   authorName,
 }: {
@@ -9,6 +11,17 @@ export function postToSlackIfEnabled({
   authorName: string
 }) {
   if (serverEnv.ENABLE_SLACK_POSTING && serverEnv.SLACK_WEBHOOK_URL) {
+    const tokens = marked.lexer(post.content)
+    const summaryToken = tokens.find((token) => {
+      return (
+        token.type === 'paragraph' ||
+        token.type === 'html' ||
+        token.type === 'image'
+      )
+    })
+    const summaryBlocks = summaryToken
+      ? await markdownToBlocks(summaryToken.raw)
+      : []
     return fetch(serverEnv.SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -23,6 +36,8 @@ export function postToSlackIfEnabled({
               text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
             },
           },
+          summaryBlocks[0],
+          { type: 'divider' },
           {
             type: 'context',
             elements: [

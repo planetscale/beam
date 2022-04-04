@@ -186,7 +186,7 @@ export const postRouter = createProtectedRouter()
         },
       })
 
-      postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
+      await postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
 
       return post
     },
