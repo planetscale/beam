@@ -46,7 +46,8 @@ export const serverEnv = {
   ...browserEnv,
   ...envsafe({
     DATABASE_URL: str(),
-    NEXT_APP_URL: url({
+    NEXT_APP_URL: slackParser({
+      allowEmpty: true,
       devDefault: 'http://localhost:3000',
     }),
     NEXTAUTH_SECRET: str({
