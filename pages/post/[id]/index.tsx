@@ -240,7 +240,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
               />
             </div>
             <HtmlView html={postQuery.data.contentHtml} className="mt-8" />
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-4 mt-6 clear-both">
               <LikeButton
                 likedBy={postQuery.data.likedBy}
                 onLike={() => {
