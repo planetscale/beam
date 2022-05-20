@@ -125,12 +125,6 @@ export const postRouter = createProtectedRouter()
               },
             },
           },
-          _count: {
-            select: {
-              comments: true,
-              likedBy: true,
-            },
-          },
         },
       })
 
