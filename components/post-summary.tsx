@@ -90,7 +90,7 @@ export function PostSummary({
 
         <HtmlView html={summary} className={hideAuthor ? 'mt-4' : 'mt-6'} />
 
-        <div className="flex items-center gap-4 mt-4">
+        <div className="flex items-center gap-4 mt-4 clear-both">
           {hasMoreContent && (
             <Link href={`/post/${post.id}`}>
               <a className="inline-flex items-center font-medium transition-colors text-blue">
