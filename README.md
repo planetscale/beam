@@ -16,6 +16,17 @@ npm install
 
 - [Create a PlanetScale database](https://docs.planetscale.com/tutorials/planetscale-quick-start-guide#create-a-database)
 - Create a [connection string](https://docs.planetscale.com/concepts/connection-strings#creating-a-password) to connect to your database. Choose **Prisma** for the format
+- Alternatively, create your PlanetScale database and connection string programmatically, either with a script using [pscale CLI](https://github.com/planetscale/cli) or by running a GitHub Action wokflow:
+
+```bash
+cd .pscale/cli-helper-scripts/
+./create-database.sh
+```
+
+or
+
+![image](https://user-images.githubusercontent.com/1872314/173367645-2627d5de-5635-43ec-8adf-60b9508c562f.png)
+
 - Set up the environment variables:
 
 ```bash
