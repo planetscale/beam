@@ -13,6 +13,7 @@ import { InferQueryOutput } from '@/lib/trpc'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import { useSession } from 'next-auth/react'
+import { summarize } from '@/lib/text'
 import Link from 'next/link'
 import * as React from 'react'
 
@@ -29,27 +30,9 @@ export function PostSummary({
   onLike,
   onUnlike,
 }: PostSummaryProps) {
-  const contentDocument = React.useMemo(
-    () => new DOMParser().parseFromString(post.contentHtml, 'text/html'),
+  const { summary, hasMore } = React.useMemo(
+    () => summarize(post.contentHtml),
     [post.contentHtml]
-  )
-  //   TODO: decide on the order of the allowed tags
-  //   and research on how to truncate html to a max amount of characters
-  const summary = React.useMemo(() => {
-    const allowedTags = ['p', 'ul', 'ol', 'h3', 'pre', 'img']
-
-    for (const tag of allowedTags) {
-      const element = contentDocument.body.querySelector(tag)
-      if (element) {
-        return element.outerHTML
-      }
-    }
-
-    return "<p>Summary couldn't be generated</p>"
-  }, [contentDocument])
-  const hasMoreContent = React.useMemo(
-    () => contentDocument.body.children.length > 1,
-    [contentDocument]
   )
 
   const { data: session } = useSession()
@@ -91,7 +74,7 @@ export function PostSummary({
         <HtmlView html={summary} className={hideAuthor ? 'mt-4' : 'mt-6'} />
 
         <div className="flex items-center gap-4 mt-4 clear-both">
-          {hasMoreContent && (
+          {hasMore && (
             <Link href={`/post/${post.id}`}>
               <a className="inline-flex items-center font-medium transition-colors text-blue">
                 Continue reading <ChevronRightIcon className="w-4 h-4 ml-1" />
