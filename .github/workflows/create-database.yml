@@ -1,0 +1,25 @@
+name: Create PlanetScale Database
+
+on: workflow_dispatch
+
+env:
+  pscale_base_directory: .pscale
+
+jobs:
+  create-database:
+    name: 'Create database - click here'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Create database - please click on displayed link to authenticate
+        timeout-minutes: 3
+        env:
+          PLANETSCALE_SERVICE_TOKEN_ID: ${{secrets.PLANETSCALE_SERVICE_TOKEN_ID}}
+          ORG_NAME: ${{secrets.ORG_NAME}}
+          DB_NAME: ${{secrets.DB_NAME}}
+          GITHUB_USER: ${{github.actor}}
+        working-directory: ${{env.pscale_base_directory}}/cli-helper-scripts/
+        run: ./create-database.sh
