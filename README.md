@@ -25,7 +25,7 @@ cd .pscale/cli-helper-scripts/
 
 or
 
-![image](https://user-images.githubusercontent.com/1872314/173367645-2627d5de-5635-43ec-8adf-60b9508c562f.png)
+![image](https://user-images.githubusercontent.com/1872314/174285290-a479b5c7-55fa-4d2f-bc67-186379d66c69.png)
 
 - Set up the environment variables:
 
