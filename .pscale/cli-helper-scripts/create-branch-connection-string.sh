@@ -36,7 +36,7 @@ function create-branch-connection-string {
     local DB_URL=`echo "$raw_output" |  jq -r ". | \"mysql://\" + .id +  \":\" + .plain_text +  \"@\" + .database_branch.access_host_url + \"/\""`
 
 read -r -d '' SECRET_TEXT <<EOF
-DATABASE_URL=${DB_URL}/${DB_NAME}?sslaccept=strict
+DATABASE_URL=${DB_URL}${DB_NAME}?sslaccept=strict
 EOF
 
     # if not running in CI
