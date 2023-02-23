@@ -1,4 +1,5 @@
 import { SearchIcon, SpinnerIcon } from '@/components/icons'
+import { api } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
 import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Dialog, Transition } from '@headlessui/react'

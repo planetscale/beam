@@ -1,13 +1,13 @@
 import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
 import { browserEnv } from '@/env/browser'
+import { api } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
 import {
   getSuggestionData,
   uploadImageCommandHandler,
   markdownToHtml,
 } from '@/lib/editor'
-import { trpc } from '@/lib/trpc'
 import { Switch } from '@headlessui/react'
 import { matchSorter } from 'match-sorter'
 import * as React from 'react'
@@ -368,7 +368,7 @@ function Suggestion({
     }
   )
 
-  const mentionListQuery = trpc.useQuery(['user.mentionList'], {
+  const mentionListQuery = api.user.mentionList.useQuery(undefined, {
     enabled: state.isOpen && isMentionType,
     staleTime: 5 * 60 * 1000,
   })
@@ -380,7 +380,7 @@ function Suggestion({
       keys: ['name'],
     })
       .slice(0, 5)
-      .map((item) => ({ label: item.name!, value: item.id }))
+      .map((item) => ({ label: item.name, value: item.id }))
   }
 
   if (isEmojiType && emojiListQuery.data) {
