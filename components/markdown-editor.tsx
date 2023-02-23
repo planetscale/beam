@@ -380,7 +380,10 @@ function Suggestion({
       keys: ['name'],
     })
       .slice(0, 5)
-      .map((item) => ({ label: item.name, value: item.id }))
+      .map((item) => ({
+        label: item.name,
+        value: item.id,
+      })) as SuggestionResult[]
   }
 
   if (isEmojiType && emojiListQuery.data) {
