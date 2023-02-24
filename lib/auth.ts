@@ -1,7 +1,7 @@
 import { serverEnv } from '@/env/server'
 import { prisma } from '@/lib/prisma'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { Role } from '@prisma/client'
+import { type Role } from '@prisma/client'
 import type { NextAuthOptions } from 'next-auth'
 import GithubProvider from 'next-auth/providers/github'
 import OktaProvider from 'next-auth/providers/okta'
@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (profile.notAllowed) {
+      if (profile?.notAllowed) {
         return false
       }
 
@@ -108,6 +108,10 @@ declare module 'next-auth' {
       image?: string | null
       role: Role
     }
+  }
+
+  interface Profile {
+    notAllowed?: boolean
   }
 
   interface User {
