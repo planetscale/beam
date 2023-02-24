@@ -26,7 +26,7 @@ import { useRouter } from 'next/router'
 import * as React from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useMutation } from 'react-query'
+import { useMutation } from '@tanstack/react-query'
 
 const PostSummary = dynamic<PostSummaryProps>(
   () => import('@/components/post-summary').then((mod) => mod.PostSummary),
