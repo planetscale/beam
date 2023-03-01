@@ -1,39 +1,41 @@
-import { Avatar } from '@/components/avatar'
-import { Button } from '@/components/button'
+import { Avatar } from '@/components/avatar';
+import { Button } from '@/components/button';
 import {
   Dialog,
   DialogActions,
   DialogCloseButton,
   DialogContent,
   DialogTitle,
-} from '@/components/dialog'
-import { IconButton } from '@/components/icon-button'
-import { EditIcon } from '@/components/icons'
-import { Layout } from '@/components/layout'
-import { getQueryPaginationInput, Pagination } from '@/components/pagination'
-import type { PostSummaryProps } from '@/components/post-summary'
-import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
-import { TextField } from '@/components/text-field'
-import { browserEnv } from '@/env/browser'
-import { api } from '@/lib/api'
-import { uploadImage } from '@/lib/cloudinary'
-import type { NextPageWithAuthAndLayout } from '@/lib/types'
-import { setDataFunction } from '@/server/trpc'
-import { useSession } from 'next-auth/react'
-import dynamic from 'next/dynamic'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import * as React from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { useMutation } from '@tanstack/react-query'
+} from '@/components/dialog';
+import { IconButton } from '@/components/icon-button';
+import { EditIcon } from '@/components/icons';
+import { Layout } from '@/components/layout';
+import { getQueryPaginationInput, Pagination } from '@/components/pagination';
+import type { PostSummaryProps } from '@/components/post-summary';
+import { PostSummarySkeleton } from '@/components/post-summary-skeleton';
+import { TextField } from '@/components/text-field';
+import { browserEnv } from '@/env/browser';
+import { api } from '@/lib/api';
+import { uploadImage } from '@/lib/cloudinary';
+import type { NextPageWithAuthAndLayout } from '@/lib/types';
+import { setDataFunction } from '@/server/trpc';
+import { useSession } from 'next-auth/react';
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import * as React from 'react';
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useMutation } from '@tanstack/react-query';
+import { getErrorMessage } from '@/lib/get-error-message';
 
 const PostSummary = dynamic<PostSummaryProps>(
   () => import('@/components/post-summary').then((mod) => mod.PostSummary),
   { ssr: false }
-)
+);
 
-const POSTS_PER_PAGE = 20
+const POSTS_PER_PAGE = 20;
 
 const ProfilePage: NextPageWithAuthAndLayout = () => {
   return (
@@ -41,29 +43,29 @@ const ProfilePage: NextPageWithAuthAndLayout = () => {
       <ProfileInfo />
       <ProfileFeed />
     </>
-  )
-}
+  );
+};
 
-ProfilePage.auth = true
+ProfilePage.auth = true;
 
 ProfilePage.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>
-}
+  return <Layout>{page}</Layout>;
+};
 
 function ProfileInfo() {
-  const { data: session } = useSession()
-  const router = useRouter()
-  const profileQueryInput = { id: String(router.query.userId) }
+  const { data: session } = useSession();
+  const router = useRouter();
+  const profileQueryInput = { id: String(router.query.userId) };
 
-  const profileQuery = api.user.profile.useQuery(profileQueryInput)
+  const profileQuery = api.user.profile.useQuery(profileQueryInput);
 
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] =
-    React.useState(false)
+    React.useState(false);
   const [isUpdateAvatarDialogOpen, setIsUpdateAvatarDialogOpen] =
-    React.useState(false)
+    React.useState(false);
 
   if (profileQuery.data) {
-    const profileBelongsToUser = profileQuery.data.id === session!.user.id
+    const profileBelongsToUser = profileQuery.data.id === session!.user.id;
 
     return (
       <>
@@ -79,7 +81,7 @@ function ProfileInfo() {
                 type="button"
                 className="relative inline-flex group"
                 onClick={() => {
-                  setIsUpdateAvatarDialogOpen(true)
+                  setIsUpdateAvatarDialogOpen(true);
                 }}
               >
                 <Avatar
@@ -117,7 +119,7 @@ function ProfileInfo() {
               <IconButton
                 variant="secondary"
                 onClick={() => {
-                  setIsEditProfileDialogOpen(true)
+                  setIsEditProfileDialogOpen(true);
                 }}
               >
                 <EditIcon className="w-4 h-4" />
@@ -135,7 +137,7 @@ function ProfileInfo() {
           }}
           isOpen={isEditProfileDialogOpen}
           onClose={() => {
-            setIsEditProfileDialogOpen(false)
+            setIsEditProfileDialogOpen(false);
           }}
         />
 
@@ -147,15 +149,15 @@ function ProfileInfo() {
           }}
           isOpen={isUpdateAvatarDialogOpen}
           onClose={() => {
-            setIsUpdateAvatarDialogOpen(false)
+            setIsUpdateAvatarDialogOpen(false);
           }}
         />
       </>
-    )
+    );
   }
 
   if (profileQuery.isError) {
-    return <div>Error: {profileQuery.error.message}</div>
+    return <div>Error: {profileQuery.error.message}</div>;
   }
 
   return (
@@ -167,25 +169,25 @@ function ProfileInfo() {
       </div>
       <DotPattern />
     </div>
-  )
+  );
 }
 
 function ProfileFeed() {
-  const { data: session } = useSession()
-  const router = useRouter()
-  const currentPageNumber = router.query.page ? Number(router.query.page) : 1
-  const utils = api.useContext()
+  const { data: session } = useSession();
+  const router = useRouter();
+  const currentPageNumber = router.query.page ? Number(router.query.page) : 1;
+  const utils = api.useContext();
   const profileFeedQueryInput = {
     ...getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
     authorId: String(router.query.userId),
-  }
+  };
 
-  const profileFeedQuery = api.post.feed.useQuery(profileFeedQueryInput)
+  const profileFeedQuery = api.post.feed.useQuery(profileFeedQueryInput);
   const likeMutation = api.post.like.useMutation({
     onMutate: async (likedPostId) => {
-      await utils.post.feed.invalidate(profileFeedQueryInput)
+      await utils.post.feed.invalidate(profileFeedQueryInput);
 
-      const previousQuery = utils.post.feed.getData(profileFeedQueryInput)
+      const previousQuery = utils.post.feed.getData(profileFeedQueryInput);
 
       if (previousQuery) {
         utils.post.feed.setData(profileFeedQueryInput, {
@@ -203,21 +205,21 @@ function ProfileFeed() {
                 }
               : post
           ),
-        })
+        });
       }
 
-      return { previousQuery }
+      return { previousQuery };
     },
     onError: (err, id, context) => {
       if (context?.previousQuery) {
-        utils.post.feed.setData(profileFeedQueryInput, context.previousQuery)
+        utils.post.feed.setData(profileFeedQueryInput, context.previousQuery);
       }
     },
-  })
+  });
   const unlikeMutation = api.post.unlike.useMutation({
     onMutate: async (unlikedPostId) => {
-      await utils.post.feed.cancel()
-      const previousQuery = utils.post.feed.getData()
+      await utils.post.feed.cancel();
+      const previousQuery = utils.post.feed.getData();
 
       if (previousQuery) {
         utils.post.feed.setData(setDataFunction, {
@@ -232,17 +234,17 @@ function ProfileFeed() {
                 }
               : post
           ),
-        })
+        });
       }
 
-      return { previousQuery }
+      return { previousQuery };
     },
     onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.post.feed.setData(setDataFunction, context.previousQuery)
+        utils.post.feed.setData(setDataFunction, context.previousQuery);
       }
     },
-  })
+  });
 
   if (profileFeedQuery.data) {
     return (
@@ -260,10 +262,10 @@ function ProfileFeed() {
                     hideAuthor
                     post={post}
                     onLike={() => {
-                      likeMutation.mutate(post.id)
+                      likeMutation.mutate(post.id);
                     }}
                     onUnlike={() => {
-                      unlikeMutation.mutate(post.id)
+                      unlikeMutation.mutate(post.id);
                     }}
                   />
                 </li>
@@ -278,11 +280,11 @@ function ProfileFeed() {
           currentPageNumber={currentPageNumber}
         />
       </>
-    )
+    );
   }
 
   if (profileFeedQuery.isError) {
-    return <div className="mt-28">Error: {profileFeedQuery.error.message}</div>
+    return <div className="mt-28">Error: {profileFeedQuery.error.message}</div>;
   }
 
   return (
@@ -295,7 +297,7 @@ function ProfileFeed() {
         ))}
       </ul>
     </div>
-  )
+  );
 }
 
 function DotPattern() {
@@ -327,13 +329,13 @@ function DotPattern() {
       </defs>
       <rect width={720} height={240} fill="url(#dot-pattern)" />
     </svg>
-  )
+  );
 }
 
 type EditFormData = {
-  name: string
-  title: string | null
-}
+  name: string;
+  title: string | null;
+};
 
 function EditProfileDialog({
   user,
@@ -341,35 +343,35 @@ function EditProfileDialog({
   onClose,
 }: {
   user: {
-    name: string
-    title: string | null
-  }
-  isOpen: boolean
-  onClose: () => void
+    name: string;
+    title: string | null;
+  };
+  isOpen: boolean;
+  onClose: () => void;
 }) {
   const { register, handleSubmit, reset } = useForm<EditFormData>({
     defaultValues: {
       name: user.name,
       title: user.title,
     },
-  })
-  const router = useRouter()
-  const utils = api.useContext()
+  });
+  const router = useRouter();
+  const utils = api.useContext();
   const editUserMutation = api.user.edit.useMutation({
     onSuccess: () => {
-      window.location.reload()
+      window.location.reload();
       return utils.user.profile.invalidate({
         id: String(router.query.userId),
-      })
+      });
     },
     onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`)
+      toast.error(`Something went wrong: ${error.message}`);
     },
-  })
+  });
 
   function handleClose() {
-    onClose()
-    reset()
+    onClose();
+    reset();
   }
 
   const onSubmit: SubmitHandler<EditFormData> = (data) => {
@@ -381,8 +383,8 @@ function EditProfileDialog({
       {
         onSuccess: () => onClose(),
       }
-    )
-  }
+    );
+  };
 
   return (
     <Dialog isOpen={isOpen} onClose={handleClose}>
@@ -414,7 +416,7 @@ function EditProfileDialog({
         </DialogActions>
       </form>
     </Dialog>
-  )
+  );
 }
 
 function UpdateAvatarDialog({
@@ -423,36 +425,36 @@ function UpdateAvatarDialog({
   onClose,
 }: {
   user: {
-    name: string
-    image: string | null
-  }
-  isOpen: boolean
-  onClose: () => void
+    name: string;
+    image: string | null;
+  };
+  isOpen: boolean;
+  onClose: () => void;
 }) {
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const [uploadedImage, setUploadedImage] = React.useState(user.image)
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [uploadedImage, setUploadedImage] = React.useState(user.image);
   const updateUserAvatarMutation = api.user.updateAvatar.useMutation({
     onSuccess: () => {
-      window.location.reload()
+      window.location.reload();
     },
     onError: (error) => {
-      toast.error(`Something went wrong: ${error.message}`)
+      toast.error(`Something went wrong: ${error.message}`);
     },
-  })
+  });
   const uploadImageMutation = useMutation(
     (file: File) => {
-      return uploadImage(file)
+      return uploadImage(file);
     },
     {
-      onError: (error: any) => {
-        toast.error(`Error uploading image: ${error.message}`)
+      onError: (error) => {
+        toast.error(`Error uploading image: ${getErrorMessage(error)}`);
       },
     }
-  )
+  );
 
   function handleClose() {
-    onClose()
-    setUploadedImage(user.image)
+    onClose();
+    setUploadedImage(user.image);
   }
 
   return (
@@ -468,7 +470,7 @@ function UpdateAvatarDialog({
             <Button
               variant="secondary"
               onClick={() => {
-                fileInputRef.current?.click()
+                fileInputRef.current?.click();
               }}
             >
               Choose file…
@@ -480,15 +482,15 @@ function UpdateAvatarDialog({
               accept=".jpg, .jpeg, .png, .gif"
               className="hidden"
               onChange={(event) => {
-                const files = event.target.files
+                const files = event.target.files;
 
                 if (files && files.length > 0) {
-                  const file = files[0]
+                  const file = files[0];
                   if (file.size > 5242880) {
-                    toast.error('Image is bigger than 5MB')
-                    return
+                    toast.error('Image is bigger than 5MB');
+                    return;
                   }
-                  setUploadedImage(URL.createObjectURL(files[0]))
+                  setUploadedImage(URL.createObjectURL(files[0]));
                 }
               }}
             />
@@ -502,9 +504,9 @@ function UpdateAvatarDialog({
                 variant="secondary"
                 className="!text-red"
                 onClick={() => {
-                  fileInputRef.current!.value = ''
-                  URL.revokeObjectURL(uploadedImage)
-                  setUploadedImage(null)
+                  fileInputRef.current!.value = '';
+                  URL.revokeObjectURL(uploadedImage);
+                  setUploadedImage(null);
                 }}
               >
                 Remove photo
@@ -524,22 +526,22 @@ function UpdateAvatarDialog({
           loadingChildren="Saving changes"
           onClick={async () => {
             if (user.image === uploadedImage) {
-              handleClose()
+              handleClose();
             } else {
-              const files = fileInputRef.current?.files
+              const files = fileInputRef.current?.files;
 
               if (files && files.length > 0) {
                 uploadImageMutation.mutate(files[0], {
                   onSuccess: (uploadedImage) => {
                     updateUserAvatarMutation.mutate({
                       image: uploadedImage.url,
-                    })
+                    });
                   },
-                })
+                });
               } else {
                 updateUserAvatarMutation.mutate({
                   image: null,
-                })
+                });
               }
             }
           }}
@@ -551,7 +553,7 @@ function UpdateAvatarDialog({
         </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;

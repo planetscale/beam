@@ -1,67 +1,69 @@
-import { HtmlView } from '@/components/html-view'
-import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
-import { browserEnv } from '@/env/browser'
-import { api } from '@/lib/api'
-import { classNames } from '@/lib/classnames'
+import { HtmlView } from '@/components/html-view';
+import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons';
+import { browserEnv } from '@/env/browser';
+import { api } from '@/lib/api';
+import { classNames } from '@/lib/classnames';
 import {
   getSuggestionData,
   uploadImageCommandHandler,
   markdownToHtml,
-} from '@/lib/editor'
-import { Switch } from '@headlessui/react'
-import { matchSorter } from 'match-sorter'
-import * as React from 'react'
-import { useDetectClickOutside } from 'react-detect-click-outside'
-import { useQuery } from '@tanstack/react-query'
+} from '@/lib/editor';
+import { Switch } from '@headlessui/react';
+import { matchSorter } from 'match-sorter';
+import * as React from 'react';
+import { useDetectClickOutside } from 'react-detect-click-outside';
+import { useQuery } from '@tanstack/react-query';
 import TextareaAutosize, {
-  TextareaAutosizeProps,
-} from 'react-textarea-autosize'
-import getCaretCoordinates from 'textarea-caret'
-import TextareaMarkdown, { TextareaMarkdownRef } from 'textarea-markdown-editor'
-import { ItemOptions, useItemList } from 'use-item-list'
+  type TextareaAutosizeProps,
+} from 'react-textarea-autosize';
+import getCaretCoordinates from 'textarea-caret';
+import type { TextareaMarkdownRef } from 'textarea-markdown-editor';
+import TextareaMarkdown from 'textarea-markdown-editor';
+import type { ItemOptions } from 'use-item-list';
+import { useItemList } from 'use-item-list';
 
 type MarkdownEditorProps = {
-  label?: string
-  value: string
-  onChange: (value: string) => void
-  onTriggerSubmit?: () => void
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  onTriggerSubmit?: () => void;
 } & Omit<
   TextareaAutosizeProps,
   'value' | 'onChange' | 'onKeyDown' | 'onInput' | 'onPaste' | 'onDrop'
->
+>;
 
 type SuggestionResult = {
-  label: string
-  value: string
-}
+  label: string;
+  value: string;
+};
 
 type SuggestionPosition = {
-  top: number
-  left: number
-}
+  top: number;
+  left: number;
+};
 
-type SuggestionType = 'mention' | 'emoji'
+type SuggestionType = 'mention' | 'emoji';
 
 type SuggestionState = {
-  isOpen: boolean
-  type: SuggestionType | null
-  position: SuggestionPosition | null
-  triggerIdx: number | null
-  query: string
-}
+  isOpen: boolean;
+  type: SuggestionType | null;
+  position: SuggestionPosition | null;
+  triggerIdx: number | null;
+  query: string;
+};
 
 type SuggestionActionType =
   | {
-      type: 'open'
+      type: 'open';
       payload: {
-        type: SuggestionType
-        position: SuggestionPosition
-        triggerIdx: number
-        query: string
-      }
+        type: SuggestionType;
+        position: SuggestionPosition;
+        triggerIdx: number;
+        query: string;
+      };
     }
   | { type: 'close' }
-  | { type: 'updateQuery'; payload: string }
+  | { type: 'updateQuery'; payload: string };
 
 function suggestionReducer(
   state: SuggestionState,
@@ -75,7 +77,7 @@ function suggestionReducer(
         position: action.payload.position,
         triggerIdx: action.payload.triggerIdx,
         query: action.payload.query,
-      }
+      };
     case 'close':
       return {
         isOpen: false,
@@ -83,11 +85,11 @@ function suggestionReducer(
         position: null,
         triggerIdx: null,
         query: '',
-      }
+      };
     case 'updateQuery':
-      return { ...state, query: action.payload }
+      return { ...state, query: action.payload };
     default:
-      throw new Error()
+      throw new Error();
   }
 }
 
@@ -112,7 +114,7 @@ const TOOLBAR_ITEMS = [
     icon: <LinkIcon className="w-4 h-4" />,
     name: 'Link',
   },
-]
+];
 
 function MarkdownPreview({ markdown }: { markdown: string }) {
   return (
@@ -123,7 +125,7 @@ function MarkdownPreview({ markdown }: { markdown: string }) {
         <p>Nothing to preview</p>
       )}
     </div>
-  )
+  );
 }
 
 export function MarkdownEditor({
@@ -134,8 +136,8 @@ export function MarkdownEditor({
   onTriggerSubmit,
   ...rest
 }: MarkdownEditorProps) {
-  const textareaMarkdownRef = React.useRef<TextareaMarkdownRef>(null)
-  const [showPreview, setShowPreview] = React.useState(false)
+  const textareaMarkdownRef = React.useRef<TextareaMarkdownRef>(null);
+  const [showPreview, setShowPreview] = React.useState(false);
   const [suggestionState, suggestionDispatch] = React.useReducer(
     suggestionReducer,
     {
@@ -145,10 +147,10 @@ export function MarkdownEditor({
       triggerIdx: null,
       query: '',
     }
-  )
+  );
 
   function closeSuggestion() {
-    suggestionDispatch({ type: 'close' })
+    suggestionDispatch({ type: 'close' });
   }
 
   return (
@@ -164,7 +166,7 @@ export function MarkdownEditor({
                 onClick={() => {
                   textareaMarkdownRef.current?.trigger(
                     toolbarItem.commandTrigger
-                  )
+                  );
                 }}
                 className={classNames(
                   'rounded inline-flex items-center justify-center h-8 w-8 disabled:opacity-50 disabled:cursor-default focus:border focus-ring',
@@ -183,9 +185,9 @@ export function MarkdownEditor({
               checked={showPreview}
               onChange={(value) => {
                 if (value === false) {
-                  textareaMarkdownRef.current?.focus()
+                  textareaMarkdownRef.current?.focus();
                 }
-                setShowPreview(value)
+                setShowPreview(value);
               }}
               className={classNames(
                 showPreview ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700',
@@ -214,25 +216,25 @@ export function MarkdownEditor({
               {...rest}
               value={value}
               onChange={(event) => {
-                onChange(event.target.value)
+                onChange(event.target.value);
 
                 const { keystrokeTriggered, triggerIdx, type, query } =
-                  getSuggestionData(event.currentTarget)
+                  getSuggestionData(event.currentTarget);
 
                 if (!keystrokeTriggered) {
                   if (suggestionState.isOpen) {
-                    closeSuggestion()
+                    closeSuggestion();
                   }
-                  return
+                  return;
                 }
 
                 if (suggestionState.isOpen) {
-                  suggestionDispatch({ type: 'updateQuery', payload: query })
+                  suggestionDispatch({ type: 'updateQuery', payload: query });
                 } else {
                   const coords = getCaretCoordinates(
                     event.currentTarget,
                     triggerIdx + 1
-                  )
+                  );
                   suggestionDispatch({
                     type: 'open',
                     payload: {
@@ -244,55 +246,55 @@ export function MarkdownEditor({
                       triggerIdx,
                       query,
                     },
-                  })
+                  });
                 }
               }}
               onKeyDown={(event) => {
-                const { code, metaKey } = event
+                const { code, metaKey } = event;
                 if (code === 'Enter' && metaKey) {
-                  onTriggerSubmit?.()
+                  onTriggerSubmit?.();
                 }
               }}
               onPaste={(event) => {
                 if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
-                  const filesArray = Array.from(event.clipboardData.files)
+                  const filesArray = Array.from(event.clipboardData.files);
 
                   if (filesArray.length === 0) {
-                    return
+                    return;
                   }
 
                   const imageFiles = filesArray.filter((file) =>
                     /image/i.test(file.type)
-                  )
+                  );
 
                   if (imageFiles.length === 0) {
-                    return
+                    return;
                   }
 
-                  event.preventDefault()
+                  event.preventDefault();
 
-                  uploadImageCommandHandler(event.currentTarget, imageFiles)
+                  uploadImageCommandHandler(event.currentTarget, imageFiles);
                 }
               }}
               onDrop={(event) => {
                 if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD) {
-                  const filesArray = Array.from(event.dataTransfer.files)
+                  const filesArray = Array.from(event.dataTransfer.files);
 
                   if (filesArray.length === 0) {
-                    return
+                    return;
                   }
 
                   const imageFiles = filesArray.filter((file) =>
                     /image/i.test(file.type)
-                  )
+                  );
 
                   if (imageFiles.length === 0) {
-                    return
+                    return;
                   }
 
-                  event.preventDefault()
+                  event.preventDefault();
 
-                  uploadImageCommandHandler(event.currentTarget, imageFiles)
+                  uploadImageCommandHandler(event.currentTarget, imageFiles);
                 }
               }}
               className="block w-full rounded shadow-sm bg-secondary border-secondary focus-ring"
@@ -303,36 +305,36 @@ export function MarkdownEditor({
           <Suggestion
             state={suggestionState}
             onSelect={(suggestionResult: SuggestionResult) => {
-              const preSuggestion = value.slice(0, suggestionState.triggerIdx!)
+              const preSuggestion = value.slice(0, suggestionState.triggerIdx!);
               const postSuggestion = value.slice(
                 textareaMarkdownRef.current?.selectionStart
-              )
+              );
 
-              let suggestionInsertion = ''
+              let suggestionInsertion = '';
 
               if (suggestionState.type === 'mention') {
-                suggestionInsertion = `[${suggestionResult.label}](/profile/${suggestionResult.value})`
+                suggestionInsertion = `[${suggestionResult.label}](/profile/${suggestionResult.value})`;
               }
 
               if (suggestionState.type === 'emoji') {
-                suggestionInsertion = suggestionResult.value
+                suggestionInsertion = suggestionResult.value;
               }
 
-              const newEditorValue = `${preSuggestion}${suggestionInsertion} ${postSuggestion}`
+              const newEditorValue = `${preSuggestion}${suggestionInsertion} ${postSuggestion}`;
 
-              onChange(newEditorValue)
-              closeSuggestion()
+              onChange(newEditorValue);
+              closeSuggestion();
 
               setTimeout(() => {
                 const caretPosition =
-                  newEditorValue.length - postSuggestion.length
+                  newEditorValue.length - postSuggestion.length;
 
-                textareaMarkdownRef.current?.focus()
+                textareaMarkdownRef.current?.focus();
                 textareaMarkdownRef.current?.setSelectionRange(
                   caretPosition,
                   caretPosition
-                )
-              }, 0)
+                );
+              }, 0);
             }}
             onClose={closeSuggestion}
           />
@@ -341,7 +343,7 @@ export function MarkdownEditor({
         {showPreview && <MarkdownPreview markdown={value} />}
       </div>
     </div>
-  )
+  );
 }
 
 function Suggestion({
@@ -349,31 +351,31 @@ function Suggestion({
   onSelect,
   onClose,
 }: {
-  state: SuggestionState
-  onSelect: (suggestionResult: SuggestionResult) => void
-  onClose: () => void
+  state: SuggestionState;
+  onSelect: (suggestionResult: SuggestionResult) => void;
+  onClose: () => void;
 }) {
-  const isMentionType = state.type === 'mention'
-  const isEmojiType = state.type === 'emoji'
+  const isMentionType = state.type === 'mention';
+  const isEmojiType = state.type === 'emoji';
 
   const emojiListQuery = useQuery(
     ['emojiList'],
     async () => {
-      const gemoji = (await import('gemoji')).gemoji
-      return gemoji
+      const gemoji = (await import('gemoji')).gemoji;
+      return gemoji;
     },
     {
       enabled: state.isOpen && isEmojiType,
       staleTime: Infinity,
     }
-  )
+  );
 
   const mentionListQuery = api.user.mentionList.useQuery(undefined, {
     enabled: state.isOpen && isMentionType,
     staleTime: 5 * 60 * 1000,
-  })
+  });
 
-  let suggestionList: SuggestionResult[] = []
+  let suggestionList: SuggestionResult[] = [];
 
   if (isMentionType && mentionListQuery.data) {
     suggestionList = matchSorter(mentionListQuery.data, state.query, {
@@ -383,7 +385,7 @@ function Suggestion({
       .map((item) => ({
         label: item.name,
         value: item.id,
-      })) as SuggestionResult[]
+      })) as SuggestionResult[];
   }
 
   if (isEmojiType && emojiListQuery.data) {
@@ -395,11 +397,11 @@ function Suggestion({
       .map((item) => ({
         label: `${item.emoji} ${item.names[0]}`,
         value: item.emoji,
-      }))
+      }));
   }
 
   if (!state.isOpen || !state.position || suggestionList.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -409,7 +411,7 @@ function Suggestion({
       onSelect={onSelect}
       onClose={onClose}
     />
-  )
+  );
 }
 
 function SuggestionList({
@@ -418,47 +420,47 @@ function SuggestionList({
   onSelect,
   onClose,
 }: {
-  suggestionList: SuggestionResult[]
-  position: SuggestionPosition
-  onSelect: (suggestionResult: SuggestionResult) => void
-  onClose: () => void
+  suggestionList: SuggestionResult[];
+  position: SuggestionPosition;
+  onSelect: (suggestionResult: SuggestionResult) => void;
+  onClose: () => void;
 }) {
-  const ref = useDetectClickOutside({ onTriggered: onClose })
+  const ref = useDetectClickOutside({ onTriggered: onClose });
 
   const { moveHighlightedItem, selectHighlightedItem, useItem } = useItemList({
     onSelect: (item) => {
-      onSelect(item.value)
+      onSelect(item.value);
     },
-  })
+  });
 
   React.useEffect(() => {
     function handleKeydownEvent(event: KeyboardEvent) {
-      const { code } = event
+      const { code } = event;
 
-      const preventDefaultCodes = ['ArrowUp', 'ArrowDown', 'Enter', 'Tab']
+      const preventDefaultCodes = ['ArrowUp', 'ArrowDown', 'Enter', 'Tab'];
 
       if (preventDefaultCodes.includes(code)) {
-        event.preventDefault()
+        event.preventDefault();
       }
 
       if (code === 'ArrowUp') {
-        moveHighlightedItem(-1)
+        moveHighlightedItem(-1);
       }
 
       if (code === 'ArrowDown') {
-        moveHighlightedItem(1)
+        moveHighlightedItem(1);
       }
 
       if (code === 'Enter' || code === 'Tab') {
-        selectHighlightedItem()
+        selectHighlightedItem();
       }
     }
 
-    document.addEventListener('keydown', handleKeydownEvent)
+    document.addEventListener('keydown', handleKeydownEvent);
     return () => {
-      document.removeEventListener('keydown', handleKeydownEvent)
-    }
-  }, [moveHighlightedItem, selectHighlightedItem])
+      document.removeEventListener('keydown', handleKeydownEvent);
+    };
+  }, [moveHighlightedItem, selectHighlightedItem]);
 
   return (
     <div
@@ -479,28 +481,28 @@ function SuggestionList({
         ))}
       </ul>
     </div>
-  )
+  );
 }
 function SuggestionResult({
   useItem,
   suggestionResult,
 }: {
   useItem: ({ ref, text, value, disabled }: ItemOptions) => {
-    id: string
-    index: number
-    highlight: () => void
-    select: () => void
-    selected: any
-    useHighlighted: () => Boolean
-  }
-  suggestionResult: SuggestionResult
+    id: string;
+    index: number;
+    highlight: () => void;
+    select: () => void;
+    selected: any;
+    useHighlighted: () => boolean;
+  };
+  suggestionResult: SuggestionResult;
 }) {
-  const ref = React.useRef<HTMLLIElement>(null)
+  const ref = React.useRef<HTMLLIElement>(null);
   const { id, index, highlight, select, useHighlighted } = useItem({
     ref,
     value: suggestionResult,
-  })
-  const highlighted = useHighlighted()
+  });
+  const highlighted = useHighlighted();
 
   return (
     <li
@@ -517,5 +519,5 @@ function SuggestionResult({
     >
       {suggestionResult.label}
     </li>
-  )
+  );
 }

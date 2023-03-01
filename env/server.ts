@@ -1,46 +1,39 @@
-import {
-  bool,
-  envsafe,
-  invalidEnvError,
-  makeValidator,
-  str,
-  url,
-} from 'envsafe'
-import { browserEnv } from './browser'
+import { bool, envsafe, invalidEnvError, makeValidator, str } from 'envsafe';
+import { browserEnv } from './browser';
 
-if (process.browser) {
+if (typeof window === 'undefined') {
   throw new Error(
     'This should only be included on the client (but the env vars wont be exposed)'
-  )
+  );
 }
 
 const githubParser = makeValidator<string>((input) => {
   if (process.env.AUTH_PROVIDER === 'github' && input === '') {
-    throw invalidEnvError('github config', input)
+    throw invalidEnvError('github config', input);
   }
-  return input
-})
+  return input;
+});
 
 const oktaParser = makeValidator<string>((input) => {
   if (process.env.AUTH_PROVIDER === 'okta' && input === '') {
-    throw invalidEnvError('okta config', input)
+    throw invalidEnvError('okta config', input);
   }
-  return input
-})
+  return input;
+});
 
 const cloudinaryParser = makeValidator<string>((input) => {
   if (browserEnv.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && input === '') {
-    throw invalidEnvError('cloudinary config', input)
+    throw invalidEnvError('cloudinary config', input);
   }
-  return input
-})
+  return input;
+});
 
 const slackParser = makeValidator<string>((input) => {
   if (process.env.ENABLE_SLACK_POSTING && input === '') {
-    throw invalidEnvError('slack config', input)
+    throw invalidEnvError('slack config', input);
   }
-  return input
-})
+  return input;
+});
 
 export const serverEnv = {
   ...browserEnv,
@@ -68,4 +61,4 @@ export const serverEnv = {
     ENABLE_SLACK_POSTING: bool({ default: false }),
     SLACK_WEBHOOK_URL: slackParser({ allowEmpty: true, default: '' }),
   }),
-}
+};
