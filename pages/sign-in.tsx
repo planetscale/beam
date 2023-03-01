@@ -49,7 +49,7 @@ const SignIn = ({
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const session = await getServerSession(context, authOptions)
+  const session = await getServerSession(authOptions)
   const providers = await getProviders()
 
   if (session?.user) {

@@ -1,13 +1,15 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { createProtectedRouter } from '../create-protected-router'
+import { protectedProcedure, router } from '../trpc'
 
-export const userRouter = createProtectedRouter()
-  .query('profile', {
-    input: z.object({
-      id: z.string(),
-    }),
-    async resolve({ ctx, input }) {
+export const userRouter = router({
+  profile: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
       const { id } = input
       const user = await ctx.prisma.user.findUnique({
         where: { id },
@@ -27,14 +29,15 @@ export const userRouter = createProtectedRouter()
       }
 
       return user
-    },
-  })
-  .mutation('edit', {
-    input: z.object({
-      name: z.string().min(1),
-      title: z.string().nullish(),
     }),
-    async resolve({ ctx, input }) {
+  edit: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        title: z.string().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
       const user = await ctx.prisma.user.update({
         where: { id: ctx.session.user.id },
         data: {
@@ -44,13 +47,14 @@ export const userRouter = createProtectedRouter()
       })
 
       return user
-    },
-  })
-  .mutation('update-avatar', {
-    input: z.object({
-      image: z.string().nullish(),
     }),
-    async resolve({ ctx, input }) {
+  updateAvatar: protectedProcedure
+    .input(
+      z.object({
+        image: z.string().nullish(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
       const user = await ctx.prisma.user.update({
         where: { id: ctx.session.user.id },
         data: {
@@ -59,20 +63,18 @@ export const userRouter = createProtectedRouter()
       })
 
       return user
-    },
-  })
-  .query('mentionList', {
-    async resolve({ ctx }) {
-      const users = await ctx.prisma.user.findMany({
-        select: {
-          id: true,
-          name: true,
-        },
-        orderBy: {
-          name: 'asc',
-        },
-      })
+    }),
+  mentionList: protectedProcedure.query(async ({ ctx }) => {
+    const users = await ctx.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
 
-      return users
-    },
-  })
+    return users
+  }),
+})

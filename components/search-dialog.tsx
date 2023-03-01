@@ -1,6 +1,6 @@
 import { SearchIcon, SpinnerIcon } from '@/components/icons'
+import { api, RouterOutputs } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
-import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Dialog, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -25,7 +25,7 @@ function SearchResult({
     selected: any
     useHighlighted: () => Boolean
   }
-  result: InferQueryOutput<'post.search'>[number]
+  result: RouterOutputs['post']['search'][number]
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
   const { id, index, highlight, select, useHighlighted } = useItem({
@@ -55,13 +55,10 @@ function SearchField({ onSelect }: { onSelect: () => void }) {
   const [debouncedValue] = useDebounce(value, 1000)
   const router = useRouter()
 
-  const feedQuery = trpc.useQuery(
-    [
-      'post.search',
-      {
-        query: debouncedValue,
-      },
-    ],
+  const feedQuery = api.post.search.useQuery(
+    {
+      query: debouncedValue,
+    },
     {
       enabled: debouncedValue.trim().length > 0,
     }
