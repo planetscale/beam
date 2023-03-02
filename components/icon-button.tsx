@@ -1,4 +1,4 @@
-import { ButtonVariant } from '@/components/button'
+import type { ButtonVariant } from '@/components/button'
 import { classNames } from '@/lib/classnames'
 import * as React from 'react'
 

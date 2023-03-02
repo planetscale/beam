@@ -4,6 +4,6 @@ const config = {
   images: {
     domains: ['res.cloudinary.com', 'avatars.githubusercontent.com'],
   },
-};
+}
 
-export default config;
+export default config

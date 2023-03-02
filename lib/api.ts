@@ -1,4 +1,4 @@
-import { AppRouter } from '@/server/router/_app'
+import type { AppRouter } from '@/server/router/_app'
 import { httpBatchLink, loggerLink } from '@trpc/client'
 import { createTRPCNext } from '@trpc/next'
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server'

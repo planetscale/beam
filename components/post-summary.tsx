@@ -15,7 +15,7 @@ import { useSession } from 'next-auth/react'
 import { summarize } from '@/lib/text'
 import Link from 'next/link'
 import * as React from 'react'
-import { RouterOutputs } from '@/lib/api'
+import type { RouterOutputs } from '@/lib/api'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]

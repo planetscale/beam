@@ -31,13 +31,15 @@ import {
   MenuItems,
   MenuItemsContent,
 } from '@/components/menu'
-import { api, RouterOutputs } from '@/lib/api'
+import type { RouterOutputs } from '@/lib/api'
+import { api } from '@/lib/api'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 const PostPage: NextPageWithAuthAndLayout = () => {

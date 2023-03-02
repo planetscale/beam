@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { useBeforeunload } from 'react-beforeunload'
-import { FieldValues, FormState } from 'react-hook-form'
+import type { FieldValues, FormState } from 'react-hook-form'
 
 type Props<T> = {
   formState: FormState<T extends FieldValues ? T : FieldValues>

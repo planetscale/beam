@@ -1,12 +1,12 @@
 import { SearchIcon, SpinnerIcon } from '@/components/icons'
-import { api, RouterOutputs } from '@/lib/api'
+import { api, type RouterOutputs } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
 import { Dialog, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { useDebounce } from 'use-debounce'
-import { ItemOptions, useItemList } from 'use-item-list'
+import { type ItemOptions, useItemList } from 'use-item-list'
 
 type SearchDialogProps = {
   isOpen: boolean
@@ -22,13 +22,13 @@ function SearchResult({
     index: number
     highlight: () => void
     select: () => void
-    selected: any
+    // eslint-disable-next-line @typescript-eslint/ban-types
     useHighlighted: () => Boolean
   }
   result: RouterOutputs['post']['search'][number]
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
-  const { id, index, highlight, select, useHighlighted } = useItem({
+  const { id, highlight, select, useHighlighted } = useItem({
     ref,
     value: result,
   })

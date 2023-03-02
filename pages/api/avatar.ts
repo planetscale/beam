@@ -1,6 +1,6 @@
-import { getErrorMessage } from '@/lib/get-error-message';
-import { sha1 } from 'crypto-hash';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { getErrorMessage } from '@/lib/get-error-message'
+import { sha1 } from 'crypto-hash'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 const COLOR_NAMES = [
   'red',
@@ -9,9 +9,9 @@ const COLOR_NAMES = [
   'green',
   'blue',
   'purple',
-] as const;
+] as const
 
-const COLOR_SHADES = [500, 600, 700, 800] as const;
+const COLOR_SHADES = [500, 600, 700, 800] as const
 
 const COLORS: Record<
   (typeof COLOR_NAMES)[number],
@@ -53,22 +53,22 @@ const COLORS: Record<
     700: '#4b3990',
     800: '#3e1f75',
   },
-};
+}
 
 async function generateSVG(name: string) {
-  const hash = await sha1(name);
+  const hash = await sha1(name)
 
   const colors = [...Array(3)].map((_, idx) => {
-    const colorHash = hash.slice(idx * 2, idx * 2 + 2);
+    const colorHash = hash.slice(idx * 2, idx * 2 + 2)
 
-    const nameDecimal = parseInt(colorHash[0], 16);
-    const colorName = COLOR_NAMES[nameDecimal % COLOR_NAMES.length];
+    const nameDecimal = parseInt(colorHash[0], 16)
+    const colorName = COLOR_NAMES[nameDecimal % COLOR_NAMES.length]
 
-    const shadeDecimal = parseInt(colorHash[1], 16);
-    const colorShade = COLOR_SHADES[shadeDecimal % COLOR_SHADES.length];
+    const shadeDecimal = parseInt(colorHash[1], 16)
+    const colorShade = COLOR_SHADES[shadeDecimal % COLOR_SHADES.length]
 
-    return COLORS[colorName][colorShade];
-  });
+    return COLORS[colorName][colorShade]
+  })
 
   const svg = `
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,9 +81,9 @@ async function generateSVG(name: string) {
     </radialGradient>
   </defs>
 </svg>
-  `.trim();
+  `.trim()
 
-  return svg;
+  return svg
 }
 
 export default async function handler(
@@ -91,29 +91,27 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method !== 'GET') {
-    res.setHeader('Allow', ['GET']);
-    return res
-      .status(405)
-      .json({ message: `Method ${req.method} Not Allowed` });
+    res.setHeader('Allow', ['GET'])
+    return res.status(405).json({ message: `Method ${req.method} Not Allowed` })
   }
 
-  const { name } = req.query;
+  const { name } = req.query
 
   if (name == null || typeof name !== 'string') {
-    return res.status(400).json({ error: 'Invalid request' });
+    return res.status(400).json({ error: 'Invalid request' })
   }
 
   try {
-    const svg = await generateSVG(name);
+    const svg = await generateSVG(name)
 
-    res.setHeader('Content-Type', 'image/svg+xml');
+    res.setHeader('Content-Type', 'image/svg+xml')
     res.setHeader(
       'Cache-Control',
       `public, immutable, no-transform, s-maxage=31536000, max-age=31536000`
-    );
-    res.statusCode = 200;
-    res.send(svg);
+    )
+    res.statusCode = 200
+    res.send(svg)
   } catch (error) {
-    return res.status(500).json({ message: getErrorMessage(error) });
+    return res.status(500).json({ message: getErrorMessage(error) })
   }
 }

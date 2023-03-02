@@ -23,10 +23,7 @@ const Home: NextPageWithAuthAndLayout = () => {
   const router = useRouter()
   const currentPageNumber = router.query.page ? Number(router.query.page) : 1
   const utils = api.useContext()
-  const feedQueryPathAndInput = [
-    'post.feed',
-    getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
-  ]
+
   const feedQuery = api.post.feed.useQuery(
     getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber)
   )
@@ -56,9 +53,10 @@ const Home: NextPageWithAuthAndLayout = () => {
 
       return { previousQuery }
     },
-    onError: (context: any) => {
-      if (context?.previousQuery) {
-        utils.post.feed.setData(setDataFunction, context.previousQuery)
+    onError: () => {
+      const previousQuery = utils.post.feed.getData()
+      if (previousQuery) {
+        utils.post.feed.setData(setDataFunction, previousQuery)
       }
     },
   })
@@ -85,9 +83,10 @@ const Home: NextPageWithAuthAndLayout = () => {
 
       return { previousQuery }
     },
-    onError: (err, id, context: any) => {
-      if (context?.previousQuery) {
-        utils.post.feed.setData(setDataFunction, context.previousQuery)
+    onError: () => {
+      const previousQuery = utils.post.feed.getData()
+      if (previousQuery) {
+        utils.post.feed.setData(setDataFunction, previousQuery)
       }
     },
   })
