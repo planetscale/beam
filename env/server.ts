@@ -58,7 +58,7 @@ export const serverEnv = {
     }),
     GITHUB_ID: githubParser({ allowEmpty: true, default: '' }),
     GITHUB_SECRET: githubParser({ allowEmpty: true, default: '' }),
-    GITHUB_ALLOWED_ORG: githubParser({ allowEmpty: true, default: '' }),
+    // GITHUB_ALLOWED_ORG: githubParser({ allowEmpty: true, default: '' }),
     OKTA_CLIENT_ID: oktaParser({ allowEmpty: true, default: '' }),
     OKTA_CLIENT_SECRET: oktaParser({ allowEmpty: true, default: '' }),
     OKTA_ISSUER: oktaParser({ allowEmpty: true, default: '' }),

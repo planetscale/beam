@@ -43,20 +43,20 @@ export const authOptions: NextAuthOptions = {
                   }
                 }
 
-                const userOrgs = await (
-                  await fetch('https://api.github.com/user/orgs', {
-                    headers: { Authorization: `token ${tokens.access_token}` },
-                  })
-                ).json()
+                // const userOrgs = await (
+                //   await fetch('https://api.github.com/user/orgs', {
+                //     headers: { Authorization: `token ${tokens.access_token}` },
+                //   })
+                // ).json()
 
-                // Set flag to deny signIn if allowed org is not found in the user organizations
-                if (
-                  !userOrgs.find(
-                    (org: any) => org.login === serverEnv.GITHUB_ALLOWED_ORG
-                  )
-                ) {
-                  profile.notAllowed = true
-                }
+                // // Set flag to deny signIn if allowed org is not found in the user organizations
+                // if (
+                //   !userOrgs.find(
+                //     (org: any) => org.login === serverEnv.GITHUB_ALLOWED_ORG
+                //   )
+                // ) {
+                //   profile.notAllowed = true
+                // }
 
                 return profile
               },
