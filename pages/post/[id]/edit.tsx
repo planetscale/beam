@@ -26,7 +26,7 @@ const EditPostPage: NextPageWithAuthAndLayout = () => {
     return (
       <>
         <Head>
-          <title>Edit {postQuery.data.title} - Beam</title>
+          <title>Edit {postQuery.data.title} - &#91;tanoshii&#93;</title>
         </Head>
 
         {postBelongsToUser ? (

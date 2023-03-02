@@ -17,7 +17,7 @@ const SignIn = ({
   return (
     <>
       <Head>
-        <title>Sign In - Beam</title>
+        <title>Sign In - &#91;tanoshii&#93;</title>
       </Head>
 
       <Div100vh>
