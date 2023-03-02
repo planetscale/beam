@@ -17,7 +17,7 @@ export const postRouter = createProtectedRouter()
       const take = input?.take ?? 50
       const skip = input?.skip
       const where = {
-        hidden: ctx.isUserAdmin ? undefined : false,
+        hidden: false, // ctx.isUserAdmin ? undefined : false
         authorId: input?.authorId,
       }
 
@@ -128,9 +128,10 @@ export const postRouter = createProtectedRouter()
         },
       })
 
-      const postBelongsToUser = post?.author.id === ctx.session.user.id
+      //const postBelongsToUser = post?.author.id === ctx.session.user.id
 
-      if (!post || (post.hidden && !postBelongsToUser && !ctx.isUserAdmin)) {
+      if (!post || post.hidden) {
+        // && !postBelongsToUser && !ctx.isUserAdmin
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: `No post with id '${id}'`,
@@ -288,11 +289,28 @@ export const postRouter = createProtectedRouter()
   .mutation('hide', {
     input: z.number(),
     async resolve({ input: id, ctx }) {
-      if (!ctx.isUserAdmin) {
+      // if (!ctx.isUserAdmin) {
+      //   throw new TRPCError({ code: 'FORBIDDEN' })
+      // }
+
+      const post = await ctx.prisma.post.findUnique({
+        where: { id },
+        select: {
+          author: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      const postBelongsToUser = post?.author.id === ctx.session.user.id
+
+      if (!postBelongsToUser) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
-      const post = await ctx.prisma.post.update({
+      const updatedPost = await ctx.prisma.post.update({
         where: { id },
         data: {
           hidden: true,
@@ -301,17 +319,35 @@ export const postRouter = createProtectedRouter()
           id: true,
         },
       })
-      return post
+
+      return updatedPost
     },
   })
   .mutation('unhide', {
     input: z.number(),
     async resolve({ input: id, ctx }) {
-      if (!ctx.isUserAdmin) {
+      // if (!ctx.isUserAdmin) {
+      //   throw new TRPCError({ code: 'FORBIDDEN' })
+      // }
+
+      const post = await ctx.prisma.post.findUnique({
+        where: { id },
+        select: {
+          author: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      const postBelongsToUser = post?.author.id === ctx.session.user.id
+
+      if (!postBelongsToUser) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
-      const post = await ctx.prisma.post.update({
+      const updatedPost = await ctx.prisma.post.update({
         where: { id },
         data: {
           hidden: false,
@@ -320,6 +356,7 @@ export const postRouter = createProtectedRouter()
           id: true,
         },
       })
-      return post
+
+      return updatedPost
     },
   })
