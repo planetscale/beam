@@ -48,16 +48,4 @@ function Auth({ children }: { children: React.ReactNode }) {
   return null
 }
 
-function getBaseUrl() {
-  if (process.browser) {
-    return ''
-  }
-
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`
-  }
-
-  return `http://localhost:${process.env.PORT ?? 3000}`
-}
-
 export default api.withTRPC(MyApp)
