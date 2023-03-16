@@ -1,3 +1,5 @@
+//!process.env.SKIP_ENV_VALIDATION && (await import('./env/server.mjs'))
+
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,

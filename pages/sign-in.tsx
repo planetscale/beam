@@ -1,9 +1,7 @@
 import { Button } from '@/components/button'
 import { Footer } from '@/components/footer'
 import { Logo } from '@/components/icons'
-import { authOptions } from '@/lib/auth'
 import type { InferGetServerSidePropsType } from 'next'
-import { getServerSession } from 'next-auth/next'
 import { getProviders, signIn } from 'next-auth/react'
 import Head from 'next/head'
 import Div100vh from 'react-div-100vh'
@@ -46,18 +44,7 @@ const SignIn = ({
 }
 
 export const getServerSideProps = async () => {
-  const session = await getServerSession(authOptions)
   const providers = await getProviders()
-
-  if (session?.user) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: '/',
-      },
-      props: { providers },
-    }
-  }
 
   return {
     props: { providers },

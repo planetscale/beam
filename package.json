@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@headlessui/react": "^1.4.3",
@@ -53,7 +54,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
     "@types/marked": "^4.0.2",
-    "@types/node": "18.14.2",
+    "@types/node": "18.15.3",
     "@types/react": "18.0.28",
     "@types/react-beforeunload": "^2.1.1",
     "@types/react-dom": "^18.0.11",
