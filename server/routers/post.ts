@@ -2,20 +2,18 @@ import { markdownToHtml } from '@/lib/editor'
 import { postToSlackIfEnabled } from '@/lib/slack'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { protectedProcedure, router } from '../trpc'
+import { createProtectedRouter } from '../create-protected-router'
 
-export const postRouter = router({
-  feed: protectedProcedure
-    .input(
-      z
-        .object({
-          take: z.number().min(1).max(50).optional(),
-          skip: z.number().min(1).optional(),
-          authorId: z.string().optional(),
-        })
-        .optional()
-    )
-    .query(async ({ ctx, input }) => {
+export const postRouter = createProtectedRouter()
+  .query('feed', {
+    input: z
+      .object({
+        take: z.number().min(1).max(50).optional(),
+        skip: z.number().min(1).optional(),
+        authorId: z.string().optional(),
+      })
+      .optional(),
+    async resolve({ input, ctx }) {
       const take = input?.take ?? 50
       const skip = input?.skip
       const where = {
@@ -72,16 +70,14 @@ export const postRouter = router({
         posts,
         postCount,
       }
+    },
+  })
+  .query('detail', {
+    input: z.object({
+      id: z.number(),
     }),
-  detail: protectedProcedure
-    .input(
-      z.object({
-        id: z.number(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
+    async resolve({ ctx, input }) {
       const { id } = input
-
       const post = await ctx.prisma.post.findUnique({
         where: { id },
         select: {
@@ -142,14 +138,13 @@ export const postRouter = router({
       }
 
       return post
+    },
+  })
+  .query('search', {
+    input: z.object({
+      query: z.string().min(1),
     }),
-  search: protectedProcedure
-    .input(
-      z.object({
-        query: z.string().min(1),
-      })
-    )
-    .query(async ({ ctx, input }) => {
+    async resolve({ input, ctx }) {
       const posts = await ctx.prisma.post.findMany({
         take: 10,
         where: {
@@ -164,15 +159,14 @@ export const postRouter = router({
       })
 
       return posts
+    },
+  })
+  .mutation('add', {
+    input: z.object({
+      title: z.string().min(1),
+      content: z.string().min(1),
     }),
-  add: protectedProcedure
-    .input(
-      z.object({
-        title: z.string().min(1),
-        content: z.string().min(1),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
+    async resolve({ ctx, input }) {
       const post = await ctx.prisma.post.create({
         data: {
           title: input.title,
@@ -189,18 +183,17 @@ export const postRouter = router({
       await postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
 
       return post
+    },
+  })
+  .mutation('edit', {
+    input: z.object({
+      id: z.number(),
+      data: z.object({
+        title: z.string().min(1),
+        content: z.string().min(1),
+      }),
     }),
-  edit: protectedProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        data: z.object({
-          title: z.string().min(1),
-          content: z.string().min(1),
-        }),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
+    async resolve({ ctx, input }) {
       const { id, data } = input
 
       const post = await ctx.prisma.post.findUnique({
@@ -230,10 +223,11 @@ export const postRouter = router({
       })
 
       return updatedPost
-    }),
-  delete: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('delete', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       const post = await ctx.prisma.post.findUnique({
         where: { id },
         select: {
@@ -253,10 +247,11 @@ export const postRouter = router({
 
       await ctx.prisma.post.delete({ where: { id } })
       return id
-    }),
-  like: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('like', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       await ctx.prisma.likedPosts.create({
         data: {
           post: {
@@ -273,10 +268,11 @@ export const postRouter = router({
       })
 
       return id
-    }),
-  unlike: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('unlike', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       await ctx.prisma.likedPosts.delete({
         where: {
           postId_userId: {
@@ -287,10 +283,11 @@ export const postRouter = router({
       })
 
       return id
-    }),
-  hide: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('hide', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       if (!ctx.isUserAdmin) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
@@ -305,10 +302,11 @@ export const postRouter = router({
         },
       })
       return post
-    }),
-  unhide: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('unhide', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       if (!ctx.isUserAdmin) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
@@ -323,5 +321,5 @@ export const postRouter = router({
         },
       })
       return post
-    }),
-})
+    },
+  })

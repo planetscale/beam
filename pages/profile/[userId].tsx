@@ -15,20 +15,17 @@ import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
 import { TextField } from '@/components/text-field'
 import { browserEnv } from '@/env/browser'
-import { api } from '@/lib/api'
 import { uploadImage } from '@/lib/cloudinary'
+import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
-import { setDataFunction } from '@/server/trpc'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import type { SubmitHandler } from 'react-hook-form'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { useMutation } from '@tanstack/react-query'
-import { getErrorMessage } from '@/lib/get-error-message'
+import { useMutation } from 'react-query'
 
 const PostSummary = dynamic<PostSummaryProps>(
   () => import('@/components/post-summary').then((mod) => mod.PostSummary),
@@ -36,6 +33,17 @@ const PostSummary = dynamic<PostSummaryProps>(
 )
 
 const POSTS_PER_PAGE = 20
+
+function getProfileQueryPathAndInput(
+  id: string
+): InferQueryPathAndInput<'user.profile'> {
+  return [
+    'user.profile',
+    {
+      id,
+    },
+  ]
+}
 
 const ProfilePage: NextPageWithAuthAndLayout = () => {
   return (
@@ -55,9 +63,10 @@ ProfilePage.getLayout = function getLayout(page: React.ReactElement) {
 function ProfileInfo() {
   const { data: session } = useSession()
   const router = useRouter()
-  const profileQueryInput = { id: String(router.query.userId) }
-
-  const profileQuery = api.user.profile.useQuery(profileQueryInput)
+  const profileQueryPathAndInput = getProfileQueryPathAndInput(
+    String(router.query.userId)
+  )
+  const profileQuery = trpc.useQuery(profileQueryPathAndInput)
 
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] =
     React.useState(false)
@@ -176,21 +185,23 @@ function ProfileFeed() {
   const { data: session } = useSession()
   const router = useRouter()
   const currentPageNumber = router.query.page ? Number(router.query.page) : 1
-  const utils = api.useContext()
-  const profileFeedQueryInput = {
-    ...getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
-    authorId: String(router.query.userId),
-  }
-
-  const profileFeedQuery = api.post.feed.useQuery(profileFeedQueryInput)
-  const likeMutation = api.post.like.useMutation({
+  const utils = trpc.useContext()
+  const profileFeedQueryPathAndInput: InferQueryPathAndInput<'post.feed'> = [
+    'post.feed',
+    {
+      ...getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
+      authorId: String(router.query.userId),
+    },
+  ]
+  const profileFeedQuery = trpc.useQuery(profileFeedQueryPathAndInput)
+  const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.post.feed.invalidate(profileFeedQueryInput)
+      await utils.cancelQuery(profileFeedQueryPathAndInput)
 
-      const previousQuery = utils.post.feed.getData(profileFeedQueryInput)
+      const previousQuery = utils.getQueryData(profileFeedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.post.feed.setData(profileFeedQueryInput, {
+        utils.setQueryData(profileFeedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === likedPostId
@@ -210,19 +221,20 @@ function ProfileFeed() {
 
       return { previousQuery }
     },
-    onError: (err, id, context) => {
+    onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.post.feed.setData(profileFeedQueryInput, context.previousQuery)
+        utils.setQueryData(profileFeedQueryPathAndInput, context.previousQuery)
       }
     },
   })
-  const unlikeMutation = api.post.unlike.useMutation({
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.post.feed.cancel()
-      const previousQuery = utils.post.feed.getData()
+      await utils.cancelQuery(profileFeedQueryPathAndInput)
+
+      const previousQuery = utils.getQueryData(profileFeedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.post.feed.setData(setDataFunction, {
+        utils.setQueryData(profileFeedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === unlikedPostId
@@ -239,9 +251,9 @@ function ProfileFeed() {
 
       return { previousQuery }
     },
-    onError: (err, id, context) => {
+    onError: (err, id, context: any) => {
       if (context?.previousQuery) {
-        utils.post.feed.setData(setDataFunction, context.previousQuery)
+        utils.setQueryData(profileFeedQueryPathAndInput, context.previousQuery)
       }
     },
   })
@@ -356,13 +368,13 @@ function EditProfileDialog({
     },
   })
   const router = useRouter()
-  const utils = api.useContext()
-  const editUserMutation = api.user.edit.useMutation({
+  const utils = trpc.useContext()
+  const editUserMutation = trpc.useMutation('user.edit', {
     onSuccess: () => {
       window.location.reload()
-      return utils.user.profile.invalidate({
-        id: String(router.query.userId),
-      })
+      return utils.invalidateQueries(
+        getProfileQueryPathAndInput(String(router.query.userId))
+      )
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -433,7 +445,7 @@ function UpdateAvatarDialog({
 }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [uploadedImage, setUploadedImage] = React.useState(user.image)
-  const updateUserAvatarMutation = api.user.updateAvatar.useMutation({
+  const updateUserAvatarMutation = trpc.useMutation('user.update-avatar', {
     onSuccess: () => {
       window.location.reload()
     },
@@ -446,8 +458,8 @@ function UpdateAvatarDialog({
       return uploadImage(file)
     },
     {
-      onError: (error) => {
-        toast.error(`Error uploading image: ${getErrorMessage(error)}`)
+      onError: (error: any) => {
+        toast.error(`Error uploading image: ${error.message}`)
       },
     }
   )

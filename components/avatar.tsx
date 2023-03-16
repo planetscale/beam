@@ -32,6 +32,7 @@ export function Avatar({ size = 'md', name, src }: AvatarProps) {
           <Image
             src={src}
             alt={name}
+            layout="fixed"
             width={dimension[size]}
             height={dimension[size]}
             className="object-cover rounded-full"
@@ -41,7 +42,8 @@ export function Avatar({ size = 'md', name, src }: AvatarProps) {
       ) : (
         <div className="grid">
           <div className="flex col-start-1 col-end-1 row-start-1 row-end-1">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={`/api/avatar?name=${encodeURIComponent(name)}`}
               alt={name}
               width={dimension[size]}
@@ -50,7 +52,8 @@ export function Avatar({ size = 'md', name, src }: AvatarProps) {
           </div>
           {isCharacterALetter(initial) && (
             <div className="relative flex items-center justify-center col-start-1 col-end-1 row-start-1 row-end-1">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={`/images/letters/${initial}.svg`}
                 className={initialSize[size]}
                 alt=""

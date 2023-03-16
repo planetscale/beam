@@ -1,7 +1,12 @@
 import { Button } from '@/components/button'
 import { Footer } from '@/components/footer'
 import { Logo } from '@/components/icons'
-import type { InferGetServerSidePropsType } from 'next'
+import { authOptions } from '@/lib/auth'
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from 'next'
+import { getServerSession } from 'next-auth/next'
 import { getProviders, signIn } from 'next-auth/react'
 import Head from 'next/head'
 import Div100vh from 'react-div-100vh'
@@ -9,8 +14,6 @@ import Div100vh from 'react-div-100vh'
 const SignIn = ({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  if (!providers) return null
-
   return (
     <>
       <Head>
@@ -22,7 +25,7 @@ const SignIn = ({
           <div className="relative bottom-16">
             <Logo className="w-[326px] text-red-light h-[94px] mb-8 bg-primary" />
             <div className="w-full space-y-4 text-center bg-primary">
-              {Object.values(providers).map((provider) => (
+              {Object.values(providers!).map((provider) => (
                 <div key={provider.name}>
                   <Button
                     className="!h-12 !px-5 !text-lg"
@@ -43,8 +46,21 @@ const SignIn = ({
   )
 }
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const session = await getServerSession(context, authOptions)
   const providers = await getProviders()
+
+  if (session?.user) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+      props: { providers },
+    }
+  }
 
   return {
     props: { providers },

@@ -1,6 +1,6 @@
-import type { User } from '@prisma/client'
+import { User } from '@prisma/client'
 import type { NextPage } from 'next'
-import type * as React from 'react'
+import * as React from 'react'
 
 export type NextPageWithAuthAndLayout = NextPage & {
   auth?: boolean
