@@ -9,16 +9,16 @@ import {
 } from '@/components/icons'
 import { MAX_LIKED_BY_SHOWN } from '@/components/like-button'
 import { classNames } from '@/lib/classnames'
-import { InferQueryOutput } from '@/lib/trpc'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import formatDistanceToNow from 'date-fns/formatDistanceToNow'
 import { useSession } from 'next-auth/react'
 import { summarize } from '@/lib/text'
 import Link from 'next/link'
 import * as React from 'react'
+import type { RouterOutputs } from '@/lib/api'
 
 export type PostSummaryProps = {
-  post: InferQueryOutput<'post.feed'>['posts'][number]
+  post: RouterOutputs['post']['feed']['posts'][number]
   hideAuthor?: boolean
   onLike: () => void
   onUnlike: () => void

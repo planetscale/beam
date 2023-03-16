@@ -3,6 +3,7 @@ import DOMPurify from 'isomorphic-dompurify'
 import { marked } from 'marked'
 import toast from 'react-hot-toast'
 import { Cursor } from 'textarea-markdown-editor'
+import { getErrorMessage } from './get-error-message'
 
 export function markdownToHtml(markdown: string) {
   return DOMPurify.sanitize(marked.parse(markdown, { breaks: true }))
@@ -23,7 +24,7 @@ export function uploadImageCommandHandler(
   const cursor = new Cursor(textareaEl)
   const currentLineNumber = cursor.position.line
 
-  files.forEach(async (file, idx) => {
+  files.forEach(async (file) => {
     const placeholder = `![Uploading ${file.name}...]()`
 
     cursor.replaceLine(currentLineNumber.lineNumber, placeholder)
@@ -40,10 +41,10 @@ export function uploadImageCommandHandler(
             : uploadedImage.width
         }" alt="${uploadedImage.originalFilename}" src="${uploadedImage.url}">`
       )
-    } catch (error: any) {
+    } catch (error) {
       console.log(error)
       replacePlaceholder(cursor, placeholder, '')
-      toast.error(`Error uploading image: ${error.message}`)
+      toast.error(`Error uploading image: ${getErrorMessage(error)}`)
     }
   })
 }

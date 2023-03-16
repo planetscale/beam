@@ -1,12 +1,12 @@
 import { SearchIcon, SpinnerIcon } from '@/components/icons'
+import { api, type RouterOutputs } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
-import { InferQueryOutput, trpc } from '@/lib/trpc'
 import { Dialog, Transition } from '@headlessui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import * as React from 'react'
 import { useDebounce } from 'use-debounce'
-import { ItemOptions, useItemList } from 'use-item-list'
+import { type ItemOptions, useItemList } from 'use-item-list'
 
 type SearchDialogProps = {
   isOpen: boolean
@@ -22,13 +22,13 @@ function SearchResult({
     index: number
     highlight: () => void
     select: () => void
-    selected: any
+    // eslint-disable-next-line @typescript-eslint/ban-types
     useHighlighted: () => Boolean
   }
-  result: InferQueryOutput<'post.search'>[number]
+  result: RouterOutputs['post']['search'][number]
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
-  const { id, index, highlight, select, useHighlighted } = useItem({
+  const { id, highlight, select, useHighlighted } = useItem({
     ref,
     value: result,
   })
@@ -55,13 +55,10 @@ function SearchField({ onSelect }: { onSelect: () => void }) {
   const [debouncedValue] = useDebounce(value, 1000)
   const router = useRouter()
 
-  const feedQuery = trpc.useQuery(
-    [
-      'post.search',
-      {
-        query: debouncedValue,
-      },
-    ],
+  const feedQuery = api.post.search.useQuery(
+    {
+      query: debouncedValue,
+    },
     {
       enabled: debouncedValue.trim().length > 0,
     }

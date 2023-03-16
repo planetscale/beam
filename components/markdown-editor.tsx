@@ -1,24 +1,25 @@
 import { HtmlView } from '@/components/html-view'
 import { BoldIcon, ItalicIcon, LinkIcon, ListIcon } from '@/components/icons'
 import { browserEnv } from '@/env/browser'
+import { api } from '@/lib/api'
 import { classNames } from '@/lib/classnames'
 import {
   getSuggestionData,
   uploadImageCommandHandler,
   markdownToHtml,
 } from '@/lib/editor'
-import { trpc } from '@/lib/trpc'
 import { Switch } from '@headlessui/react'
 import { matchSorter } from 'match-sorter'
 import * as React from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import TextareaAutosize, {
-  TextareaAutosizeProps,
+  type TextareaAutosizeProps,
 } from 'react-textarea-autosize'
 import getCaretCoordinates from 'textarea-caret'
-import TextareaMarkdown, { TextareaMarkdownRef } from 'textarea-markdown-editor'
-import { ItemOptions, useItemList } from 'use-item-list'
+import type { TextareaMarkdownRef } from 'textarea-markdown-editor'
+import TextareaMarkdown from 'textarea-markdown-editor'
+import { useItemList, type ItemOptions } from 'use-item-list'
 
 type MarkdownEditorProps = {
   label?: string
@@ -357,7 +358,7 @@ function Suggestion({
   const isEmojiType = state.type === 'emoji'
 
   const emojiListQuery = useQuery(
-    'emojiList',
+    ['emojiList'],
     async () => {
       const gemoji = (await import('gemoji')).gemoji
       return gemoji
@@ -368,7 +369,7 @@ function Suggestion({
     }
   )
 
-  const mentionListQuery = trpc.useQuery(['user.mentionList'], {
+  const mentionListQuery = api.user.mentionList.useQuery(undefined, {
     enabled: state.isOpen && isMentionType,
     staleTime: 5 * 60 * 1000,
   })
@@ -380,7 +381,10 @@ function Suggestion({
       keys: ['name'],
     })
       .slice(0, 5)
-      .map((item) => ({ label: item.name!, value: item.id }))
+      .map((item) => ({
+        label: item.name,
+        value: item.id,
+      })) as SuggestionResult[]
   }
 
   if (isEmojiType && emojiListQuery.data) {
@@ -487,13 +491,13 @@ function SuggestionResult({
     index: number
     highlight: () => void
     select: () => void
-    selected: any
+    // eslint-disable-next-line @typescript-eslint/ban-types
     useHighlighted: () => Boolean
   }
   suggestionResult: SuggestionResult
 }) {
   const ref = React.useRef<HTMLLIElement>(null)
-  const { id, index, highlight, select, useHighlighted } = useItem({
+  const { id, highlight, select, useHighlighted } = useItem({
     ref,
     value: suggestionResult,
   })
