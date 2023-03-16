@@ -1,17 +1,15 @@
 import { markdownToHtml } from '@/lib/editor'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { protectedProcedure, router } from '../trpc'
+import { createProtectedRouter } from '../create-protected-router'
 
-export const commentRouter = router({
-  add: protectedProcedure
-    .input(
-      z.object({
-        postId: z.number(),
-        content: z.string().min(1),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
+export const commentRouter = createProtectedRouter()
+  .mutation('add', {
+    input: z.object({
+      postId: z.number(),
+      content: z.string().min(1),
+    }),
+    async resolve({ ctx, input }) {
       const comment = await ctx.prisma.comment.create({
         data: {
           content: input.content,
@@ -30,17 +28,16 @@ export const commentRouter = router({
       })
 
       return comment
+    },
+  })
+  .mutation('edit', {
+    input: z.object({
+      id: z.number(),
+      data: z.object({
+        content: z.string().min(1),
+      }),
     }),
-  edit: protectedProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        data: z.object({
-          content: z.string().min(1),
-        }),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
+    async resolve({ ctx, input }) {
       const { id, data } = input
 
       const comment = await ctx.prisma.comment.findUnique({
@@ -69,10 +66,11 @@ export const commentRouter = router({
       })
 
       return updatedComment
-    }),
-  delete: protectedProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input: id }) => {
+    },
+  })
+  .mutation('delete', {
+    input: z.number(),
+    async resolve({ input: id, ctx }) {
       const comment = await ctx.prisma.comment.findUnique({
         where: { id },
         select: {
@@ -92,5 +90,5 @@ export const commentRouter = router({
 
       await ctx.prisma.comment.delete({ where: { id } })
       return id
-    }),
-})
+    },
+  })

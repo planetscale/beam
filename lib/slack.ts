@@ -1,6 +1,6 @@
 import { serverEnv } from '@/env/server'
 import type { Post } from '@prisma/client'
-import { markdownToBlocks } from '@tryfabric/mack'
+import { markdownToBlocks } from '@instantish/mack'
 import { marked } from 'marked'
 
 export async function postToSlackIfEnabled({

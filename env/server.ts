@@ -1,7 +1,14 @@
-import { bool, envsafe, invalidEnvError, makeValidator, str } from 'envsafe'
+import {
+  bool,
+  envsafe,
+  invalidEnvError,
+  makeValidator,
+  str,
+  url,
+} from 'envsafe'
 import { browserEnv } from './browser'
 
-if (typeof window === 'undefined') {
+if (process.browser) {
   throw new Error(
     'This should only be included on the client (but the env vars wont be exposed)'
   )

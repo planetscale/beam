@@ -1,4 +1,3 @@
-import { getErrorMessage } from '@/lib/get-error-message'
 import { sha1 } from 'crypto-hash'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -14,8 +13,8 @@ const COLOR_NAMES = [
 const COLOR_SHADES = [500, 600, 700, 800] as const
 
 const COLORS: Record<
-  (typeof COLOR_NAMES)[number],
-  Record<(typeof COLOR_SHADES)[number], string>
+  typeof COLOR_NAMES[number],
+  Record<typeof COLOR_SHADES[number], string>
 > = {
   red: {
     500: '#ff455d',
@@ -111,7 +110,7 @@ export default async function handler(
     )
     res.statusCode = 200
     res.send(svg)
-  } catch (error) {
-    return res.status(500).json({ message: getErrorMessage(error) })
+  } catch (error: any) {
+    return res.status(500).json({ message: error.message })
   }
 }

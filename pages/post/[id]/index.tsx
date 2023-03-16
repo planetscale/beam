@@ -31,32 +31,42 @@ import {
   MenuItems,
   MenuItemsContent,
 } from '@/components/menu'
-import type { RouterOutputs } from '@/lib/api'
-import { api } from '@/lib/api'
+import { InferQueryOutput, InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import type { SubmitHandler } from 'react-hook-form'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+
+function getPostQueryPathAndInput(
+  id: number
+): InferQueryPathAndInput<'post.detail'> {
+  return [
+    'post.detail',
+    {
+      id,
+    },
+  ]
+}
 
 const PostPage: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
-  const utils = api.useContext()
-  const postQueryInput = { id: Number(router.query.id) }
-  const postQuery = api.post.detail.useQuery(postQueryInput)
-
-  const likeMutation = api.post.like.useMutation({
+  const utils = trpc.useContext()
+  const postQueryPathAndInput = getPostQueryPathAndInput(
+    Number(router.query.id)
+  )
+  const postQuery = trpc.useQuery(postQueryPathAndInput)
+  const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.post.detail.cancel(postQueryInput)
+      await utils.cancelQuery(postQueryPathAndInput)
 
-      const previousPost = utils.post.detail.getData(postQueryInput)
+      const previousPost = utils.getQueryData(postQueryPathAndInput)
 
       if (previousPost) {
-        utils.post.detail.setData(postQueryInput, {
+        utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
           likedBy: [
             ...previousPost.likedBy,
@@ -67,20 +77,20 @@ const PostPage: NextPageWithAuthAndLayout = () => {
 
       return { previousPost }
     },
-    onError: (err, id, context) => {
+    onError: (err, id, context: any) => {
       if (context?.previousPost) {
-        utils.post.detail.setData(postQueryInput, context.previousPost)
+        utils.setQueryData(postQueryPathAndInput, context.previousPost)
       }
     },
   })
-  const unlikeMutation = api.post.unlike.useMutation({
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.post.detail.cancel(postQueryInput)
+      await utils.cancelQuery(postQueryPathAndInput)
 
-      const previousPost = utils.post.detail.getData(postQueryInput)
+      const previousPost = utils.getQueryData(postQueryPathAndInput)
 
       if (previousPost) {
-        utils.post.detail.setData(postQueryInput, {
+        utils.setQueryData(postQueryPathAndInput, {
           ...previousPost,
           likedBy: previousPost.likedBy.filter(
             (item) => item.user.id !== session!.user.id
@@ -90,9 +100,9 @@ const PostPage: NextPageWithAuthAndLayout = () => {
 
       return { previousPost }
     },
-    onError: (err, id, context) => {
+    onError: (err, id, context: any) => {
       if (context?.previousPost) {
-        utils.post.detail.setData(postQueryInput, context.previousPost)
+        utils.setQueryData(postQueryPathAndInput, context.previousPost)
       }
     },
   })
@@ -352,7 +362,7 @@ function Comment({
   comment,
 }: {
   postId: number
-  comment: RouterOutputs['post']['detail']['comments'][number]
+  comment: InferQueryOutput<'post.detail'>['comments'][number]
 }) {
   const { data: session } = useSession()
   const [isEditing, setIsEditing] = React.useState(false)
@@ -431,10 +441,10 @@ type CommentFormData = {
 
 function AddCommentForm({ postId }: { postId: number }) {
   const [markdownEditorKey, setMarkdownEditorKey] = React.useState(0)
-  const utils = api.useContext()
-  const addCommentMutation = api.comment.add.useMutation({
+  const utils = trpc.useContext()
+  const addCommentMutation = trpc.useMutation('comment.add', {
     onSuccess: () => {
-      return utils.post.detail.invalidate({ id: postId })
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -494,13 +504,13 @@ function EditCommentForm({
   onDone,
 }: {
   postId: number
-  comment: RouterOutputs['post']['detail']['comments'][number]
+  comment: InferQueryOutput<'post.detail'>['comments'][number]
   onDone: () => void
 }) {
-  const utils = api.useContext()
-  const editCommentMutation = api.comment.edit.useMutation({
+  const utils = trpc.useContext()
+  const editCommentMutation = trpc.useMutation('comment.edit', {
     onSuccess: () => {
-      return utils.post.detail.invalidate({ id: postId })
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -572,10 +582,10 @@ function ConfirmDeleteCommentDialog({
   onClose: () => void
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
-  const utils = api.useContext()
-  const deleteCommentMutation = api.comment.delete.useMutation({
+  const utils = trpc.useContext()
+  const deleteCommentMutation = trpc.useMutation('comment.delete', {
     onSuccess: () => {
-      return utils.post.detail.invalidate({ id: postId })
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -624,7 +634,7 @@ function ConfirmDeleteDialog({
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
   const router = useRouter()
-  const deletePostMutation = api.post.delete.useMutation({
+  const deletePostMutation = trpc.useMutation('post.delete', {
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
     },
@@ -671,10 +681,10 @@ function ConfirmHideDialog({
   onClose: () => void
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
-  const utils = api.useContext()
-  const hidePostMutation = api.post.hide.useMutation({
+  const utils = trpc.useContext()
+  const hidePostMutation = trpc.useMutation('post.hide', {
     onSuccess: () => {
-      return utils.post.detail.invalidate({ id: postId })
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -724,10 +734,10 @@ function ConfirmUnhideDialog({
   onClose: () => void
 }) {
   const cancelRef = React.useRef<HTMLButtonElement>(null)
-  const utils = api.useContext()
-  const unhidePostMutation = api.post.unhide.useMutation({
+  const utils = trpc.useContext()
+  const unhidePostMutation = trpc.useMutation('post.unhide', {
     onSuccess: () => {
-      return utils.post.detail.invalidate({ id: postId })
+      return utils.invalidateQueries(getPostQueryPathAndInput(postId))
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)

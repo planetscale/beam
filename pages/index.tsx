@@ -2,9 +2,8 @@ import { Layout } from '@/components/layout'
 import { getQueryPaginationInput, Pagination } from '@/components/pagination'
 import type { PostSummaryProps } from '@/components/post-summary'
 import { PostSummarySkeleton } from '@/components/post-summary-skeleton'
-import { api } from '@/lib/api'
+import { InferQueryPathAndInput, trpc } from '@/lib/trpc'
 import type { NextPageWithAuthAndLayout } from '@/lib/types'
-import { setDataFunction } from '@/server/trpc'
 import { useSession } from 'next-auth/react'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
@@ -22,18 +21,20 @@ const Home: NextPageWithAuthAndLayout = () => {
   const { data: session } = useSession()
   const router = useRouter()
   const currentPageNumber = router.query.page ? Number(router.query.page) : 1
-  const utils = api.useContext()
-
-  const feedQuery = api.post.feed.useQuery(
-    getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber)
-  )
-  const likeMutation = api.post.like.useMutation({
+  const utils = trpc.useContext()
+  const feedQueryPathAndInput: InferQueryPathAndInput<'post.feed'> = [
+    'post.feed',
+    getQueryPaginationInput(POSTS_PER_PAGE, currentPageNumber),
+  ]
+  const feedQuery = trpc.useQuery(feedQueryPathAndInput)
+  const likeMutation = trpc.useMutation(['post.like'], {
     onMutate: async (likedPostId) => {
-      await utils.post.feed.cancel()
-      const previousQuery = utils.post.feed.getData()
+      await utils.cancelQuery(feedQueryPathAndInput)
+
+      const previousQuery = utils.getQueryData(feedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.post.feed.setData(setDataFunction, {
+        utils.setQueryData(feedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === likedPostId
@@ -53,20 +54,20 @@ const Home: NextPageWithAuthAndLayout = () => {
 
       return { previousQuery }
     },
-    onError: () => {
-      const previousQuery = utils.post.feed.getData()
-      if (previousQuery) {
-        utils.post.feed.setData(setDataFunction, previousQuery)
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(feedQueryPathAndInput, context.previousQuery)
       }
     },
   })
-  const unlikeMutation = api.post.unlike.useMutation({
+  const unlikeMutation = trpc.useMutation(['post.unlike'], {
     onMutate: async (unlikedPostId) => {
-      await utils.post.feed.cancel()
-      const previousQuery = utils.post.feed.getData()
+      await utils.cancelQuery(feedQueryPathAndInput)
+
+      const previousQuery = utils.getQueryData(feedQueryPathAndInput)
 
       if (previousQuery) {
-        utils.post.feed.setData(setDataFunction, {
+        utils.setQueryData(feedQueryPathAndInput, {
           ...previousQuery,
           posts: previousQuery.posts.map((post) =>
             post.id === unlikedPostId
@@ -83,10 +84,9 @@ const Home: NextPageWithAuthAndLayout = () => {
 
       return { previousQuery }
     },
-    onError: () => {
-      const previousQuery = utils.post.feed.getData()
-      if (previousQuery) {
-        utils.post.feed.setData(setDataFunction, previousQuery)
+    onError: (err, id, context: any) => {
+      if (context?.previousQuery) {
+        utils.setQueryData(feedQueryPathAndInput, context.previousQuery)
       }
     },
   })
