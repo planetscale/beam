@@ -139,7 +139,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
           <title>{postQuery.data.title} - Beam</title>
         </Head>
 
-        <div className="divide-y divide-primary">
+        <article className="divide-y divide-primary">
           <div className="pb-12">
             {postQuery.data.hidden && (
               <Banner className="mb-6">
@@ -284,7 +284,7 @@ const PostPage: NextPageWithAuthAndLayout = () => {
               <AddCommentForm postId={postQuery.data.id} />
             </div>
           </div>
-        </div>
+        </article>
 
         <ConfirmDeleteDialog
           postId={postQuery.data.id}
