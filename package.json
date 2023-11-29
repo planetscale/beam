@@ -44,7 +44,7 @@
     "textarea-markdown-editor": "^1.0.1",
     "use-debounce": "^7.0.1",
     "use-item-list": "^0.1.2",
-    "zod": "^3.11.6"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.4.0",
