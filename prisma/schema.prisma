@@ -3,7 +3,7 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex"]
+  previewFeatures = ["referentialIntegrity", "fullTextSearch", "fullTextIndex", "extendedIndexes"]
 }
 
 datasource db {
@@ -87,6 +87,7 @@ model Post {
   comments    Comment[]
 
   @@index([authorId])
+  @@index([hidden, createdAt(sort: Desc)])
   @@fulltext([title, content])
 }
 
