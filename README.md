@@ -1,74 +1,28 @@
-<img src="public/images/logo.svg" width="150" />
+# Create T3 App
 
-Beam is a simple tool that allows members to write posts to share across your organization. Think of it like a lightweight internal blog. Features include a simple **Markdown-based** editor with preview, **image drag and drop**, comments and likes, **search**, a clean responsive layout with **dark mode support**, and an admin role for hiding posts.
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-<img src="public/images/screenshot.png" width="690" />
+## What's next? How do I make an app with this?
 
-## Setup
+We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-### Install dependencies
+If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
 
-```bash
-npm install
-```
+- [Next.js](https://nextjs.org)
+- [NextAuth.js](https://next-auth.js.org)
+- [Prisma](https://prisma.io)
+- [Tailwind CSS](https://tailwindcss.com)
+- [tRPC](https://trpc.io)
 
-### Create a database
+## Learn More
 
-- [Create a PlanetScale database](https://planetscale.com/docs/tutorials/planetscale-quick-start-guide#create-a-database)
-- Create a [connection string](https://planetscale.com/docs/concepts/connection-strings#creating-a-password) to connect to your database. Choose **Prisma** for the format
-- **Alternatively**, your PlanetScale database and connection string can be generated using the [pscale CLI](https://github.com/planetscale/cli) or GitHub Actions. [View instructions](doc/pscale-actions-setup.md).
-- Set up the environment variables:
+To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
 
-```bash
-cp .env.example .env
-```
+- [Documentation](https://create.t3.gg/)
+- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
 
-- Open `.env` and set the `DATABASE_URL` variable with the connection string from PlanetScale
-- Create the database schema:
+You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
-```bash
-npx prisma db push
-```
+## How do I deploy this?
 
-### Configure authentication
-
-GitHub and Okta authentication settings are available as defaults, but thanks to NextAuth.js, you can configure your Beam instance with most other common authentication providers.
-
-- [Configuring GitHub authentication](doc/github_setup.md)
-- [Configuring Okta authentication](doc/okta_setup.md)
-
-Beam uses [NextAuth.js](https://next-auth.js.org/), so if you prefer to use one of the [many providers](https://next-auth.js.org/providers/) it supports, you can customize your own installation. Simply update the [`lib/auth.ts`](/lib/auth.ts#L11) file to add your own provider.
-
-### Enable image uploads (optional)
-
-To enable image uploads, set the environment variable `NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD` to `true`.
-
-Beam uses Cloudinary for storing uploaded images. You can [sign up for a free account](https://cloudinary.com/users/register/free).
-
-- On your Cloudinary dashboard, look for these values under your account settings: **Cloud Name**, **API Key**, **API Secret**.
-- Update `.env` with the following variables:
-  - `CLOUDINARY_CLOUD_NAME`: **Cloud Name**
-  - `CLOUDINARY_API_KEY`: **API Key**
-  - `CLOUDINARY_API_SECRET`: **API Secret**
-
-### Configure Slack notifications (optional)
-
-If you'd like to have new Beam posts published to a Slack channel, follow [these instructions](doc/slack_setup.md).
-
-## Running the app locally
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Authenticating with GitHub
-
-## Deploying to Vercel
-
-One-click deploy:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fplanetscale%2Fbeam)
-
-⚠️ Remember to update your callback URLs after deploying.
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
