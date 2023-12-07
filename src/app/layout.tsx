@@ -8,7 +8,6 @@ import { classNames } from '~/utils/core'
 import { ThemeProvider } from '~/app/_providers/theme'
 import { Toaster } from '~/app/_providers/toaster'
 
-import { getServerAuthSession } from '~/server/auth'
 import { SearchDialog } from './_components/search-dialog'
 import { AlertDialog } from './_components/alert-dialog'
 
