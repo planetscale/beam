@@ -38,8 +38,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerAuthSession()
-
   return (
     <html lang="en">
       <body className={classNames('font-sans min-h-screen', inter.variable)}>
