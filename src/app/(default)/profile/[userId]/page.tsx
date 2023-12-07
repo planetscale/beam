@@ -7,7 +7,8 @@ import EditIcon from '~/app/_svg/edit-icon'
 import { env } from '~/env'
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
-import { EditProfileAction } from './_components/edit-profile-action'
+import { EditProfileAction } from './_components/edit-profile'
+import { UpdateAvatarAction } from './_components/update-avatar'
 
 type ProfilePageParams = {
   params: {
@@ -59,13 +60,7 @@ export default async function ProfilePage({
       <div className="relative flex items-center gap-4 py-8 overflow-hidden">
         <div className="flex items-center gap-8">
           {env.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && profileBelongsToUser ? (
-            <button type="button" className="relative inline-flex group">
-              <Avatar name={profile.name!} src={profile.image} size="lg" />
-              <div className="absolute inset-0 transition-opacity bg-gray-900 rounded-full opacity-0 group-hover:opacity-50" />
-              <div className="absolute inline-flex items-center justify-center transition-opacity -translate-x-1/2 -translate-y-1/2 bg-gray-900 border border-white rounded-full opacity-0 top-1/2 left-1/2 h-9 w-9 group-hover:opacity-100">
-                <EditIcon className="w-4 h-4 text-white" />
-              </div>
-            </button>
+            <UpdateAvatarAction name={profile.name!} image={profile.image} />
           ) : (
             <Avatar name={profile.name!} src={profile.image} size="lg" />
           )}

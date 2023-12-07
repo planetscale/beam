@@ -49,6 +49,22 @@ export const userRouter = createTRPCRouter({
 
       revalidatePath(`/profile/${user.id}`, 'page')
     }),
+  updateAvatar: protectedProcedure
+    .input(
+      z.object({
+        image: z.string().nullish(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: {
+          image: input.image,
+        },
+      })
+
+      return user
+    }),
   mentionList: protectedProcedure.query(async ({ ctx }) => {
     const users = await ctx.db.user.findMany({
       select: {

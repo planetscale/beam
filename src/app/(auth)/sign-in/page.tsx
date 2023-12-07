@@ -21,7 +21,10 @@ export default async function SignIn() {
   return (
     <main className="min-h-screen relative flex items-center justify-center h-full bg-center bg-circle-grid dark:bg-circle-grid-dark">
       <div className="relative bottom-16">
-        <Logo className="w-[326px] text-red-light h-[94px] mb-8 bg-primary" />
+        <Logo
+          aria-label="Beam"
+          className="w-[326px] text-red-light h-[94px] mb-8 bg-primary"
+        />
         <div className="w-full space-y-4 text-center bg-primary">
           <SignInButtons providers={providers} />
         </div>
