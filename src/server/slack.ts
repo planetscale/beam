@@ -10,11 +10,7 @@ export const postToSlackIfEnabled = async ({
   post: Post
   authorName: string
 }) => {
-  if (
-    env.ENABLE_SLACK_POSTING &&
-    env.SLACK_WEBHOOK_URL &&
-    env.NODE_ENV === 'production'
-  ) {
+  if (env.ENABLE_SLACK_POSTING && env.SLACK_WEBHOOK_URL) {
     const tokens = marked.lexer(post.content)
     const summaryToken = tokens.find((token) => {
       return (
@@ -26,6 +22,7 @@ export const postToSlackIfEnabled = async ({
     const summaryBlocks = summaryToken
       ? await markdownToBlocks(summaryToken.raw)
       : []
+
     return fetch(env.SLACK_WEBHOOK_URL, {
       method: 'POST',
       headers: {

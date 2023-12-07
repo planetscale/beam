@@ -48,11 +48,11 @@ export const SearchDialog = () => {
       label="Search"
       open={open}
       onOpenChange={toggleOpen}
-      className="fixed inset-0 animate-fade-in"
+      className="fixed inset-0 animate-fade-in group"
     >
       <div className="fixed inset-0 transition-opacity bg-gray-700 opacity-90 dark:bg-gray-900" />
-      <div className="relative z-[100] w-[650px] bg-primary mx-auto flex flex-col items-center max-w-md">
-        <div className="inline-block w-full mt-[10vh] overflow-hidden text-left align-middle transition-all transform bg-primary rounded-lg shadow-xl dark:border">
+      <div className="relative z-[100] w-[650px] mx-auto flex flex-col items-center max-w-md">
+        <div className="inline-block w-full mt-[10vh] overflow-hidden animate-scale-in-content text-left align-middle transition-all transform bg-primary rounded-lg shadow-xl dark:border">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none transition-opacity">
               {isFetching ? (

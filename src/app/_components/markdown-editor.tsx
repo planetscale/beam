@@ -384,7 +384,7 @@ const Suggestions = ({
       keys: ['name'],
     })
       .slice(0, 5)
-      .map((item) => ({ label: item.name!, value: item.name! }))
+      .map((item) => ({ label: item.name!, value: item.id! }))
   }
 
   if (isEmojiType && emojiListQuery.data) {
