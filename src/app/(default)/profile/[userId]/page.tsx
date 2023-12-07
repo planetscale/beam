@@ -3,7 +3,7 @@ import { Avatar } from '~/app/_components/avatar'
 import { Pagination } from '~/app/_components/pagination'
 import { PostSummary } from '~/app/_components/post-summary'
 import DotPattern from '~/app/_svg/dot-pattern'
-import EditIcon from '~/app/_svg/edit-icon'
+
 import { env } from '~/env'
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'

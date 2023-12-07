@@ -44,8 +44,8 @@ const UpdateAvatar = ({
       return uploadImage(file)
     },
     {
-      onError: (error: any) => {
-        toast.error(`Error uploading image: ${error.message}`)
+      onError: () => {
+        toast.error(`Error uploading image`)
       },
     },
   )
