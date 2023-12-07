@@ -8,7 +8,6 @@ import { classNames } from '~/utils/core'
 import { ThemeProvider } from '~/app/_providers/theme'
 import { Toaster } from '~/app/_providers/toaster'
 
-import { SessionProvider } from '~/app/_providers/session'
 import { getServerAuthSession } from '~/server/auth'
 import { SearchDialog } from './_components/search-dialog'
 import { AlertDialog } from './_components/alert-dialog'
@@ -44,17 +43,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={classNames('font-sans min-h-screen', inter.variable)}>
-        <SessionProvider session={session}>
-          <ThemeProvider>
-            <TRPCReactProvider cookies={cookies().toString()}>
-              <main>{children}</main>
+        <ThemeProvider>
+          <TRPCReactProvider cookies={cookies().toString()}>
+            <main>{children}</main>
 
-              <Toaster />
-              <SearchDialog />
-              <AlertDialog />
-            </TRPCReactProvider>
-          </ThemeProvider>
-        </SessionProvider>
+            <Toaster />
+            <SearchDialog />
+            <AlertDialog />
+          </TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
