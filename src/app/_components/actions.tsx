@@ -16,7 +16,7 @@ export const Actions = ({ session }: { session: Session | null }) => {
         onClick={toggleOpen}
         aria-label="Search"
       >
-        <SearchIcon className="h-4 w-4 text-white" />
+        <SearchIcon className="h-4 w-4 text-primary" />
       </Button>
       <ProfileMenu session={session} />
 
