@@ -9,7 +9,7 @@ Beam is a simple tool that allows members to write posts to share across your or
 ### Install dependencies
 
 ```bash
-npm install
+pnpm i
 ```
 
 ### Create a database
@@ -58,7 +58,7 @@ If you'd like to have new Beam posts published to a Slack channel, follow [these
 ## Running the app locally
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
