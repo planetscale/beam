@@ -360,7 +360,7 @@ const Suggestions = ({
   onClose,
 }: {
   state: SuggestionState
-  onSelect: (suggestionResult: string) => void
+  onSelect: (suggestionResult: SuggestionResult) => void
   onClose: () => void
 }) => {
   const isMentionType = state.type === 'mention'
@@ -420,13 +420,13 @@ const SuggestionList = ({
 }: {
   suggestionList: SuggestionResult[]
   position: SuggestionPosition
-  onSuggestionSelect: (suggestionResult: string) => void
+  onSuggestionSelect: (suggestionResult: SuggestionResult) => void
   onClose: () => void
 }) => {
   const ref = useDetectClickOutside({ onTriggered: onClose })
 
   const { moveHighlightedItem, selectHighlightedItem, useItem } = useItemList({
-    onSelect: (item: SuggestionResult) => {
+    onSelect: (item: { value: SuggestionResult }) => {
       onSuggestionSelect(item.value)
     },
   })
