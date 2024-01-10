@@ -4,6 +4,7 @@ import * as Switch from '@radix-ui/react-switch'
 import { matchSorter } from 'match-sorter'
 import * as React from 'react'
 import { useDetectClickOutside } from 'react-detect-click-outside'
+import { type ItemOptions, useItemList } from 'use-item-list'
 
 import TextareaAutosize, {
   type TextareaAutosizeProps,
@@ -22,9 +23,9 @@ import { HtmlView } from './html-view'
 import { type SuggestionType, getSuggestionData } from '~/utils/suggestion'
 import { env } from '~/env'
 import { api } from '~/trpc/react'
-import { SuggestionListSelect } from './suggestion-list'
 import { uploadImageCommandHandler } from '~/server/cloudinary'
 import { markdownToHtml } from '~/utils/text'
+import { useEffect, useRef } from 'react'
 
 type SuggestionResult = {
   label: string
@@ -359,11 +360,9 @@ const Suggestions = ({
   onClose,
 }: {
   state: SuggestionState
-  onSelect: (suggestionResult: SuggestionResult) => void
+  onSelect: (suggestionResult: string) => void
   onClose: () => void
 }) => {
-  const ref = useDetectClickOutside({ onTriggered: onClose })
-
   const isMentionType = state.type === 'mention'
   const isEmojiType = state.type === 'emoji'
 
@@ -404,20 +403,129 @@ const Suggestions = ({
   }
 
   return (
+    <SuggestionList
+      suggestionList={suggestionList}
+      position={state.position}
+      onSuggestionSelect={onSelect}
+      onClose={onClose}
+    />
+  )
+}
+
+const SuggestionList = ({
+  suggestionList,
+  position,
+  onSuggestionSelect,
+  onClose,
+}: {
+  suggestionList: SuggestionResult[]
+  position: SuggestionPosition
+  onSuggestionSelect: (suggestionResult: string) => void
+  onClose: () => void
+}) => {
+  const ref = useDetectClickOutside({ onTriggered: onClose })
+
+  const { moveHighlightedItem, selectHighlightedItem, useItem } = useItemList({
+    onSelect: (item: SuggestionResult) => {
+      onSuggestionSelect(item.value)
+    },
+  })
+
+  useEffect(() => {
+    function handleKeydownEvent(event: KeyboardEvent) {
+      const { code } = event
+
+      const preventDefaultCodes = ['ArrowUp', 'ArrowDown', 'Enter', 'Tab']
+
+      if (preventDefaultCodes.includes(code)) {
+        event.preventDefault()
+      }
+
+      if (code === 'ArrowUp') {
+        moveHighlightedItem(-1)
+      }
+
+      if (code === 'ArrowDown') {
+        moveHighlightedItem(1)
+      }
+
+      if (code === 'Enter' || code === 'Tab') {
+        selectHighlightedItem()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeydownEvent)
+    return () => {
+      document.removeEventListener('keydown', handleKeydownEvent)
+    }
+  }, [moveHighlightedItem, selectHighlightedItem])
+
+  return (
     <div
-      className="absolute"
       ref={ref}
+      className="absolute w-56 max-h-[286px] border rounded shadow-lg bg-primary overflow-y-auto"
       style={{
-        top: state.position.top,
-        left: state.position.left,
+        top: position.top,
+        left: position.left,
       }}
     >
-      <SuggestionListSelect
-        name={state.type === 'mention' ? 'Mention' : 'Emoji'}
-        onValueChange={onSelect}
-        open={state.isOpen}
-        suggestions={suggestionList}
-      />
+      <ul role="listbox" className="divide-y divide-primary">
+        {suggestionList.map((suggestionResult) => (
+          <SuggestionResult
+            key={suggestionResult.value}
+            useItem={
+              useItem as ({ ref, text, value, disabled }: ItemOptions) => {
+                id: string
+                index: number
+                highlight: () => void
+                select: () => void
+                selected: boolean
+                useHighlighted: () => boolean
+              }
+            }
+            suggestionResult={suggestionResult}
+          />
+        ))}
+      </ul>
     </div>
+  )
+}
+
+const SuggestionResult = ({
+  useItem,
+  suggestionResult,
+}: {
+  useItem: ({ ref, text, value, disabled }: ItemOptions) => {
+    id: string
+    index: number
+    highlight: () => void
+    select: () => void
+    selected: boolean
+    useHighlighted: () => boolean
+  }
+  suggestionResult: SuggestionResult
+}) => {
+  const ref = useRef<HTMLLIElement>(null)
+  const { id, highlight, select, useHighlighted } = useItem({
+    ref,
+    value: suggestionResult,
+  })
+  const highlighted = useHighlighted()
+
+  return (
+    <li
+      ref={ref}
+      id={id}
+      onMouseEnter={highlight}
+      onClick={select}
+      role="option"
+      aria-selected={highlighted ? 'true' : 'false'}
+      className={classNames(
+        'px-4 py-2 text-sm text-left transition-colors cursor-pointer ',
+        highlighted ? 'bg-blue-600 text-white' : 'text-primary',
+      )}
+    >
+      {suggestionResult.label}
+    </li>
   )
 }

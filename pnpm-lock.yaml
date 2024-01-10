@@ -146,6 +146,9 @@ dependencies:
   use-debounce:
     specifier: ^10.0.0
     version: 10.0.0(react@18.2.0)
+  use-item-list:
+    specifier: ^0.1.2
+    version: 0.1.2(react@18.2.0)
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -3440,6 +3443,10 @@ packages:
       brace-expansion: 2.0.1
     dev: true
 
+  /mitt@2.1.0:
+    resolution: {integrity: sha512-ILj2TpLiysu2wkBbWjAmww7TkZb65aiQO+DkVdUTBpBXq+MHYiETENkKFMtsJZX1Lf4pe4QOrTSjIfUwN5lRdg==}
+    dev: false
+
   /mousetrap@1.6.5:
     resolution: {integrity: sha512-QNo4kEepaIBwiT8CDhP98umTetp+JNfQYBWvC1pc6/OAibuXtRcxZ58Qz8skvEHYvURne/7R8T5VoOI7rDsEUA==}
     dev: false
@@ -4476,6 +4483,14 @@ packages:
       react: 18.2.0
     dev: false
 
+  /use-constant@1.1.1(react@18.2.0):
+    resolution: {integrity: sha512-sy2ttlE4kuAnNbp2P6a5aTZiGYwsZojkqaGZ31yDDjIurteUS8GOcYiPGmJ3y/LHOHkdazDdVRBZPzH3RZHffA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /use-debounce@10.0.0(react@18.2.0):
     resolution: {integrity: sha512-XRjvlvCB46bah9IBXVnq/ACP2lxqXyZj0D9hj4K5OzNroMDpTEBg8Anuh1/UfRTRs7pLhQ+RiNxxwZu9+MVl1A==}
     engines: {node: '>= 16.0.0'}
@@ -4496,6 +4511,16 @@ packages:
     dependencies:
       '@types/react': 18.2.39
       react: 18.2.0
+    dev: false
+
+  /use-item-list@0.1.2(react@18.2.0):
+    resolution: {integrity: sha512-Pxn7/lETiJu3xRO6XGRqoGiqkpsA6IUVQ2Tx51LtuiJVB+G7OC4OTUXG19YgYtxW3dok9MkN7ZlHeFOIUi98fg==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      mitt: 2.1.0
+      react: 18.2.0
+      use-constant: 1.1.1(react@18.2.0)
     dev: false
 
   /use-latest@1.2.1(@types/react@18.2.39)(react@18.2.0):
