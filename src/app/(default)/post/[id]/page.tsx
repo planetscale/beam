@@ -70,6 +70,7 @@ export default async function PostPage({ params }: PostPageParams) {
         <HtmlView html={post.contentHtml} className="mt-8" />
         <div className="flex gap-4 mt-6">
           <ReactionButton
+            likedBy={post.likedBy}
             likeCount={post.likedBy.length}
             isLikedByCurrentUser={post.isLikedByCurrentUser}
             id={post.id}

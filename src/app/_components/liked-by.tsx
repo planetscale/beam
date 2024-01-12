@@ -4,22 +4,20 @@ import { classNames } from '~/utils/core'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { type RouterOutputs } from '~/trpc/shared'
 import { MAX_LIKED_BY_SHOWN } from './like-button'
-import HeartFilledIcon from '../_svg/heart-filled-icon'
-import HeartIcon from '../_svg/heart-icon'
+import { type ReactNode } from 'react'
 
 type LikedByProps = {
+  trigger: ReactNode
   likedBy: RouterOutputs['post']['detail']['likedBy']
-  isLikedByCurrentUser: RouterOutputs['post']['detail']['isLikedByCurrentUser']
 }
 
-export const LikedBy = ({ likedBy, isLikedByCurrentUser }: LikedByProps) => {
+export const LikedBy = ({ trigger, likedBy }: LikedByProps) => {
   const likeCount = likedBy.length
 
   return (
     <Tooltip.TooltipProvider>
       <Tooltip.Root delayDuration={300}>
         <Tooltip.Trigger
-          asChild
           onClick={(event) => {
             event.preventDefault()
           }}
@@ -27,22 +25,13 @@ export const LikedBy = ({ likedBy, isLikedByCurrentUser }: LikedByProps) => {
             event.preventDefault()
           }}
         >
-          <div className="inline-flex items-center gap-1.5">
-            {isLikedByCurrentUser ? (
-              <HeartFilledIcon className="w-4 h-4 text-red" />
-            ) : (
-              <HeartIcon className="w-4 h-4 text-red" />
-            )}
-            <span className="text-sm font-semibold tabular-nums">
-              {likeCount}
-            </span>
-          </div>
+          {trigger}
         </Tooltip.Trigger>
         <Tooltip.Content
           side="bottom"
           sideOffset={4}
           className={classNames(
-            'max-w-[260px] px-3 py-1.5 rounded shadow-lg bg-secondary-inverse text-secondary-inverse sm:max-w-sm',
+            'max-w-[260px] px-3 py-1.5 rounded shadow-lg bg-secondary-inverse text-secondary-inverse sm:max-w-sm z-50',
             likeCount === 0 && 'hidden',
           )}
         >

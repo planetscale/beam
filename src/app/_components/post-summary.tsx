@@ -11,6 +11,8 @@ import MessageIcon from '~/app/_svg/message-icon'
 
 import { type Session } from 'next-auth'
 import { LikedBy } from './liked-by'
+import HeartFilledIcon from '../_svg/heart-filled-icon'
+import HeartIcon from '../_svg/heart-icon'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
@@ -65,7 +67,18 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
           )}
           <div className="ml-auto flex gap-6">
             <LikedBy
-              isLikedByCurrentUser={post.isLikedByCurrentUser}
+              trigger={
+                <div className="inline-flex items-center gap-1.5">
+                  {post.isLikedByCurrentUser ? (
+                    <HeartFilledIcon className="w-4 h-4 text-red" />
+                  ) : (
+                    <HeartIcon className="w-4 h-4 text-red" />
+                  )}
+                  <span className="text-sm font-semibold tabular-nums">
+                    {post.likedBy.length}
+                  </span>
+                </div>
+              }
               likedBy={post.likedBy}
             />
 
