@@ -9,14 +9,12 @@ import { HtmlView } from '~/app/_components/html-view'
 import ChevronRightIcon from '~/app/_svg/chevron-right-icon'
 import MessageIcon from '~/app/_svg/message-icon'
 
-import { type Session } from 'next-auth'
 import { LikedBy } from './liked-by'
 import HeartFilledIcon from '../_svg/heart-filled-icon'
 import HeartIcon from '../_svg/heart-icon'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
-  session: Session | null
   hideAuthor?: boolean
 }
 

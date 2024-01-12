@@ -37,7 +37,6 @@
     "date-fns": "^2.30.0",
     "gemoji": "^8.1.0",
     "isomorphic-dompurify": "^1.10.0",
-    "jsdom": "^23.0.1",
     "marked": "^11.0.0",
     "match-sorter": "^6.3.1",
     "next": "^14.0.3",

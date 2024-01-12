@@ -74,9 +74,6 @@ dependencies:
   isomorphic-dompurify:
     specifier: ^1.10.0
     version: 1.10.0
-  jsdom:
-    specifier: ^23.0.1
-    version: 23.0.1
   marked:
     specifier: ^11.0.0
     version: 11.0.0

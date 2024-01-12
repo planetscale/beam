@@ -1,7 +1,5 @@
 import { Avatar } from '~/app/_components/avatar'
 
-import { Pagination } from '~/app/_components/pagination'
-import { PostSummary } from '~/app/_components/post-summary'
 import DotPattern from '~/app/_svg/dot-pattern'
 
 import { env } from '~/env'
@@ -9,6 +7,7 @@ import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 import { EditProfileAction } from './_components/edit-profile'
 import { UpdateAvatarAction } from './_components/update-avatar'
+import { PostFeed } from '~/app/_components/post-feed'
 
 type ProfilePageParams = {
   params: {
@@ -40,7 +39,8 @@ export default async function ProfilePage({
   const profile = await api.user.profile.query({
     id: params.userId,
   })
-  const { posts, postCount } = await api.post.feed.query({
+
+  const initialPostData = await api.post.feed.query({
     take: POSTS_PER_PAGE,
     skip:
       currentPageNumber === 1
@@ -89,27 +89,19 @@ export default async function ProfilePage({
         <DotPattern />
       </div>
 
-      <div className="flow-root mt-28">
-        {postCount === 0 ? (
+      <div className="mt-28">
+        {initialPostData.postCount === 0 ? (
           <div className="text-center text-secondary border rounded py-20 px-10">
             This user hasn&apos;t published any posts yet.
           </div>
         ) : (
-          <ul className="-my-12 divide-y divide-primary">
-            {posts.map((post) => (
-              <li key={post.id} className="py-10">
-                <PostSummary hideAuthor post={post} session={session} />
-              </li>
-            ))}
-          </ul>
+          <PostFeed
+            authorId={params.userId}
+            initialPosts={initialPostData}
+            postsPerPage={POSTS_PER_PAGE}
+          />
         )}
       </div>
-
-      <Pagination
-        itemCount={postCount}
-        itemsPerPage={POSTS_PER_PAGE}
-        currentPageNumber={currentPageNumber}
-      />
     </>
   )
 }

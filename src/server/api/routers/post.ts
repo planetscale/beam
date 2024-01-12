@@ -202,6 +202,8 @@ export const postRouter = createTRPCRouter({
         },
       })
 
+      revalidatePath('/', 'page')
+
       await postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
 
       return post

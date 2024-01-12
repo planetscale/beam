@@ -7,8 +7,10 @@ import { TextField } from '~/app/_components/text-field'
 import { Button } from '~/app/_components/button'
 import MarkdownIcon from '~/app/_svg/markdown-icon'
 import { MarkdownEditor } from '~/app/_components/markdown-editor'
-import { useRouter } from 'next/navigation'
+
 import { api } from '~/trpc/react'
+import { useRouter } from 'next/navigation'
+import { type RouterOutputs } from '~/trpc/shared'
 
 type FormData = {
   title: string
@@ -17,25 +19,32 @@ type FormData = {
 
 type PostFormProps = {
   postId: number
-  defaultValues?: FormData
   isSubmitting?: boolean
   backTo: string
+  initialData: RouterOutputs['post']['detail']
 }
 
 export const EditPostForm = ({
   postId,
-  defaultValues,
   backTo,
+  initialData,
 }: PostFormProps) => {
+  const { data } = api.post.detail.useQuery(
+    {
+      id: postId,
+    },
+    { initialData },
+  )
+
   const { control, register, handleSubmit } = useForm<FormData>({
-    defaultValues,
+    defaultValues: data,
   })
 
   // useLeaveConfirm({ formState })
-
   const router = useRouter()
+
   const editPostMutation = api.post.edit.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       router.push(`/post/${postId}`)
     },
   })
