@@ -1,6 +1,5 @@
 import { api } from '~/trpc/server'
 import { PostFeed } from '../_components/post-feed'
-import { cache } from 'react'
 
 const POSTS_PER_PAGE = 20
 
@@ -11,17 +10,13 @@ export default async function Index({
 }) {
   const currentPageNumber = searchParams.page ? Number(searchParams.page) : 1
 
-  const cachedData = cache(async () => {
-    return await api.post.feed.query({
-      take: POSTS_PER_PAGE,
-      skip:
-        currentPageNumber === 1
-          ? undefined
-          : POSTS_PER_PAGE * (currentPageNumber - 1),
-    })
+  const initialPostData = await api.post.feed.query({
+    take: POSTS_PER_PAGE,
+    skip:
+      currentPageNumber === 1
+        ? undefined
+        : POSTS_PER_PAGE * (currentPageNumber - 1),
   })
-
-  const initialPostData = await cachedData()
 
   return (
     <>

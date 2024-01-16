@@ -5,7 +5,6 @@ import { Comment, AddCommentForm } from '~/app/_components/comment'
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 import { PostView } from '~/app/_components/post-view'
-import { cache } from 'react'
 
 type PostPageParams = {
   params: {
@@ -14,11 +13,7 @@ type PostPageParams = {
 }
 
 export const generateStaticParams = async () => {
-  const cachedPosts = cache(async () => {
-    return await api.post.feed.query()
-  })
-
-  const { posts } = await cachedPosts()
+  const { posts } = await api.post.feed.query()
 
   return posts.map((post) => ({
     params: {
@@ -40,13 +35,9 @@ export const generateMetadata = async ({ params }: PostPageParams) => {
 }
 
 export default async function PostPage({ params }: PostPageParams) {
-  const cachedPost = cache(async () => {
-    return await api.post.detail.query({
-      id: Number(params.id),
-    })
+  const post = await api.post.detail.query({
+    id: Number(params.id),
   })
-
-  const post = await cachedPost()
 
   const session = await getServerAuthSession()
 
