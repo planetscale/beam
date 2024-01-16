@@ -1,3 +1,5 @@
+import 'client-only'
+
 export const summarize = (html: string) => {
   const parser = new DOMParser()
   const document = parser.parseFromString(html, 'text/html')

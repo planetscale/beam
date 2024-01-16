@@ -31,6 +31,7 @@
     "@trpc/server": "^10.43.6",
     "@tryfabric/mack": "^1.2.1",
     "class-variance-authority": "^0.7.0",
+    "client-only": "^0.0.1",
     "cloudinary": "^1.41.0",
     "clsx": "^2.0.0",
     "cmdk": "^0.2.0",

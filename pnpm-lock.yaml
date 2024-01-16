@@ -56,6 +56,9 @@ dependencies:
   class-variance-authority:
     specifier: ^0.7.0
     version: 0.7.0
+  client-only:
+    specifier: ^0.0.1
+    version: 0.0.1
   cloudinary:
     specifier: ^1.41.0
     version: 1.41.0

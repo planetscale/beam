@@ -13,25 +13,14 @@ type PostPageParams = {
   }
 }
 
-export const generateStaticParams = async () => {
-  const cachedPosts = cache(async () => {
-    return await api.post.feed.query()
-  })
-
-  const { posts } = await cachedPosts()
-
-  return posts.map((post) => ({
-    params: {
-      id: post.id,
-    },
-  }))
-}
-
 export const generateMetadata = async ({ params }: PostPageParams) => {
-  const post = await api.post.detail.query({
-    id: Number(params.id),
+  const cachedPost = cache(async () => {
+    return await api.post.detail.query({
+      id: Number(params.id),
+    })
   })
 
+  const post = await cachedPost()
   if (!post) return
 
   return {

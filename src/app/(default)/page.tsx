@@ -21,7 +21,9 @@ export default async function Index({
     })
   })
 
+  console.time()
   const initialPostData = await cachedData()
+  console.timeEnd()
 
   return (
     <>
