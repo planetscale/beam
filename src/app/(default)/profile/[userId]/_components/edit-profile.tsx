@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 import { Button } from '~/app/_components/button'
@@ -34,7 +33,6 @@ const EditProfileDialog = ({
   const { handleDialogClose } = useDialogStore()
 
   const utils = api.useUtils()
-  const router = useRouter()
 
   const { register, handleSubmit, reset } = useForm<EditFormData>({
     defaultValues: {

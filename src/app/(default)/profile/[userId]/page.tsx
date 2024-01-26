@@ -1,12 +1,8 @@
-import { Avatar } from '~/app/_components/avatar'
-
 import DotPattern from '~/app/_svg/dot-pattern'
 
-import { env } from '~/env'
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 import { EditProfileAction } from './_components/edit-profile'
-import { UpdateAvatarAction } from './_components/update-avatar'
 import { PostFeed } from '~/app/_components/post-feed'
 import { cache } from 'react'
 
