@@ -6,50 +6,100 @@ import HeartFilledIcon from '../_svg/heart-filled-icon'
 import HeartIcon from '../_svg/heart-icon'
 
 import { api } from '~/trpc/react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { LikedBy } from './liked-by'
 import { type RouterOutputs } from '~/trpc/shared'
+import { useSearchParams } from 'next/navigation'
 
 export const MAX_LIKED_BY_SHOWN = 50
 
-type LikeButtonProps = {
+type ReactionButtonProps = {
   likeCount: number
   isLikedByCurrentUser: boolean
   likedBy: RouterOutputs['post']['detail']['likedBy']
   id: number
 }
 
+const POSTS_PER_PAGE = 20
+
 export const ReactionButton = ({
   id,
   likeCount,
   likedBy,
   isLikedByCurrentUser,
-}: LikeButtonProps) => {
+}: ReactionButtonProps) => {
   const [isAnimating, setIsAnimating] = useState(false)
-  const router = useRouter()
+  const utils = api.useUtils()
+  const params = useSearchParams()
+
+  const currentPageNumber = params.get('page') ? Number(params.get('page')) : 1
+
+  const queryParams = {
+    take: 20,
+    skip:
+      currentPageNumber === 1
+        ? undefined
+        : POSTS_PER_PAGE * (currentPageNumber - 1),
+  }
+
+  const previousPosts = utils.post.feed.getData(queryParams)
+
+  const handleAnimationEnd = () => {
+    const timeout = setTimeout(() => {
+      setIsAnimating(false)
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }
+
   const like = api.post.like.useMutation({
-    onSuccess: () => {
-      router.refresh()
-      const timeout = setTimeout(() => {
-        setIsAnimating(false)
-      }, 1000)
+    onMutate: async (data) => {
+      const newPosts = previousPosts!.posts.map((post) => {
+        if (post.id === data.id) {
+          return {
+            ...post,
+            isLikedByCurrentUser: true,
+            likedBy: [...post.likedBy, 'You'],
+          }
+        }
+        return post
+      })
 
-      return () => clearTimeout(timeout)
-    },
-  })
-  const unlike = api.post.unlike.useMutation({
-    onSuccess: () => {
-      router.refresh()
-    },
-  })
+      utils.post.feed.setData(queryParams, {
+        posts: newPosts,
+        postCount: newPosts.length,
+      })
 
-  const handleReaction = async () => {
-    if (isLikedByCurrentUser) {
-      await unlike.mutateAsync({ id })
-    } else {
       setIsAnimating(true)
-      await like.mutateAsync({ id })
+      handleAnimationEnd()
+    },
+  })
+
+  const unlike = api.post.unlike.useMutation({
+    onMutate: async (data) => {
+      const newPosts = previousPosts!.posts.map((post) => {
+        if (post.id === data.id) {
+          return {
+            ...post,
+            isLikedByCurrentUser: false,
+            likedBy: post.likedBy.filter((user) => user !== 'You'),
+          }
+        }
+        return post
+      })
+
+      utils.post.feed.setData(queryParams, {
+        posts: newPosts,
+        postCount: newPosts.length,
+      })
+    },
+  })
+
+  const handleReaction = () => {
+    if (isLikedByCurrentUser) {
+      unlike.mutate({ id })
+    } else {
+      like.mutate({ id })
     }
   }
 
@@ -68,7 +118,7 @@ export const ReactionButton = ({
             },
           )}
           onClick={handleReaction}
-          disabled={like.isLoading}
+          disabled={like.isLoading || unlike.isLoading || isAnimating}
         >
           <span className="relative block w-4 h-4 shrink-0">
             {isLikedByCurrentUser && !isAnimating ? (

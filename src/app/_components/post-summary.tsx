@@ -9,9 +9,7 @@ import { HtmlView } from '~/app/_components/html-view'
 import ChevronRightIcon from '~/app/_svg/chevron-right-icon'
 import MessageIcon from '~/app/_svg/message-icon'
 
-import { LikedBy } from './liked-by'
-import HeartFilledIcon from '../_svg/heart-filled-icon'
-import HeartIcon from '../_svg/heart-icon'
+import { ReactionButton } from './reaction-button'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
@@ -64,20 +62,11 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
             </Link>
           )}
           <div className="ml-auto flex gap-6">
-            <LikedBy
-              trigger={
-                <div className="inline-flex items-center gap-1.5">
-                  {post.isLikedByCurrentUser ? (
-                    <HeartFilledIcon className="w-4 h-4 text-red" />
-                  ) : (
-                    <HeartIcon className="w-4 h-4 text-red" />
-                  )}
-                  <span className="text-sm font-semibold tabular-nums">
-                    {post.likedBy.length}
-                  </span>
-                </div>
-              }
+            <ReactionButton
+              id={post.id}
               likedBy={post.likedBy}
+              isLikedByCurrentUser={post.isLikedByCurrentUser}
+              likeCount={post.likedBy.length}
             />
 
             <Link

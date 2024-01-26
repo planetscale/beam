@@ -44,8 +44,8 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={classNames('font-sans min-h-screen', inter.variable)}>
-        <ThemeProvider>
-          <SessionProvider session={session}>
+        <SessionProvider session={session}>
+          <ThemeProvider>
             <TRPCReactProvider cookies={cookies().toString()}>
               <main>{children}</main>
 
@@ -53,8 +53,8 @@ export default async function RootLayout({
               <SearchDialog />
               <AlertDialog />
             </TRPCReactProvider>
-          </SessionProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   )

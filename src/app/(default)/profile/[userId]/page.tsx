@@ -71,31 +71,10 @@ export default async function ProfilePage({
   return (
     <>
       <div className="relative flex items-center gap-4 py-8 overflow-hidden">
-        <div className="flex items-center gap-8">
-          {env.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && profileBelongsToUser ? (
-            <UpdateAvatarAction name={profile.name!} image={profile.image} />
-          ) : (
-            <Avatar name={profile.name!} src={profile.image} size="lg" />
-          )}
-
-          <div className="flex-1">
-            <h1 className="bg-primary text-2xl font-semibold tracking-tight md:text-3xl">
-              {profile.name}
-            </h1>
-            {profile.title && (
-              <p className="text-lg tracking-tight text-secondary">
-                {profile.title}
-              </p>
-            )}
-          </div>
-        </div>
-
         {profileBelongsToUser && (
           <EditProfileAction
-            user={{
-              name: profile.name!,
-              title: profile.title,
-            }}
+            profileBelongsToUser={profileBelongsToUser}
+            user={profile}
           />
         )}
 

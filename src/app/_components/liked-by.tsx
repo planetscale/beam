@@ -3,7 +3,7 @@
 import { classNames } from '~/utils/core'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { type RouterOutputs } from '~/trpc/shared'
-import { MAX_LIKED_BY_SHOWN } from './like-button'
+import { MAX_LIKED_BY_SHOWN } from './reaction-button'
 import { type ReactNode } from 'react'
 
 type LikedByProps = {
@@ -24,6 +24,7 @@ export const LikedBy = ({ trigger, likedBy }: LikedByProps) => {
           onMouseDown={(event) => {
             event.preventDefault()
           }}
+          asChild
         >
           {trigger}
         </Tooltip.Trigger>

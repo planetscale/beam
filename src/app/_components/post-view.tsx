@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react'
 import { PostAction } from '../(default)/post/[id]/_components/post-action'
 import { AuthorWithDate } from './author-with-date'
 import { HtmlView } from './html-view'
-import { ReactionButton } from './like-button'
+import { ReactionButton } from './reaction-button'
 import { Button } from './button'
 import MessageIcon from '../_svg/message-icon'
 

@@ -2,7 +2,7 @@ import { api } from '~/trpc/server'
 import { PostFeed } from '../_components/post-feed'
 import { cache } from 'react'
 
-const POSTS_PER_PAGE = 20
+export const POSTS_PER_PAGE = 20
 
 export default async function Index({
   searchParams,
