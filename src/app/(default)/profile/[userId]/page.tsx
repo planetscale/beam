@@ -4,7 +4,7 @@ import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 import { EditProfileAction } from './_components/edit-profile'
 import { PostFeed } from '~/app/_components/post-feed'
-import { cache } from 'react'
+import { Suspense, cache } from 'react'
 
 type ProfilePageParams = {
   params: {
@@ -83,11 +83,13 @@ export default async function ProfilePage({
             This user hasn&apos;t published any posts yet.
           </div>
         ) : (
-          <PostFeed
-            authorId={params.userId}
-            initialPosts={initialPostData}
-            postsPerPage={POSTS_PER_PAGE}
-          />
+          <Suspense fallback={null}>
+            <PostFeed
+              authorId={params.userId}
+              initialPosts={initialPostData}
+              postsPerPage={POSTS_PER_PAGE}
+            />
+          </Suspense>
         )}
       </div>
     </>

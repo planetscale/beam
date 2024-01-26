@@ -10,6 +10,7 @@ import ChevronRightIcon from '~/app/_svg/chevron-right-icon'
 import MessageIcon from '~/app/_svg/message-icon'
 
 import { ReactionButton } from './reaction-button'
+import { Suspense } from 'react'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
@@ -62,12 +63,14 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
             </Link>
           )}
           <div className="ml-auto flex gap-6">
-            <ReactionButton
-              id={post.id}
-              likedBy={post.likedBy}
-              isLikedByCurrentUser={post.isLikedByCurrentUser}
-              likeCount={post.likedBy.length}
-            />
+            <Suspense fallback={null}>
+              <ReactionButton
+                id={post.id}
+                likedBy={post.likedBy}
+                isLikedByCurrentUser={post.isLikedByCurrentUser}
+                likeCount={post.likedBy.length}
+              />
+            </Suspense>
 
             <Link
               href={`/post/${post.id}#comments`}

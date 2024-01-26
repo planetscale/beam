@@ -10,6 +10,7 @@ import { HtmlView } from './html-view'
 import { ReactionButton } from './reaction-button'
 import { Button } from './button'
 import MessageIcon from '../_svg/message-icon'
+import { Suspense } from 'react'
 
 type PostViewProps = {
   postId: string
@@ -58,12 +59,14 @@ export const PostView = ({ postId, initialPostData }: PostViewProps) => {
       </div>
       <HtmlView html={data.contentHtml} className="mt-8" />
       <div className="flex gap-4 mt-6">
-        <ReactionButton
-          likedBy={data.likedBy}
-          likeCount={data.likedBy.length}
-          isLikedByCurrentUser={data.isLikedByCurrentUser}
-          id={data.id}
-        />
+        <Suspense fallback={null}>
+          <ReactionButton
+            likedBy={data.likedBy}
+            likeCount={data.likedBy.length}
+            isLikedByCurrentUser={data.isLikedByCurrentUser}
+            id={data.id}
+          />
+        </Suspense>
         <Button href={`/post/${postId}#comments`} variant="secondary">
           <MessageIcon className="w-4 h-4 text-secondary" />
           <span className="ml-1.5">{data.comments.length}</span>
