@@ -4,7 +4,7 @@ import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 import { EditProfileAction } from './_components/edit-profile'
 import { PostFeed } from '~/app/_components/post-feed'
-import { Suspense, cache } from 'react'
+import { Suspense } from 'react'
 
 type ProfilePageParams = {
   params: {
@@ -14,13 +14,9 @@ type ProfilePageParams = {
 }
 
 export const generateMetadata = async ({ params }: ProfilePageParams) => {
-  const profileData = cache(async () => {
-    return await api.user.profile.query({
-      id: params.userId,
-    })
+  const profile = await api.user.profile.query({
+    id: params.userId,
   })
-
-  const profile = await profileData()
 
   if (!profile) return
 
@@ -37,26 +33,18 @@ export default async function ProfilePage({
 }: ProfilePageParams) {
   const currentPageNumber = searchParams.page ? Number(searchParams.page) : 1
 
-  const profileData = cache(async () => {
-    return await api.user.profile.query({
-      id: params.userId,
-    })
+  const profile = await api.user.profile.query({
+    id: params.userId,
   })
 
-  const profile = await profileData()
-
-  const cachedData = cache(async () => {
-    return await api.post.feed.query({
-      take: POSTS_PER_PAGE,
-      skip:
-        currentPageNumber === 1
-          ? undefined
-          : POSTS_PER_PAGE * (currentPageNumber - 1),
-      authorId: params.userId,
-    })
+  const initialPostData = await api.post.feed.query({
+    take: POSTS_PER_PAGE,
+    skip:
+      currentPageNumber === 1
+        ? undefined
+        : POSTS_PER_PAGE * (currentPageNumber - 1),
+    authorId: params.userId,
   })
-
-  const initialPostData = await cachedData()
 
   const session = await getServerAuthSession()
 

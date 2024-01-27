@@ -2,7 +2,6 @@ import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 
 import { EditPostForm } from '../_components/edit-post-form'
-import { cache } from 'react'
 
 type ProfilePageParams = {
   params: {
@@ -11,13 +10,9 @@ type ProfilePageParams = {
 }
 
 export const generateMetadata = async ({ params }: ProfilePageParams) => {
-  const cachedPostData = cache(async () => {
-    return await api.post.detail.query({
-      id: Number(params.id),
-    })
+  const post = await api.post.detail.query({
+    id: Number(params.id),
   })
-
-  const post = await cachedPostData()
 
   if (!post) return
 
@@ -27,13 +22,9 @@ export const generateMetadata = async ({ params }: ProfilePageParams) => {
 }
 
 export default async function EditPostPage({ params }: ProfilePageParams) {
-  const cachedPostData = cache(async () => {
-    return await api.post.detail.query({
-      id: Number(params.id),
-    })
+  const post = await api.post.detail.query({
+    id: Number(params.id),
   })
-
-  const post = await cachedPostData()
 
   const session = await getServerAuthSession()
   const postBelongsToUser = post.author.id === session!.user.id
