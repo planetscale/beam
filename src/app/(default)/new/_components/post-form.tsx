@@ -8,7 +8,6 @@ import MarkdownIcon from '~/app/_svg/markdown-icon'
 import { MarkdownEditor } from '~/app/_components/markdown-editor'
 import { useRouter } from 'next/navigation'
 import { api } from '~/trpc/react'
-import { useLeaveConfirm } from '~/app/_hooks/use-leave-confirm'
 
 type FormData = {
   title: string
@@ -26,12 +25,10 @@ export function PostForm({
   isSubmitting,
   backTo,
 }: PostFormProps) {
-  const { control, register, getValues, formState, reset, handleSubmit } =
+  const { control, register, getValues, reset, handleSubmit } =
     useForm<FormData>({
       defaultValues,
     })
-
-  useLeaveConfirm({ formState })
 
   const router = useRouter()
   const addPostMutation = api.post.add.useMutation({

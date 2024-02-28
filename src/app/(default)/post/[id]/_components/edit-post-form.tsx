@@ -1,6 +1,5 @@
 'use client'
 
-//import { useLeaveConfirm } from '~/hooks/use-leave-confirm'
 import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { TextField } from '~/app/_components/text-field'
@@ -40,7 +39,6 @@ export const EditPostForm = ({
     defaultValues: data,
   })
 
-  // useLeaveConfirm({ formState })
   const router = useRouter()
 
   const editPostMutation = api.post.edit.useMutation({
