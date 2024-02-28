@@ -1,8 +1,8 @@
 import 'client-only'
+import { parse } from 'node-html-parser'
 
 export const summarize = (html: string) => {
-  const parser = new DOMParser()
-  const document = parser.parseFromString(html, 'text/html')
+  const document = parse(html)
 
   const allowedTags = ['p', 'ul', 'ol', 'h3', 'pre', 'img']
 
@@ -24,12 +24,12 @@ export const summarize = (html: string) => {
       return {
         summary:
           firstElement.outerHTML + firstElement.nextElementSibling.outerHTML,
-        hasMore: document.body.children.length > 2,
+        hasMore: document.childNodes.length > 2,
       }
     } else {
       return {
         summary: firstElement.outerHTML,
-        hasMore: document.body.children.length > 1,
+        hasMore: document.childNodes.length > 1,
       }
     }
   } else {
