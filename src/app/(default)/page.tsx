@@ -1,6 +1,5 @@
 import { api } from '~/trpc/server'
 import { PostFeed } from '../_components/post-feed'
-import { Suspense } from 'react'
 
 const POSTS_PER_PAGE = 20
 
@@ -26,12 +25,10 @@ export default async function Index({
           There are no published posts to show yet.
         </div>
       ) : (
-        <Suspense fallback={null}>
-          <PostFeed
-            initialPosts={initialPostData}
-            postsPerPage={POSTS_PER_PAGE}
-          />
-        </Suspense>
+        <PostFeed
+          initialPosts={initialPostData}
+          postsPerPage={POSTS_PER_PAGE}
+        />
       )}
     </>
   )
