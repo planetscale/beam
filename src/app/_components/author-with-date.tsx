@@ -1,4 +1,4 @@
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import Link from 'next/link'
 import { Avatar } from './avatar'
 import { type User } from '@prisma/client'
