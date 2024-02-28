@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation'
 import { api } from '~/trpc/react'
-import { api as server } from '~/trpc/server'
 import { PostSummary } from './post-summary'
 import { type RouterOutputs } from '~/trpc/shared'
 import { Pagination } from './pagination'
