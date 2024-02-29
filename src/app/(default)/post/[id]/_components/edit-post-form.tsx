@@ -1,14 +1,16 @@
 'use client'
 
-//import { useLeaveConfirm } from '~/hooks/use-leave-confirm'
 import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { TextField } from '~/app/_components/text-field'
 import { Button } from '~/app/_components/button'
 import MarkdownIcon from '~/app/_svg/markdown-icon'
 import { MarkdownEditor } from '~/app/_components/markdown-editor'
-import { useRouter } from 'next/navigation'
+
 import { api } from '~/trpc/react'
+import { useRouter } from 'next/navigation'
+import { type RouterOutputs } from '~/trpc/shared'
+import { markdownToHtml } from '~/utils/text'
 
 type FormData = {
   title: string
@@ -17,31 +19,64 @@ type FormData = {
 
 type PostFormProps = {
   postId: number
-  defaultValues?: FormData
   isSubmitting?: boolean
   backTo: string
+  initialData: RouterOutputs['post']['detail']
+}
+
+const usePostData = (
+  id: number,
+  initialData: RouterOutputs['post']['detail'],
+) => {
+  const router = useRouter()
+  const utils = api.useUtils()
+
+  const { data } = api.post.detail.useQuery(
+    {
+      id,
+    },
+    { initialData },
+  )
+
+  const { mutate, isLoading } = api.post.edit.useMutation({
+    onMutate: async (newPost) => {
+      const post = utils.post.detail.getData({
+        id,
+      })
+
+      utils.post.detail.setData(
+        {
+          id,
+        },
+        {
+          ...post!,
+          title: newPost.data.title,
+          content: newPost.data.content,
+          contentHtml: markdownToHtml(newPost.data.content),
+        },
+      )
+    },
+    onSuccess: () => {
+      router.push(`/post/${id}`)
+    },
+  })
+
+  return { data, mutate, isLoading }
 }
 
 export const EditPostForm = ({
   postId,
-  defaultValues,
   backTo,
+  initialData,
 }: PostFormProps) => {
+  const { data, mutate, isLoading } = usePostData(postId, initialData)
+
   const { control, register, handleSubmit } = useForm<FormData>({
-    defaultValues,
-  })
-
-  // useLeaveConfirm({ formState })
-
-  const router = useRouter()
-  const editPostMutation = api.post.edit.useMutation({
-    onSuccess: () => {
-      router.push(`/post/${postId}`)
-    },
+    defaultValues: data,
   })
 
   const onSubmit = (values: FormData) => {
-    editPostMutation.mutate({
+    mutate({
       id: postId,
       data: values,
     })
@@ -78,10 +113,8 @@ export const EditPostForm = ({
         <div className="flex gap-4">
           <Button
             type="submit"
-            isLoading={editPostMutation.isLoading}
-            loadingChildren={`${
-              editPostMutation.isLoading ? 'Saving' : 'Save'
-            }`}
+            isLoading={isLoading}
+            loadingChildren={`${isLoading ? 'Saving' : 'Save'}`}
           >
             Save
           </Button>
@@ -89,7 +122,7 @@ export const EditPostForm = ({
             Cancel
           </Button>
         </div>
-        {!editPostMutation.isLoading && (
+        {!isLoading && (
           <a
             href="https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
             target="_blank"

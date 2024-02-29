@@ -16,10 +16,24 @@ import { type Session } from 'next-auth'
 import { Avatar } from './avatar'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/utils/core'
+import { api } from '~/trpc/react'
 
 export const ProfileMenu = ({ session }: { session: Session | null }) => {
   const { theme, themes, setTheme } = useTheme()
   const pathname = usePathname()
+  const { data } = api.user.profile.useQuery(
+    {
+      id: session!.user.id,
+    },
+    {
+      initialData: {
+        id: session!.user.id,
+        name: session!.user.name,
+        title: '',
+        image: session!.user.image ?? '',
+      },
+    },
+  )
 
   const menuItemClasses = ({
     active,
@@ -38,7 +52,7 @@ export const ProfileMenu = ({ session }: { session: Session | null }) => {
   return (
     <Menu>
       <MenuButton className="relative inline-flex rounded-full group focus-ring">
-        <Avatar name={session!.user.name} src={session!.user.image} size="sm" />
+        <Avatar name={data.name!} src={data.image} size="sm" />
       </MenuButton>
 
       <MenuItems className="w-48">

@@ -21,7 +21,7 @@ export const postRouter = createTRPCRouter({
       const skip = input?.skip
       const where = {
         hidden: !ctx.isUserAdmin ? undefined : false,
-        authorId: input?.authorId,
+        authorId: input?.authorId ?? undefined,
       }
 
       const posts = await ctx.db.post.findMany({
@@ -73,7 +73,7 @@ export const postRouter = createTRPCRouter({
         posts: posts.map((post) => ({
           ...post,
           isLikedByCurrentUser: Boolean(
-            post.likedBy.find((item) => item.user.id === ctx.session!.user.id),
+            post.likedBy.find((item) => item.user.id === ctx.session.user.id),
           ),
           likedBy: post.likedBy.map((like) =>
             like.user.id === ctx.session.user.id ? 'You' : like.user.name,
@@ -152,7 +152,7 @@ export const postRouter = createTRPCRouter({
       return {
         ...post,
         isLikedByCurrentUser: Boolean(
-          post.likedBy.find((item) => item.user.id === ctx.session!.user.id),
+          post.likedBy.find((item) => item.user.id === ctx.session.user.id),
         ),
         likedBy: post.likedBy.map((like) =>
           like.user.id === ctx.session.user.id ? 'You' : like.user.name,
@@ -201,6 +201,8 @@ export const postRouter = createTRPCRouter({
           },
         },
       })
+
+      revalidatePath('/', 'page')
 
       await postToSlackIfEnabled({ post, authorName: ctx.session.user.name })
 

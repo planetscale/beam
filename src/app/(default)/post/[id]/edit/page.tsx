@@ -37,14 +37,7 @@ export default async function EditPostPage({ params }: ProfilePageParams) {
             Edit &quot;{post.title}&quot;
           </h1>
           <div className="mt-6">
-            <EditPostForm
-              postId={post.id}
-              defaultValues={{
-                title: post.title,
-                content: post.content,
-              }}
-              backTo="/"
-            />
+            <EditPostForm initialData={post} postId={post.id} backTo="/" />
           </div>
         </>
       ) : (
