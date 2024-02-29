@@ -39,15 +39,17 @@ export const PostFeed = ({
   return (
     <>
       <ul className="-my-12 divide-y divide-primary">
-        {data.posts.map((post) => (
-          <li key={post.id} className="py-10">
-            <PostSummary post={post} />
-          </li>
-        ))}
+        {data.posts.map((post) => {
+          return (
+            <li key={post.id} className="py-10">
+              <PostSummary post={post} />
+            </li>
+          )
+        })}
       </ul>
 
       <Pagination
-        itemCount={initialPosts.postCount}
+        itemCount={data.postCount}
         itemsPerPage={postsPerPage}
         currentPageNumber={currentPageNumber}
       />

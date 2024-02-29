@@ -19,7 +19,6 @@ export type PostSummaryProps = {
 
 export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
   const { summary, hasMore } = summarize(post.contentHtml)
-
   return (
     <div>
       {post.hidden && (

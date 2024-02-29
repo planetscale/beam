@@ -54,7 +54,7 @@ export const ReactionButton = ({
 
   const like = api.post.like.useMutation({
     onMutate: async (data) => {
-      const newPosts = previousPosts!.posts.map((post) => {
+      const updatedPosts = previousPosts!.posts.map((post) => {
         if (post.id === data.id) {
           return {
             ...post,
@@ -66,12 +66,15 @@ export const ReactionButton = ({
       })
 
       utils.post.feed.setData(queryParams, {
-        posts: newPosts,
-        postCount: newPosts.length,
+        posts: updatedPosts,
+        postCount: updatedPosts.length + 1,
       })
 
       setIsAnimating(true)
       handleAnimationEnd()
+    },
+    onSuccess: async () => {
+      await utils.post.feed.invalidate(queryParams)
     },
   })
 
@@ -92,6 +95,9 @@ export const ReactionButton = ({
         posts: newPosts,
         postCount: newPosts.length,
       })
+    },
+    onSuccess: () => {
+      console.log('unliked')
     },
   })
 
@@ -118,7 +124,7 @@ export const ReactionButton = ({
             },
           )}
           onClick={handleReaction}
-          disabled={like.isLoading || unlike.isLoading || isAnimating}
+          disabled={isAnimating}
         >
           <span className="relative block w-4 h-4 shrink-0">
             {isLikedByCurrentUser && !isAnimating ? (
@@ -136,7 +142,7 @@ export const ReactionButton = ({
                     'absolute w-4 h-4 top-0 left-[-.5px] rounded-full ring-inset ring-6 ring-gray-50 transition-all duration-300 transform-gpu z-10',
                     isAnimating ? 'scale-150 !ring-0' : 'scale-0',
                   )}
-                ></span>
+                />
                 <HeartFilledIcon
                   className={classNames(
                     'absolute inset-0 transition-transform delay-200 duration-300 text-gray-50 transform-gpu z-10 ease-spring',
@@ -149,7 +155,7 @@ export const ReactionButton = ({
 
           <span
             className={classNames('relative z-10 tabular-nums', {
-              'transition-colors duration-100 text-gray-50': like.isLoading,
+              'transition-colors duration-100 text-gray-50': isAnimating,
             })}
           >
             {likeCount}

@@ -17,7 +17,7 @@ export const postRouter = createTRPCRouter({
         .optional(),
     )
     .query(async ({ ctx, input }) => {
-      const take = input?.take ?? 50
+      const take = input?.take ?? 20
       const skip = input?.skip
       const where = {
         hidden: !ctx.isUserAdmin ? undefined : false,
