@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
 import { Button } from '~/app/_components/button'
@@ -16,6 +15,10 @@ import { TextField } from '~/app/_components/text-field'
 import { useDialogStore } from '~/app/_hooks/use-dialog-store'
 import EditIcon from '~/app/_svg/edit-icon'
 import { api } from '~/trpc/react'
+import { type RouterOutputs } from '~/trpc/shared'
+import { env } from '~/env'
+import { UpdateAvatarAction } from './update-avatar'
+import { Avatar } from '~/app/_components/avatar'
 
 type EditFormData = {
   name: string
@@ -25,23 +28,33 @@ type EditFormData = {
 const EditProfileDialog = ({
   user,
 }: {
-  user: {
-    name: string
-    title: string | null
-  }
+  user: RouterOutputs['user']['profile']
 }) => {
   const { handleDialogClose } = useDialogStore()
 
+  const utils = api.useUtils()
+
   const { register, handleSubmit, reset } = useForm<EditFormData>({
     defaultValues: {
-      name: user.name,
-      title: user.title,
+      name: user.name ?? '',
+      title: user.title ?? '',
     },
   })
-  const router = useRouter()
   const editUserMutation = api.user.edit.useMutation({
-    onSuccess: () => {
-      router.refresh()
+    onMutate: (data) => {
+      utils.user.profile.setData(
+        { id: user.id },
+        {
+          name: data.name,
+          id: user.id,
+          title: data.title ?? '',
+          image: user.image,
+        },
+      )
+    },
+    onSuccess: async () => {
+      await utils.post.feed.invalidate({ authorId: user.id })
+      await utils.user.profile.invalidate({ id: user.id })
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
@@ -56,8 +69,7 @@ const EditProfileDialog = ({
   const onSubmit: SubmitHandler<EditFormData> = (data) => {
     editUserMutation.mutate(
       {
-        name: data.name,
-        title: data.title,
+        ...data,
       },
       {
         onSuccess: () => handleDialogClose(),
@@ -102,25 +114,50 @@ const EditProfileDialog = ({
 
 export const EditProfileAction = ({
   user,
+  profileBelongsToUser,
 }: {
-  user: {
-    name: string
-    title: string | null
-  }
+  user: RouterOutputs['user']['profile']
+  profileBelongsToUser: boolean
 }) => {
   const { handleDialog } = useDialogStore()
+  const { data } = api.user.profile.useQuery(
+    { id: user.id },
+    {
+      initialData: user,
+    },
+  )
   return (
-    <div className="ml-auto mr-10">
-      <Button
-        variant="secondary"
-        onClick={() => {
-          handleDialog({
-            content: <EditProfileDialog user={user} />,
-          })
-        }}
-      >
-        <EditIcon className="w-4 h-4" />
-      </Button>
-    </div>
+    <>
+      <div className="flex items-center gap-8">
+        {env.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && profileBelongsToUser ? (
+          <UpdateAvatarAction name={data.name!} image={data.image} />
+        ) : (
+          <Avatar name={data.name!} src={data.image} size="lg" />
+        )}
+
+        <div className="flex-1">
+          <h1 className="bg-primary text-2xl font-semibold tracking-tight md:text-3xl">
+            {data.name}
+          </h1>
+          {data.title && (
+            <p className="text-lg tracking-tight text-secondary">
+              {data.title}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="ml-auto mr-10">
+        <Button
+          variant="secondary"
+          onClick={() => {
+            handleDialog({
+              content: <EditProfileDialog user={data} />,
+            })
+          }}
+        >
+          <EditIcon className="w-4 h-4" />
+        </Button>
+      </div>
+    </>
   )
 }

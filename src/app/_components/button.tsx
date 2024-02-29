@@ -1,4 +1,9 @@
-import { type ComponentPropsWithRef, type ReactNode } from 'react'
+import {
+  forwardRef,
+  type ComponentPropsWithRef,
+  type ReactNode,
+  type Ref,
+} from 'react'
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import Link, { type LinkProps } from 'next/link'
@@ -41,39 +46,47 @@ type BaseProps =
 export type ButtonVariant = VariantProps<typeof button>
 type ButtonProps = BaseProps & ButtonVariant
 
-export const Button = ({
-  children,
-  variant,
-  className,
-  disabled,
-  isLoading,
-  loadingChildren,
-  ...props
-}: ButtonProps) => {
-  if (props.href === undefined) {
+export const Button = forwardRef(
+  (
+    {
+      children,
+      variant,
+      className,
+      disabled,
+      isLoading,
+      loadingChildren,
+      ...props
+    }: ButtonProps,
+    ref: Ref<HTMLButtonElement>,
+  ) => {
+    if (props.href === undefined) {
+      return (
+        <button
+          className={classNames(button({ variant, className }), {
+            'opacity-50 cursor-default': disabled ?? isLoading,
+          })}
+          disabled={disabled}
+          ref={ref}
+          {...props}
+        >
+          {isLoading && <Spinner className="w-4 h-4 mr-2 -ml-1 animate-spin" />}
+          {isLoading && loadingChildren ? loadingChildren : children}
+        </button>
+      )
+    }
+
     return (
-      <button
+      <Link
         className={classNames(button({ variant, className }), {
           'opacity-50 cursor-default': disabled ?? isLoading,
         })}
-        disabled={disabled}
         {...props}
       >
         {isLoading && <Spinner className="w-4 h-4 mr-2 -ml-1 animate-spin" />}
         {isLoading && loadingChildren ? loadingChildren : children}
-      </button>
+      </Link>
     )
-  }
+  },
+)
 
-  return (
-    <Link
-      className={classNames(button({ variant, className }), {
-        'opacity-50 cursor-default': disabled ?? isLoading,
-      })}
-      {...props}
-    >
-      {isLoading && <Spinner className="w-4 h-4 mr-2 -ml-1 animate-spin" />}
-      {isLoading && loadingChildren ? loadingChildren : children}
-    </Link>
-  )
-}
+Button.displayName = 'Button'

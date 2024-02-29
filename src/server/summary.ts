@@ -1,16 +1,15 @@
-import { JSDOM } from 'jsdom'
+import 'client-only'
+import { parse } from 'node-html-parser'
 
-export const summarize = (
-  html: string,
-): { summary: string; hasMore: boolean } => {
-  const document = new JSDOM(html)
+export const summarize = (html: string) => {
+  const document = parse(html)
 
   const allowedTags = ['p', 'ul', 'ol', 'h3', 'pre', 'img']
 
   let firstElement
 
   for (const tag of allowedTags) {
-    firstElement = document.window.document.querySelector(tag)
+    firstElement = document.querySelector(tag)
     if (firstElement) {
       break
     }
@@ -25,12 +24,12 @@ export const summarize = (
       return {
         summary:
           firstElement.outerHTML + firstElement.nextElementSibling.outerHTML,
-        hasMore: document.window.document.body.children.length > 2,
+        hasMore: document.childNodes.length > 2,
       }
     } else {
       return {
         summary: firstElement.outerHTML,
-        hasMore: document.window.document.body.children.length > 1,
+        hasMore: document.childNodes.length > 1,
       }
     }
   } else {
