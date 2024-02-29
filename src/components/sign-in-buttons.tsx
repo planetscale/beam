@@ -1,6 +1,6 @@
 'use client'
 import { type getProviders, signIn } from 'next-auth/react'
-import { Button } from '~/app/_components/button'
+import { Button } from '~/components/button'
 
 export const SignInButtons = ({
   providers,

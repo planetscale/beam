@@ -14,11 +14,11 @@ import TextareaMarkdown, {
   type TextareaMarkdownRef,
 } from 'textarea-markdown-editor'
 
-import BoldIcon from '../_svg/bold-icon'
+import BoldIcon from '~/components/svg/bold-icon'
 import { classNames } from '~/utils/core'
-import ItalicIcon from '../_svg/italic-icon'
-import LinkIcon from '../_svg/link-icon'
-import ListIcon from '../_svg/list-icon'
+import ItalicIcon from '~/components/svg/italic-icon'
+import LinkIcon from '~/components/svg/link-icon'
+import ListIcon from '~/components/svg/list-icon'
 import { HtmlView } from './html-view'
 import { type SuggestionType, getSuggestionData } from '~/utils/suggestion'
 import { env } from '~/env'

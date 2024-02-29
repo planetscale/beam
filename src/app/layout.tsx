@@ -5,13 +5,13 @@ import { cookies } from 'next/headers'
 
 import { TRPCReactProvider } from '~/trpc/react'
 import { classNames } from '~/utils/core'
-import { ThemeProvider } from '~/app/_providers/theme'
-import { Toaster } from '~/app/_providers/toaster'
+import { ThemeProvider } from '~/providers/theme'
+import { Toaster } from '~/providers/toaster'
 
-import { SearchDialog } from './_components/search-dialog'
-import { AlertDialog } from './_components/alert-dialog'
+import { SearchDialog } from '~/components/search-dialog'
+import { AlertDialog } from '~/components/alert-dialog'
 import { getServerAuthSession } from '~/server/auth'
-import { SessionProvider } from './_providers/auth'
+import { SessionProvider } from '~/providers/auth'
 
 const inter = localFont({
   variable: '--font-sans',

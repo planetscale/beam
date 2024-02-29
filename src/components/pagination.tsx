@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation'
 import { Button } from './button'
-import ChevronLeftIcon from '../_svg/chevron-left-icon'
-import ChevronRightIcon from '../_svg/chevron-right-icon'
+import ChevronLeftIcon from '~/components/svg/chevron-left-icon'
+import ChevronRightIcon from '~/components/svg/chevron-right-icon'
 
 type PaginationProps = {
   itemCount: number
