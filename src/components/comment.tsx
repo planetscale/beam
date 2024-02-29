@@ -22,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 import { MarkdownEditor } from './markdown-editor'
 
-import { useDialogStore } from '../_hooks/use-dialog-store'
+import { useDialogStore } from '~/hooks/use-dialog-store'
 import {
   AlertDialogAction,
   AlertDialogActions,

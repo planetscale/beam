@@ -1,5 +1,5 @@
 import { type Metadata } from 'next'
-import { PostForm } from './_components/post-form'
+import { PostForm } from '../../../components/post-form'
 
 export const metadata = {
   title: 'New Post - Beam',

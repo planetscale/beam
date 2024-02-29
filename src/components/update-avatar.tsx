@@ -11,9 +11,9 @@ import {
   AlertDialogCloseButton,
   AlertDialogContent,
   AlertDialogTitle,
-} from '~/app/_components/alert-dialog'
-import { Avatar } from '~/app/_components/avatar'
-import { Button } from '~/app/_components/button'
+} from '~/components/alert-dialog'
+import { Avatar } from '~/components/avatar'
+import { Button } from '~/components/button'
 import { useDialogStore } from '~/hooks/use-dialog-store'
 import EditIcon from '~/components/svg/edit-icon'
 import { uploadImage } from '~/server/cloudinary'

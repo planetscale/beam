@@ -12,6 +12,7 @@ import { SearchDialog } from '~/components/search-dialog'
 import { AlertDialog } from '~/components/alert-dialog'
 import { getServerAuthSession } from '~/server/auth'
 import { SessionProvider } from '~/providers/auth'
+import { redirect } from 'next/navigation'
 
 const inter = localFont({
   variable: '--font-sans',

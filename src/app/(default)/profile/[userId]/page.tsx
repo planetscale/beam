@@ -2,8 +2,8 @@ import DotPattern from '~/components/svg/dot-pattern'
 
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
-import { EditProfileAction } from './_components/edit-profile'
-import { PostFeed } from '~/app/_components/post-feed'
+import { EditProfileAction } from '../../../../components/edit-profile'
+import { PostFeed } from '~/components/post-feed'
 import { Suspense } from 'react'
 
 type ProfilePageParams = {
