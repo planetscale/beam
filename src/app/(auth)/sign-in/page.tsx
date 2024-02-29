@@ -1,9 +1,9 @@
 import { type Metadata } from 'next'
 import { getProviders } from 'next-auth/react'
 import { redirect } from 'next/navigation'
-import Logo from '~/app/_svg/logo'
+import Logo from '~/components/svg/logo'
 import { getServerAuthSession } from '~/server/auth'
-import { SignInButtons } from './_components/sign-in-buttons'
+import { SignInButtons } from '~/components/sign-in-buttons'
 
 export const metadata: Metadata = {
   title: 'Sign In - Beam',

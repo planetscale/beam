@@ -12,8 +12,8 @@ import {
   AlertDialogCancel,
 } from '~/app/_components/alert-dialog'
 import { TextField } from '~/app/_components/text-field'
-import { useDialogStore } from '~/app/_hooks/use-dialog-store'
-import EditIcon from '~/app/_svg/edit-icon'
+import { useDialogStore } from '~/hooks/use-dialog-store'
+import EditIcon from '~/components/svg/edit-icon'
 import { api } from '~/trpc/react'
 import { type RouterOutputs } from '~/trpc/shared'
 import { env } from '~/env'

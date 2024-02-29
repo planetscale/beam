@@ -1,4 +1,4 @@
-import DotPattern from '~/app/_svg/dot-pattern'
+import DotPattern from '~/components/svg/dot-pattern'
 
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'

@@ -2,10 +2,10 @@
 
 import * as React from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { TextField } from '~/app/_components/text-field'
-import { Button } from '~/app/_components/button'
-import MarkdownIcon from '~/app/_svg/markdown-icon'
-import { MarkdownEditor } from '~/app/_components/markdown-editor'
+import { TextField } from '~/components/text-field'
+import { Button } from '~/components/button'
+import MarkdownIcon from '~/components/svg/markdown-icon'
+import { MarkdownEditor } from '~/components/markdown-editor'
 
 import { api } from '~/trpc/react'
 import { useRouter } from 'next/navigation'

@@ -9,7 +9,7 @@ import { AuthorWithDate } from './author-with-date'
 import { HtmlView } from './html-view'
 import { ReactionButton } from './reaction-button'
 import { Button } from './button'
-import MessageIcon from '../_svg/message-icon'
+import MessageIcon from '~/components/svg/message-icon'
 import { Suspense } from 'react'
 
 type PostViewProps = {

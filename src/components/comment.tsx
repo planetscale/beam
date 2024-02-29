@@ -13,7 +13,7 @@ import {
   MenuItem,
   MenuItemsContent,
 } from './menu'
-import DotsIcon from '../_svg/dots-icon'
+import DotsIcon from '~/components/svg/dots-icon'
 import { Button } from './button'
 import { HtmlView } from './html-view'
 import { api } from '~/trpc/react'

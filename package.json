@@ -9,7 +9,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "next dev",
-    "generate:svg": "npx @svgr/cli --no-index --out-dir src/app/_svg -- src/svg",
+    "generate:svg": "npx @svgr/cli --no-index --out-dir src/app/components/svg -- src/svg",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"

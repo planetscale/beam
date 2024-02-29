@@ -14,8 +14,8 @@ import {
 } from '~/app/_components/alert-dialog'
 import { Avatar } from '~/app/_components/avatar'
 import { Button } from '~/app/_components/button'
-import { useDialogStore } from '~/app/_hooks/use-dialog-store'
-import EditIcon from '~/app/_svg/edit-icon'
+import { useDialogStore } from '~/hooks/use-dialog-store'
+import EditIcon from '~/components/svg/edit-icon'
 import { uploadImage } from '~/server/cloudinary'
 import { api } from '~/trpc/react'
 

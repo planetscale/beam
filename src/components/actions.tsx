@@ -3,8 +3,8 @@
 import { type Session } from 'next-auth'
 import { Button } from './button'
 import { ProfileMenu } from './profile-menu'
-import { useSearchStore } from '~/app/_hooks/use-search-store'
-import SearchIcon from '../_svg/search-icon'
+import { useSearchStore } from '~/hooks/use-search-store'
+import SearchIcon from '~/components/svg/search-icon'
 
 export const Actions = ({ session }: { session: Session | null }) => {
   const { toggleOpen } = useSearchStore()
