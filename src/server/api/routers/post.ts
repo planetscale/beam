@@ -24,7 +24,7 @@ export const postRouter = createTRPCRouter({
         authorId: input?.authorId ?? undefined,
       }
 
-      const posts = await ctx.db.post.findMany({
+      const postQuery = await ctx.db.post.findMany({
         take,
         skip,
         orderBy: {
@@ -65,20 +65,14 @@ export const postRouter = createTRPCRouter({
         },
       })
 
-      const postCount = await ctx.db.post.count({
+      const postCountQuery = await ctx.db.post.count({
         where,
       })
 
+      const [posts, postCount] = await Promise.all([postQuery, postCountQuery])
+
       return {
-        posts: posts.map((post) => ({
-          ...post,
-          isLikedByCurrentUser: Boolean(
-            post.likedBy.find((item) => item.user.id === ctx.session.user.id),
-          ),
-          likedBy: post.likedBy.map((like) =>
-            like.user.id === ctx.session.user.id ? 'You' : like.user.name,
-          ),
-        })),
+        posts,
         postCount,
       }
     }),
@@ -141,7 +135,6 @@ export const postRouter = createTRPCRouter({
       })
 
       const postBelongsToUser = post?.author.id === ctx.session.user.id
-
       if (!post || (post.hidden && !postBelongsToUser && !ctx.isUserAdmin)) {
         throw new TRPCError({
           code: 'NOT_FOUND',
@@ -149,15 +142,7 @@ export const postRouter = createTRPCRouter({
         })
       }
 
-      return {
-        ...post,
-        isLikedByCurrentUser: Boolean(
-          post.likedBy.find((item) => item.user.id === ctx.session.user.id),
-        ),
-        likedBy: post.likedBy.map((like) =>
-          like.user.id === ctx.session.user.id ? 'You' : like.user.name,
-        ),
-      }
+      return post
     }),
   search: protectedProcedure
     .input(

@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { summarize } from '~/server/summary'
 import { type RouterOutputs } from '~/trpc/shared'
@@ -11,6 +13,7 @@ import MessageIcon from '~/components/svg/message-icon'
 
 import { ReactionButton } from './reaction-button'
 import { Suspense } from 'react'
+import { useSession } from 'next-auth/react'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
@@ -19,6 +22,12 @@ export type PostSummaryProps = {
 
 export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
   const { summary, hasMore } = summarize(post.contentHtml)
+  const { data: session } = useSession()
+
+  const isLikedByCurrentUser = !!post.likedBy.find(
+    ({ user }) => user.id === session?.user.id,
+  )
+
   return (
     <div>
       {post.hidden && (
@@ -66,7 +75,7 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
               <ReactionButton
                 id={post.id}
                 likedBy={post.likedBy}
-                isLikedByCurrentUser={post.isLikedByCurrentUser}
+                isLikedByCurrentUser={isLikedByCurrentUser}
                 likeCount={post.likedBy.length}
               />
             </Suspense>

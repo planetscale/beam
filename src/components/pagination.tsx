@@ -4,21 +4,20 @@ import { usePathname } from 'next/navigation'
 import { Button } from './button'
 import ChevronLeftIcon from '~/components/svg/chevron-left-icon'
 import ChevronRightIcon from '~/components/svg/chevron-right-icon'
+import { POSTS_PER_PAGE } from '~/utils/core'
 
 type PaginationProps = {
   itemCount: number
-  itemsPerPage: number
   currentPageNumber: number
 }
 
 export const Pagination = ({
   itemCount,
-  itemsPerPage,
   currentPageNumber,
 }: PaginationProps) => {
   const pathname = usePathname()
 
-  const totalPages = Math.ceil(itemCount / itemsPerPage)
+  const totalPages = Math.ceil(itemCount / POSTS_PER_PAGE)
 
   if (totalPages <= 1) {
     return null

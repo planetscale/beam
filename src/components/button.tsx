@@ -63,7 +63,7 @@ export const Button = forwardRef(
       return (
         <button
           className={classNames(button({ variant, className }), {
-            'opacity-50 cursor-default': disabled ?? isLoading,
+            'opacity-50 cursor-default': isLoading,
           })}
           disabled={disabled}
           ref={ref}

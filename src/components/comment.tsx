@@ -1,10 +1,9 @@
 'use client'
 
-import { type Session } from 'next-auth'
 import { useState } from 'react'
 import { type RouterOutputs } from '~/trpc/shared'
-import { Avatar } from './avatar'
-import { AuthorWithDate } from './author-with-date'
+import { Avatar } from '~/components/avatar'
+import { AuthorWithDate } from '~/components/author-with-date'
 import {
   Menu,
   MenuButton,
@@ -12,15 +11,15 @@ import {
   MenuItems,
   MenuItem,
   MenuItemsContent,
-} from './menu'
+} from '~/components/menu'
 import DotsIcon from '~/components/svg/dots-icon'
-import { Button } from './button'
-import { HtmlView } from './html-view'
+import { Button } from '~/components/button'
+import { HtmlView } from '~/components/html-view'
 import { api } from '~/trpc/react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
-import { MarkdownEditor } from './markdown-editor'
+import { MarkdownEditor } from '~/components/markdown-editor'
 
 import { useDialogStore } from '~/hooks/use-dialog-store'
 import {
@@ -31,19 +30,20 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
-} from './alert-dialog'
+} from '~/components/alert-dialog'
+import { useSession } from 'next-auth/react'
 
 type Comment = RouterOutputs['post']['detail']['comments'][number]
 
 type CommentProps = {
-  session: Session | null
   postId: number
   comment: Comment
 }
 
-export const Comment = ({ session, postId, comment }: CommentProps) => {
+export const Comment = ({ postId, comment }: CommentProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const { handleDialog } = useDialogStore()
+  const { data: session } = useSession()
 
   const commentBelongsToUser = comment.author.id === session!.user.id
 

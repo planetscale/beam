@@ -11,16 +11,16 @@ import {
 } from './menu'
 import { useTheme } from 'next-themes'
 import { capitalize } from 'string-ts'
-import { signOut } from 'next-auth/react'
-import { type Session } from 'next-auth'
+import { signOut, useSession } from 'next-auth/react'
 import { Avatar } from './avatar'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/utils/core'
 import { api } from '~/trpc/react'
 
-export const ProfileMenu = ({ session }: { session: Session | null }) => {
+export const ProfileMenu = () => {
   const { theme, themes, setTheme } = useTheme()
   const pathname = usePathname()
+  const { data: session } = useSession()
   const { data } = api.user.profile.useQuery(
     {
       id: session!.user.id,
