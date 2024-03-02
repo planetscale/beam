@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { summarize } from '~/server/summary'
 import { type RouterOutputs } from '~/trpc/shared'
 import { Banner } from '~/components/banner'
-import { classNames } from '~/utils/core'
+import { POSTS_PER_PAGE, classNames } from '~/utils/core'
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow'
 import { AuthorWithDate } from '~/components/author-with-date'
 import { HtmlView } from '~/components/html-view'
@@ -12,20 +12,27 @@ import ChevronRightIcon from '~/components/svg/chevron-right-icon'
 import MessageIcon from '~/components/svg/message-icon'
 
 import { ReactionButton } from './reaction-button'
-import { Suspense } from 'react'
-import { useSession } from 'next-auth/react'
+import { useMemo } from 'react'
 
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
   hideAuthor?: boolean
 }
 
-export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
-  const { summary, hasMore } = summarize(post.contentHtml)
-  const { data: session } = useSession()
+export const getFeedPagination = (currentPageNumber: number) => {
+  return {
+    take: POSTS_PER_PAGE,
+    skip:
+      currentPageNumber === 1
+        ? undefined
+        : POSTS_PER_PAGE * (currentPageNumber ?? 1 - 1),
+  }
+}
 
-  const isLikedByCurrentUser = !!post.likedBy.find(
-    ({ user }) => user.id === session?.user.id,
+export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
+  const { summary, hasMore } = useMemo(
+    () => summarize(post.contentHtml),
+    [post.contentHtml],
   )
 
   return (
@@ -71,14 +78,7 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
             </Link>
           )}
           <div className="ml-auto flex gap-6">
-            <Suspense fallback={null}>
-              <ReactionButton
-                id={post.id}
-                likedBy={post.likedBy}
-                isLikedByCurrentUser={isLikedByCurrentUser}
-                likeCount={post.likedBy.length}
-              />
-            </Suspense>
+            <ReactionButton id={post.id} likedBy={post.likedBy} />
 
             <Link
               href={`/post/${post.id}#comments`}

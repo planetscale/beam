@@ -1,6 +1,8 @@
+'use client'
+
 import { PostFeed } from '~/components/post-feed'
 
-export default async function Index({
+export default function Index({
   searchParams,
 }: {
   searchParams: Record<string, string | undefined>

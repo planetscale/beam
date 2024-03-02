@@ -1,125 +1,105 @@
 'use client'
 
-import { POSTS_PER_PAGE, classNames } from '~/utils/core'
+import { classNames } from '~/utils/core'
 import { Button } from './button'
 import HeartFilledIcon from '~/components/svg/heart-filled-icon'
 import HeartIcon from '~/components/svg/heart-icon'
 
-import { api } from '~/trpc/react'
 import { useState } from 'react'
 import { LikedBy } from './liked-by'
 import { type RouterOutputs } from '~/trpc/shared'
 import { useSession } from 'next-auth/react'
+import { api } from '~/trpc/react'
+import { useSearchParams } from 'next/navigation'
+import { getFeedPagination } from './post-summary'
 
 export const MAX_LIKED_BY_SHOWN = 50
 
 type ReactionButtonProps = {
-  likeCount: number
-  isLikedByCurrentUser: boolean
   likedBy: RouterOutputs['post']['detail']['likedBy']
   id: number
 }
 
-export const ReactionButton = ({
-  id,
-  likeCount,
-  likedBy,
-  isLikedByCurrentUser,
-}: ReactionButtonProps) => {
+export const ReactionButton = ({ likedBy, id }: ReactionButtonProps) => {
   const [isAnimating, setIsAnimating] = useState(false)
-  const utils = api.useUtils()
   const { data: session } = useSession()
+  const utils = api.useUtils()
+  const params = useSearchParams()
 
-  const handleAnimationEnd = () => {
-    const timeout = setTimeout(() => {
-      setIsAnimating(false)
-    }, 1000)
+  const currentPageNumber = params.get('page') ? Number(params.get('page')) : 1
 
-    return () => clearTimeout(timeout)
-  }
+  const previousQuery = utils.post.feed.getData(
+    getFeedPagination(currentPageNumber),
+  )
 
-  const like = api.post.like.useMutation({
-    onMutate: async (data) => {
-      setIsAnimating(true)
-      handleAnimationEnd()
-
-      const previousPosts = utils.post.feed.getData({
-        take: 20,
-        skip: undefined,
-      })
-
-      utils.post.feed.setData(
-        {
-          take: POSTS_PER_PAGE,
-          skip: undefined,
-        },
-        {
-          ...previousPosts!,
-          posts: previousPosts!.posts.map((post) => {
-            if (post.id === data.id) {
-              return {
-                ...post,
-                likedBy: [
-                  ...post.likedBy,
-                  { user: { id: session!.user.id, name: 'You' } },
-                ],
-              }
-            }
-
-            return post
-          }),
-        },
-      )
-    },
-    onSuccess: async () => {
-      await utils.post.feed.invalidate()
+  const likeMutation = api.post.like.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(getFeedPagination(currentPageNumber), {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === id
+              ? {
+                  ...post,
+                  likedBy: [
+                    ...post.likedBy,
+                    {
+                      user: {
+                        id: session!.user.id,
+                        name: session!.user.name,
+                      },
+                    },
+                  ],
+                }
+              : post,
+          ),
+        })
+      }
     },
   })
 
-  const unlike = api.post.unlike.useMutation({
-    onMutate: async (data) => {
-      setIsAnimating(true)
-      handleAnimationEnd()
-
-      const previousPosts = utils.post.feed.getData({
-        take: 20,
-        skip: undefined,
-      })
-
-      utils.post.feed.setData(
-        {
-          take: POSTS_PER_PAGE,
-          skip: undefined,
-        },
-        {
-          ...previousPosts!,
-          posts: previousPosts!.posts.map((post) => {
-            if (post.id === data.id) {
-              return {
-                ...post,
-                likedBy: post.likedBy.filter(
-                  (like) => like.user.id !== session!.user.id,
-                ),
-              }
-            }
-
-            return post
-          }),
-        },
-      )
-    },
-    onSuccess: async () => {
-      await utils.post.feed.invalidate()
+  const unlikeMutation = api.post.unlike.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(getFeedPagination(currentPageNumber), {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === id
+              ? {
+                  ...post,
+                  likedBy: post.likedBy.filter(
+                    (item) => item.user.id !== session!.user.id,
+                  ),
+                }
+              : post,
+          ),
+        })
+      }
     },
   })
 
   const handleReaction = () => {
+    if (isAnimating) {
+      return
+    }
     if (isLikedByCurrentUser) {
-      unlike.mutate({ id })
+      unlikeMutation.mutate({ id })
     } else {
-      like.mutate({ id })
+      setIsAnimating(!isAnimating)
+      likeMutation.mutate({ id })
+
+      const timeout = setTimeout(() => {
+        setIsAnimating(false)
+      }, 1000)
+
+      return () => clearTimeout(timeout)
     }
   }
+
+  const isLikedByCurrentUser = Boolean(
+    likedBy.find((item) => item.user.id === session!.user.id),
+  )
+  const likeCount = likedBy.length
 
   return (
     <LikedBy
