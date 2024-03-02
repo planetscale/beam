@@ -1,7 +1,5 @@
-import { getServerAuthSession } from '~/server/auth'
-import { api } from '~/trpc/server'
-
 import { EditPostForm } from '~/components/edit-post-form'
+import { type Metadata } from 'next'
 
 type ProfilePageParams = {
   params: {
@@ -9,40 +7,10 @@ type ProfilePageParams = {
   }
 }
 
-export const generateMetadata = async ({ params }: ProfilePageParams) => {
-  const post = await api.post.detail.query({
-    id: Number(params.id),
-  })
-
-  if (!post) return
-
-  return {
-    title: `Edit - ${post.title} - Beam`,
-  }
+export const metadata: Metadata = {
+  title: 'Edit Post',
 }
 
 export default async function EditPostPage({ params }: ProfilePageParams) {
-  const post = await api.post.detail.query({
-    id: Number(params.id),
-  })
-
-  const session = await getServerAuthSession()
-  const postBelongsToUser = post.author.id === session!.user.id
-
-  return (
-    <>
-      {postBelongsToUser ? (
-        <>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            Edit &quot;{post.title}&quot;
-          </h1>
-          <div className="mt-6">
-            <EditPostForm initialData={post} postId={post.id} backTo="/" />
-          </div>
-        </>
-      ) : (
-        <div>You don&apos;t have permissions to edit this post.</div>
-      )}
-    </>
-  )
+  return <EditPostForm postId={Number(params.id)} backTo="/" />
 }
