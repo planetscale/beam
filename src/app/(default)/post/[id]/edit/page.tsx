@@ -12,5 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function EditPostPage({ params }: ProfilePageParams) {
-  return <EditPostForm postId={Number(params.id)} backTo="/" />
+  return (
+    <EditPostForm postId={Number(params.id)} backTo={`/post/${params.id}`} />
+  )
 }
