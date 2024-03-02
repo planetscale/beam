@@ -74,8 +74,7 @@ export default async function ProfilePage({
           <Suspense fallback={null}>
             <PostFeed
               authorId={params.userId}
-              initialPosts={initialPostData}
-              postsPerPage={POSTS_PER_PAGE}
+              currentPageNumber={currentPageNumber}
             />
           </Suspense>
         )}
