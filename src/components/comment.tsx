@@ -263,13 +263,7 @@ export const AddCommentForm = ({ postId }: { postId: number }) => {
         )}
       />
       <div className="mt-4">
-        <Button
-          type="submit"
-          isLoading={addCommentMutation.isLoading}
-          loadingChildren="Adding comment"
-        >
-          Add comment
-        </Button>
+        <Button type="submit">Add comment</Button>
       </div>
     </form>
   )
