@@ -3,8 +3,6 @@
 import * as React from 'react'
 
 import { api } from '~/trpc/react'
-import { useRouter } from 'next/navigation'
-import { markdownToHtml } from '~/utils/text'
 import { useSession } from 'next-auth/react'
 import { PostSkeleton } from './post-skeleton'
 import { PostForm } from './post-form'
@@ -16,7 +14,10 @@ type PostFormProps = {
 }
 
 export const EditPostForm = ({ postId, backTo }: PostFormProps) => {
-  const { data, isLoading } = usePostData(postId)
+  const { data, isLoading } = api.post.detail.useQuery({
+    id: postId,
+  })
+
   const { data: session } = useSession()
 
   if (isLoading || !data) return <PostSkeleton />
@@ -37,43 +38,10 @@ export const EditPostForm = ({ postId, backTo }: PostFormProps) => {
             title: data.title,
             content: data.content,
           }}
+          postId={data.id}
           backTo={backTo}
         />
       </div>
     </>
   )
-}
-
-const usePostData = (id: number) => {
-  const router = useRouter()
-  const utils = api.useUtils()
-
-  const { data } = api.post.detail.useQuery({
-    id,
-  })
-
-  const { mutate, isLoading } = api.post.edit.useMutation({
-    onMutate: async (newPost) => {
-      const post = utils.post.detail.getData({
-        id,
-      })
-
-      utils.post.detail.setData(
-        {
-          id,
-        },
-        {
-          ...post!,
-          title: newPost.data.title,
-          content: newPost.data.content,
-          contentHtml: markdownToHtml(newPost.data.content),
-        },
-      )
-    },
-    onSuccess: () => {
-      router.push(`/post/${id}`)
-    },
-  })
-
-  return { data, mutate, isLoading }
 }
