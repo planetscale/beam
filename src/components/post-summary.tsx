@@ -17,6 +17,8 @@ import { useMemo } from 'react'
 export type PostSummaryProps = {
   post: RouterOutputs['post']['feed']['posts'][number]
   hideAuthor?: boolean
+  onLike: () => void
+  onUnlike: () => void
 }
 
 export const getFeedPagination = (currentPageNumber: number) => {
@@ -29,7 +31,12 @@ export const getFeedPagination = (currentPageNumber: number) => {
   }
 }
 
-export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
+export const PostSummary = ({
+  post,
+  hideAuthor,
+  onLike,
+  onUnlike,
+}: PostSummaryProps) => {
   const { summary, hasMore } = useMemo(
     () => summarize(post.contentHtml),
     [post.contentHtml],
@@ -78,7 +85,11 @@ export const PostSummary = ({ post, hideAuthor }: PostSummaryProps) => {
             </Link>
           )}
           <div className="ml-auto flex gap-6">
-            <ReactionButton id={post.id} likedBy={post.likedBy} />
+            <ReactionButton
+              onLike={onLike}
+              onUnlike={onUnlike}
+              likedBy={post.likedBy}
+            />
 
             <Link
               href={`/post/${post.id}#comments`}

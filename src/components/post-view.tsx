@@ -25,13 +25,51 @@ export const PostView = ({ postId }: PostViewProps) => {
     id: Number(postId),
   })
 
+  const utils = api.useUtils()
+  const previousQuery = utils.post.detail.getData({ id: Number(postId) })
+
+  const likeMutation = api.post.like.useMutation({
+    onMutate: async () => {
+      if (previousQuery) {
+        utils.post.detail.setData(
+          { id: Number(postId) },
+          {
+            ...previousQuery,
+            likedBy: [
+              ...previousQuery.likedBy,
+              {
+                user: {
+                  id: session!.user.id,
+                  name: session!.user.name,
+                },
+              },
+            ],
+          },
+        )
+      }
+    },
+  })
+
+  const unlikeMutation = api.post.unlike.useMutation({
+    onMutate: async () => {
+      if (previousQuery) {
+        utils.post.detail.setData(
+          { id: Number(postId) },
+          {
+            ...previousQuery,
+            likedBy: previousQuery.likedBy.filter(
+              (item) => item.user.id !== session!.user.id,
+            ),
+          },
+        )
+      }
+    },
+  })
+
   if (isLoading || !data) return <PostSkeleton />
 
-  const postBelongsToUser = data.author.id === session?.user?.id
-  const isLikedByCurrentUser = !!data.likedBy.find(
-    ({ user }) => user.id === session?.user.id,
-  )
   const isUserAdmin = session?.user.role === 'ADMIN'
+  const postBelongsToUser = session?.user.id === data.author.id
 
   return (
     <>
@@ -64,10 +102,9 @@ export const PostView = ({ postId }: PostViewProps) => {
         <div className="flex gap-4 mt-6">
           <Suspense fallback={null}>
             <ReactionButton
+              onLike={() => likeMutation.mutate({ id: Number(postId) })}
+              onUnlike={() => unlikeMutation.mutate({ id: Number(postId) })}
               likedBy={data.likedBy}
-              likeCount={data.likedBy.length}
-              isLikedByCurrentUser={isLikedByCurrentUser}
-              id={data.id}
             />
           </Suspense>
           <Button href={`/post/${postId}#comments`} variant="secondary">

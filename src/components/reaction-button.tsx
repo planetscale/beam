@@ -9,84 +9,32 @@ import { useState } from 'react'
 import { LikedBy } from './liked-by'
 import { type RouterOutputs } from '~/trpc/shared'
 import { useSession } from 'next-auth/react'
-import { api } from '~/trpc/react'
-import { useSearchParams } from 'next/navigation'
-import { getFeedPagination } from './post-summary'
 
 export const MAX_LIKED_BY_SHOWN = 50
 
 type ReactionButtonProps = {
   likedBy: RouterOutputs['post']['detail']['likedBy']
-  id: number
+  onLike: () => void
+  onUnlike: () => void
 }
 
-export const ReactionButton = ({ likedBy, id }: ReactionButtonProps) => {
+export const ReactionButton = ({
+  likedBy,
+  onLike,
+  onUnlike,
+}: ReactionButtonProps) => {
   const [isAnimating, setIsAnimating] = useState(false)
   const { data: session } = useSession()
-  const utils = api.useUtils()
-  const params = useSearchParams()
-
-  const currentPageNumber = params.get('page') ? Number(params.get('page')) : 1
-
-  const previousQuery = utils.post.feed.getData(
-    getFeedPagination(currentPageNumber),
-  )
-
-  const likeMutation = api.post.like.useMutation({
-    onMutate: async ({ id }) => {
-      if (previousQuery) {
-        utils.post.feed.setData(getFeedPagination(currentPageNumber), {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === id
-              ? {
-                  ...post,
-                  likedBy: [
-                    ...post.likedBy,
-                    {
-                      user: {
-                        id: session!.user.id,
-                        name: session!.user.name,
-                      },
-                    },
-                  ],
-                }
-              : post,
-          ),
-        })
-      }
-    },
-  })
-
-  const unlikeMutation = api.post.unlike.useMutation({
-    onMutate: async ({ id }) => {
-      if (previousQuery) {
-        utils.post.feed.setData(getFeedPagination(currentPageNumber), {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === id
-              ? {
-                  ...post,
-                  likedBy: post.likedBy.filter(
-                    (item) => item.user.id !== session!.user.id,
-                  ),
-                }
-              : post,
-          ),
-        })
-      }
-    },
-  })
 
   const handleReaction = () => {
     if (isAnimating) {
       return
     }
     if (isLikedByCurrentUser) {
-      unlikeMutation.mutate({ id })
+      onUnlike()
     } else {
       setIsAnimating(!isAnimating)
-      likeMutation.mutate({ id })
+      onLike()
 
       const timeout = setTimeout(() => {
         setIsAnimating(false)

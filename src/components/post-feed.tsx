@@ -1,10 +1,11 @@
 'use client'
 
 import { api } from '~/trpc/react'
-import { PostSummary } from './post-summary'
+import { PostSummary, getFeedPagination } from './post-summary'
 import { Pagination } from './pagination'
 import { PostSkeleton } from './post-skeleton'
 import { POSTS_PER_PAGE } from '~/utils/core'
+import { useSession } from 'next-auth/react'
 
 type PostFeedProps = {
   currentPageNumber?: number
@@ -21,6 +22,59 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
     authorId,
   })
 
+  const { data: session } = useSession()
+
+  const utils = api.useUtils()
+  const previousQuery = utils.post.feed.getData(
+    getFeedPagination(currentPageNumber ?? 1),
+  )
+
+  const likeMutation = api.post.like.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(getFeedPagination(currentPageNumber ?? 1), {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === id
+              ? {
+                  ...post,
+                  likedBy: [
+                    ...post.likedBy,
+                    {
+                      user: {
+                        id: session!.user.id,
+                        name: session!.user.name,
+                      },
+                    },
+                  ],
+                }
+              : post,
+          ),
+        })
+      }
+    },
+  })
+
+  const unlikeMutation = api.post.unlike.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(getFeedPagination(currentPageNumber ?? 1), {
+          ...previousQuery,
+          posts: previousQuery.posts.map((post) =>
+            post.id === id
+              ? {
+                  ...post,
+                  likedBy: post.likedBy.filter(
+                    (item) => item.user.id !== session!.user.id,
+                  ),
+                }
+              : post,
+          ),
+        })
+      }
+    },
+  })
+
   if (isLoading) return <PostSkeleton count={3} />
 
   return (
@@ -29,7 +83,11 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
         {data?.posts.map((post) => {
           return (
             <li key={post.id} className="py-10">
-              <PostSummary post={post} />
+              <PostSummary
+                onLike={() => likeMutation.mutate({ id: post.id })}
+                onUnlike={() => unlikeMutation.mutate({ id: post.id })}
+                post={post}
+              />
             </li>
           )
         })}
