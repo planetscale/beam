@@ -113,19 +113,19 @@ const EditProfileDialog = ({
 }
 
 export const EditProfileAction = ({
-  user,
+  id,
   profileBelongsToUser,
 }: {
-  user: RouterOutputs['user']['profile']
+  id: string
   profileBelongsToUser: boolean
 }) => {
   const { handleDialog } = useDialogStore()
-  const { data } = api.user.profile.useQuery(
-    { id: user.id },
-    {
-      initialData: user,
-    },
-  )
+  const { data } = api.user.profile.useQuery({ id })
+
+  if (!data) {
+    return null
+  }
+
   return (
     <>
       <div className="flex items-center gap-8">

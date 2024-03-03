@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import { markdownToHtml } from '~/utils/text'
 import { useSession } from 'next-auth/react'
 import { PostSkeleton } from './post-skeleton'
+import { useEffect } from 'react'
 
 type FormData = {
   title: string
@@ -24,54 +25,29 @@ type PostFormProps = {
   backTo: string
 }
 
-const usePostData = (id: number) => {
-  const router = useRouter()
-  const utils = api.useUtils()
-
-  const { data } = api.post.detail.useQuery({
-    id,
-  })
-
-  const { mutate, isLoading } = api.post.edit.useMutation({
-    onMutate: async (newPost) => {
-      const post = utils.post.detail.getData({
-        id,
-      })
-
-      utils.post.detail.setData(
-        {
-          id,
-        },
-        {
-          ...post!,
-          title: newPost.data.title,
-          content: newPost.data.content,
-          contentHtml: markdownToHtml(newPost.data.content),
-        },
-      )
-    },
-    onSuccess: () => {
-      router.push(`/post/${id}`)
-    },
-  })
-
-  return { data, mutate, isLoading }
-}
-
 export const EditPostForm = ({ postId, backTo }: PostFormProps) => {
   const { data, mutate, isLoading } = usePostData(postId)
   const { data: session } = useSession()
 
-  const { control, register, handleSubmit } = useForm<FormData>({
-    defaultValues: data,
+  const { control, register, reset, handleSubmit } = useForm<FormData>({
+    defaultValues: {
+      title: data?.title,
+      content: data?.content,
+    },
   })
 
-  const onSubmit = (values: FormData) => {
+  const onSubmit = (data: FormData) => {
     mutate({
       id: postId,
-      data: values,
+      data,
     })
   }
+
+  useEffect(() => {
+    if (data) {
+      reset(data)
+    }
+  }, [data])
 
   if (isLoading || !data) return <PostSkeleton />
 
@@ -141,4 +117,38 @@ export const EditPostForm = ({ postId, backTo }: PostFormProps) => {
       </div>
     </>
   )
+}
+
+const usePostData = (id: number) => {
+  const router = useRouter()
+  const utils = api.useUtils()
+
+  const { data } = api.post.detail.useQuery({
+    id,
+  })
+
+  const { mutate, isLoading } = api.post.edit.useMutation({
+    onMutate: async (newPost) => {
+      const post = utils.post.detail.getData({
+        id,
+      })
+
+      utils.post.detail.setData(
+        {
+          id,
+        },
+        {
+          ...post!,
+          title: newPost.data.title,
+          content: newPost.data.content,
+          contentHtml: markdownToHtml(newPost.data.content),
+        },
+      )
+    },
+    onSuccess: () => {
+      router.push(`/post/${id}`)
+    },
+  })
+
+  return { data, mutate, isLoading }
 }

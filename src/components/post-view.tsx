@@ -21,49 +21,10 @@ type PostViewProps = {
 export const PostView = ({ postId }: PostViewProps) => {
   const { data: session } = useSession()
 
+  const { like, unlike } = useReaction(Number(postId))
+
   const { data, isLoading } = api.post.detail.useQuery({
     id: Number(postId),
-  })
-
-  const utils = api.useUtils()
-  const previousQuery = utils.post.detail.getData({ id: Number(postId) })
-
-  const likeMutation = api.post.like.useMutation({
-    onMutate: async () => {
-      if (previousQuery) {
-        utils.post.detail.setData(
-          { id: Number(postId) },
-          {
-            ...previousQuery,
-            likedBy: [
-              ...previousQuery.likedBy,
-              {
-                user: {
-                  id: session!.user.id,
-                  name: session!.user.name,
-                },
-              },
-            ],
-          },
-        )
-      }
-    },
-  })
-
-  const unlikeMutation = api.post.unlike.useMutation({
-    onMutate: async () => {
-      if (previousQuery) {
-        utils.post.detail.setData(
-          { id: Number(postId) },
-          {
-            ...previousQuery,
-            likedBy: previousQuery.likedBy.filter(
-              (item) => item.user.id !== session!.user.id,
-            ),
-          },
-        )
-      }
-    },
   })
 
   if (isLoading || !data) return <PostSkeleton />
@@ -102,8 +63,8 @@ export const PostView = ({ postId }: PostViewProps) => {
         <div className="flex gap-4 mt-6">
           <Suspense fallback={null}>
             <ReactionButton
-              onLike={() => likeMutation.mutate({ id: Number(postId) })}
-              onUnlike={() => unlikeMutation.mutate({ id: Number(postId) })}
+              onLike={() => like.mutate({ id: Number(postId) })}
+              onUnlike={() => unlike.mutate({ id: Number(postId) })}
               likedBy={data.likedBy}
             />
           </Suspense>
@@ -139,4 +100,54 @@ export const PostView = ({ postId }: PostViewProps) => {
       </div>
     </>
   )
+}
+
+const useReaction = (id: number) => {
+  const { data: session } = useSession()
+
+  const utils = api.useUtils()
+  const previousQuery = utils.post.detail.getData({ id })
+
+  const like = api.post.like.useMutation({
+    onMutate: async () => {
+      if (previousQuery) {
+        utils.post.detail.setData(
+          { id },
+          {
+            ...previousQuery,
+            likedBy: [
+              ...previousQuery.likedBy,
+              {
+                user: {
+                  id: session!.user.id,
+                  name: session!.user.name,
+                },
+              },
+            ],
+          },
+        )
+      }
+    },
+  })
+
+  const unlike = api.post.unlike.useMutation({
+    onMutate: async () => {
+      if (previousQuery) {
+        utils.post.detail.setData(
+          { id },
+          {
+            ...previousQuery,
+            likedBy: previousQuery.likedBy.filter(
+              (item) => item.user.id !== session!.user.id,
+            ),
+          },
+        )
+      }
+    },
+  })
+
+  return {
+    like,
+    unlike,
+  }
 }

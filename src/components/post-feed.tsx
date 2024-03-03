@@ -22,58 +22,7 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
     authorId,
   })
 
-  const { data: session } = useSession()
-
-  const utils = api.useUtils()
-  const previousQuery = utils.post.feed.getData(
-    getFeedPagination(currentPageNumber ?? 1),
-  )
-
-  const likeMutation = api.post.like.useMutation({
-    onMutate: async ({ id }) => {
-      if (previousQuery) {
-        utils.post.feed.setData(getFeedPagination(currentPageNumber ?? 1), {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === id
-              ? {
-                  ...post,
-                  likedBy: [
-                    ...post.likedBy,
-                    {
-                      user: {
-                        id: session!.user.id,
-                        name: session!.user.name,
-                      },
-                    },
-                  ],
-                }
-              : post,
-          ),
-        })
-      }
-    },
-  })
-
-  const unlikeMutation = api.post.unlike.useMutation({
-    onMutate: async ({ id }) => {
-      if (previousQuery) {
-        utils.post.feed.setData(getFeedPagination(currentPageNumber ?? 1), {
-          ...previousQuery,
-          posts: previousQuery.posts.map((post) =>
-            post.id === id
-              ? {
-                  ...post,
-                  likedBy: post.likedBy.filter(
-                    (item) => item.user.id !== session!.user.id,
-                  ),
-                }
-              : post,
-          ),
-        })
-      }
-    },
-  })
+  const { like, unlike } = useReaction({ currentPageNumber, authorId })
 
   if (isLoading) return <PostSkeleton count={3} />
 
@@ -84,8 +33,8 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
           return (
             <li key={post.id} className="py-10">
               <PostSummary
-                onLike={() => likeMutation.mutate({ id: post.id })}
-                onUnlike={() => unlikeMutation.mutate({ id: post.id })}
+                onLike={() => like.mutate({ id: post.id })}
+                onUnlike={() => unlike.mutate({ id: post.id })}
                 post={post}
               />
             </li>
@@ -99,4 +48,76 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
       />
     </>
   )
+}
+
+const useReaction = ({
+  authorId,
+  currentPageNumber,
+}: {
+  authorId?: string
+  currentPageNumber?: number
+}) => {
+  const { data: session } = useSession()
+
+  const utils = api.useUtils()
+  const previousQuery = utils.post.feed.getData(
+    getFeedPagination({ authorId, currentPageNumber }),
+  )
+
+  const like = api.post.like.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(
+          getFeedPagination({ authorId, currentPageNumber }),
+          {
+            ...previousQuery,
+            posts: previousQuery.posts.map((post) =>
+              post.id === id
+                ? {
+                    ...post,
+                    likedBy: [
+                      ...post.likedBy,
+                      {
+                        user: {
+                          id: session!.user.id,
+                          name: session!.user.name,
+                        },
+                      },
+                    ],
+                  }
+                : post,
+            ),
+          },
+        )
+      }
+    },
+  })
+
+  const unlike = api.post.unlike.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(
+          getFeedPagination({ authorId, currentPageNumber }),
+          {
+            ...previousQuery,
+            posts: previousQuery.posts.map((post) =>
+              post.id === id
+                ? {
+                    ...post,
+                    likedBy: post.likedBy.filter(
+                      (item) => item.user.id !== session!.user.id,
+                    ),
+                  }
+                : post,
+            ),
+          },
+        )
+      }
+    },
+  })
+
+  return {
+    like,
+    unlike,
+  }
 }

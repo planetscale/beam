@@ -21,13 +21,20 @@ export type PostSummaryProps = {
   onUnlike: () => void
 }
 
-export const getFeedPagination = (currentPageNumber: number) => {
+export const getFeedPagination = ({
+  authorId,
+  currentPageNumber,
+}: {
+  authorId?: string
+  currentPageNumber?: number
+}) => {
   return {
     take: POSTS_PER_PAGE,
     skip:
       currentPageNumber === 1
         ? undefined
         : POSTS_PER_PAGE * (currentPageNumber ?? 1 - 1),
+    authorId,
   }
 }
 
