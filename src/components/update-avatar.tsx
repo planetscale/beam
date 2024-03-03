@@ -172,7 +172,7 @@ export const UpdateAvatarAction = ({
       type="button"
       className="relative inline-flex group"
       onClick={() =>
-        handleDialog({ content: <UpdateAvatar user={{ name, image }} /> })
+        handleDialog({ component: <UpdateAvatar user={{ name, image }} /> })
       }
     >
       <Avatar name={name} src={image} size="lg" />

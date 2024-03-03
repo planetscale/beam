@@ -41,7 +41,7 @@ const EditProfileDialog = ({
     },
   })
   const editUserMutation = api.user.edit.useMutation({
-    onMutate: (data) => {
+    onMutate: async (data) => {
       utils.user.profile.setData(
         { id: user.id },
         {
@@ -51,9 +51,9 @@ const EditProfileDialog = ({
           image: user.image,
         },
       )
+      await utils.post.feed.invalidate({ authorId: user.id })
     },
     onSuccess: async () => {
-      await utils.post.feed.invalidate({ authorId: user.id })
       await utils.user.profile.invalidate({ id: user.id })
     },
     onError: (error) => {
@@ -151,7 +151,7 @@ export const EditProfileAction = ({
           variant="secondary"
           onClick={() => {
             handleDialog({
-              content: <EditProfileDialog user={data} />,
+              component: <EditProfileDialog user={data} />,
             })
           }}
         >

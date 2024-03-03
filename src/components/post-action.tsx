@@ -59,7 +59,9 @@ export const PostAction = ({
                     <MenuItemButton
                       onClick={() =>
                         handleDialog({
-                          content: <ConfirmUnhidePostDialog postId={postId} />,
+                          component: (
+                            <ConfirmUnhidePostDialog postId={postId} />
+                          ),
                         })
                       }
                     >
@@ -71,7 +73,7 @@ export const PostAction = ({
                     <MenuItemButton
                       onClick={() =>
                         handleDialog({
-                          content: <ConfirmHidePostDialog postId={postId} />,
+                          component: <ConfirmHidePostDialog postId={postId} />,
                         })
                       }
                     >
@@ -90,7 +92,7 @@ export const PostAction = ({
                     <MenuItemButton
                       onClick={() =>
                         handleDialog({
-                          content: <ConfirmDeleteDialog postId={postId} />,
+                          component: <ConfirmDeleteDialog postId={postId} />,
                         })
                       }
                       className="text-red"
@@ -112,7 +114,7 @@ export const PostAction = ({
               title="Unhide"
               onClick={() =>
                 handleDialog({
-                  content: <ConfirmUnhidePostDialog postId={postId} />,
+                  component: <ConfirmUnhidePostDialog postId={postId} />,
                 })
               }
             >
@@ -124,7 +126,7 @@ export const PostAction = ({
               title="Hide"
               onClick={() =>
                 handleDialog({
-                  content: <ConfirmHidePostDialog postId={postId} />,
+                  component: <ConfirmHidePostDialog postId={postId} />,
                 })
               }
             >
@@ -141,7 +143,7 @@ export const PostAction = ({
               title="Delete"
               onClick={() =>
                 handleDialog({
-                  content: <ConfirmDeleteDialog postId={postId} />,
+                  component: <ConfirmDeleteDialog postId={postId} />,
                 })
               }
             >

@@ -87,7 +87,7 @@ export const Comment = ({ postId, comment }: CommentProps) => {
                   <MenuItemButton
                     onClick={() => {
                       handleDialog({
-                        content: (
+                        component: (
                           <ConfirmDeleteCommentDialog commentId={comment.id} />
                         ),
                       })
