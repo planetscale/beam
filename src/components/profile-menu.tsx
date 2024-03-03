@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItemButton,
-  MenuItemLink,
-  MenuItems,
-  MenuItemsContent,
-} from './menu'
+import { Menu, MenuButton, MenuItem, MenuItems, MenuItemsContent } from './menu'
 import { useTheme } from 'next-themes'
 import { capitalize } from 'string-ts'
 import { signOut, useSession } from 'next-auth/react'
@@ -16,6 +8,7 @@ import { Avatar } from './avatar'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/utils/core'
 import { api } from '~/trpc/react'
+import Link from 'next/link'
 
 export const ProfileMenu = () => {
   const { theme, themes, setTheme } = useTheme()
@@ -39,13 +32,13 @@ export const ProfileMenu = () => {
     active,
     className,
   }: {
-    active: boolean
+    active?: boolean
     className?: string
-  }) => {
+  } = {}) => {
     return classNames(
       { 'bg-secondary': active },
       className,
-      'block w-full text-left px-4 py-2 text-sm text-primary transition-colors',
+      'block w-full text-left px-4 py-2 text-sm text-primary transition-colors focus:ring-0',
     )
   }
 
@@ -57,18 +50,26 @@ export const ProfileMenu = () => {
 
       <MenuItems className="w-48">
         <MenuItemsContent>
-          <MenuItem>
-            <MenuItemLink
+          <MenuItem
+            className="focus:outline-none focus:bg-secondary transition-colors"
+            asChild
+          >
+            <Link
               href={`/profile/${session!.user.id}`}
               className={menuItemClasses({
                 active: pathname === `/profile/${session!.user.id}`,
               })}
             >
               Profile
-            </MenuItemLink>
+            </Link>
           </MenuItem>
-          <MenuItem>
-            <MenuItemButton onClick={() => signOut()}>Log out</MenuItemButton>
+          <MenuItem
+            className="focus:outline-none focus:bg-secondary transition-colors"
+            asChild
+          >
+            <button className={menuItemClasses()} onClick={() => signOut()}>
+              Log out
+            </button>
           </MenuItem>
         </MenuItemsContent>
         <div className="flex items-center gap-4 px-4 py-3 rounded-b bg-secondary">

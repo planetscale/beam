@@ -1,9 +1,9 @@
 import { type Metadata } from 'next'
 import { PostForm } from '~/components/post-form'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'New Post - Beam',
-} satisfies Metadata
+}
 
 export default function NewPost() {
   return (
