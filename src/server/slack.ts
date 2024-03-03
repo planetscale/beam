@@ -1,5 +1,5 @@
 import type { Post } from '@prisma/client'
-import { markdownToBlocks } from '@tryfabric/mack'
+import slackifyMarkdown from 'slackify-markdown'
 import { marked } from 'marked'
 import { env } from '~/env'
 
@@ -19,9 +19,7 @@ export const postToSlackIfEnabled = async ({
         token.type === 'image'
       )
     })
-    const summaryBlocks = summaryToken
-      ? await markdownToBlocks(summaryToken.raw)
-      : []
+    const summaryBlocks = summaryToken ? slackifyMarkdown(summaryToken.raw) : []
 
     return fetch(env.SLACK_WEBHOOK_URL, {
       method: 'POST',
