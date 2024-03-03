@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from '~/components/alert-dialog'
 import { useSession } from 'next-auth/react'
+import { markdownToHtml } from '~/utils/text'
 
 type Comment = RouterOutputs['post']['detail']['comments'][number]
 
@@ -88,7 +89,10 @@ export const Comment = ({ postId, comment }: CommentProps) => {
                     onClick={() => {
                       handleDialog({
                         component: (
-                          <ConfirmDeleteCommentDialog commentId={comment.id} />
+                          <ConfirmDeleteCommentDialog
+                            postId={postId}
+                            commentId={comment.id}
+                          />
                         ),
                       })
                     }}
@@ -186,8 +190,36 @@ const EditCommentForm = ({ comment, onDone }: EditCommentFormProps) => {
 export const AddCommentForm = ({ postId }: { postId: number }) => {
   const router = useRouter()
   const [markdownEditorKey, setMarkdownEditorKey] = useState(0)
+  const utils = api.useUtils()
+  const { data: session } = useSession()
 
   const addCommentMutation = api.comment.add.useMutation({
+    onMutate: (data) => {
+      const previousPostData = utils.post.detail.getData({ id: postId })
+
+      if (previousPostData) {
+        utils.post.detail.setData(
+          { id: postId },
+          {
+            ...previousPostData,
+            comments: [
+              ...previousPostData.comments,
+              {
+                id: data.postId,
+                content: data.content,
+                contentHtml: markdownToHtml(data.content),
+                createdAt: new Date(),
+                author: {
+                  name: session!.user.name,
+                  image: session!.user.image ?? '',
+                  id: session!.user.id,
+                },
+              },
+            ],
+          },
+        )
+      }
+    },
     onSuccess: () => {
       router.refresh()
     },
@@ -244,18 +276,32 @@ export const AddCommentForm = ({ postId }: { postId: number }) => {
 }
 
 type ConfirmDeleteCommentDialogProps = {
+  postId: number
   commentId: number
 }
 
 const ConfirmDeleteCommentDialog = ({
+  postId,
   commentId,
 }: ConfirmDeleteCommentDialogProps) => {
-  const router = useRouter()
   const { handleDialogClose } = useDialogStore()
+  const utils = api.useUtils()
 
   const deleteCommentMutation = api.comment.delete.useMutation({
-    onSuccess: () => {
-      router.refresh()
+    onMutate: () => {
+      const previousPostData = utils.post.detail.getData({ id: postId })
+
+      if (previousPostData) {
+        utils.post.detail.setData(
+          { id: postId },
+          {
+            ...previousPostData,
+            comments: previousPostData.comments.filter(
+              (comment) => comment.id !== commentId,
+            ),
+          },
+        )
+      }
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
