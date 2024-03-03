@@ -160,7 +160,7 @@ export const EditProfileAction = ({
     <>
       <div className="flex items-center gap-8">
         {env.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && profileBelongsToUser ? (
-          <UpdateAvatarAction name={data.name ?? ''} image={data.image} />
+          <UpdateAvatarAction user={data} />
         ) : (
           <Avatar name={data.name ?? ''} src={data.image} size="lg" />
         )}
