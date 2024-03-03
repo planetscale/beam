@@ -2,17 +2,12 @@ import DotPattern from '~/components/svg/dot-pattern'
 
 import { EditProfileAction } from '~/components/edit-profile'
 import { PostFeed } from '~/components/post-feed'
-import { type Metadata } from 'next'
 
 type ProfilePageParams = {
   params: {
     userId: string
   }
   searchParams: Record<string, string | undefined>
-}
-
-export const metadata: Metadata = {
-  title: 'Profile',
 }
 
 export default async function ProfilePage({
