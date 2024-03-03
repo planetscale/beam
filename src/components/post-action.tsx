@@ -27,6 +27,7 @@ import EditIcon from '~/components/svg/edit-icon'
 import EyeIcon from '~/components/svg/eye-icon'
 import TrashIcon from '~/components/svg/trash-icon'
 import { api } from '~/trpc/react'
+import { getFeedPagination } from './post-summary'
 
 type PostActionProps = {
   isUserAdmin: boolean
@@ -159,8 +160,23 @@ export const PostAction = ({
 const ConfirmDeleteDialog = ({ postId }: { postId: number }) => {
   const { handleDialogClose } = useDialogStore()
   const router = useRouter()
+  const utils = api.useUtils()
   const deletePostMutation = api.post.delete.useMutation({
-    onSuccess: () => router.push('/'),
+    onMutate: () => {
+      const previousQuery = utils.post.feed.getData(
+        getFeedPagination({ currentPageNumber: 1 }),
+      )
+
+      if (previousQuery) {
+        utils.post.feed.setData(getFeedPagination({ currentPageNumber: 1 }), {
+          ...previousQuery,
+          posts: previousQuery.posts.filter((post) => post.id !== postId),
+        })
+      }
+    },
+    onSuccess: () => {
+      router.push('/')
+    },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)
     },

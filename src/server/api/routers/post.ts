@@ -259,8 +259,6 @@ export const postRouter = createTRPCRouter({
 
       await ctx.db.post.delete({ where: { id } })
 
-      revalidatePath('/')
-
       return id
     }),
   like: protectedProcedure

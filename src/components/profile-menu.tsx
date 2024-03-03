@@ -1,6 +1,14 @@
 'use client'
 
-import { Menu, MenuButton, MenuItem, MenuItems, MenuItemsContent } from './menu'
+import {
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItemButton,
+  MenuItemLink,
+  MenuItems,
+  MenuItemsContent,
+} from './menu'
 import { useTheme } from 'next-themes'
 import { capitalize } from 'string-ts'
 import { signOut, useSession } from 'next-auth/react'
@@ -8,7 +16,6 @@ import { Avatar } from './avatar'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/utils/core'
 import { api } from '~/trpc/react'
-import Link from 'next/link'
 
 export const ProfileMenu = () => {
   const { theme, themes, setTheme } = useTheme()
@@ -54,22 +61,20 @@ export const ProfileMenu = () => {
             className="focus:outline-none focus:bg-secondary transition-colors"
             asChild
           >
-            <Link
+            <MenuItemLink
               href={`/profile/${session!.user.id}`}
               className={menuItemClasses({
                 active: pathname === `/profile/${session!.user.id}`,
               })}
             >
               Profile
-            </Link>
+            </MenuItemLink>
           </MenuItem>
           <MenuItem
             className="focus:outline-none focus:bg-secondary transition-colors"
             asChild
           >
-            <button className={menuItemClasses()} onClick={() => signOut()}>
-              Log out
-            </button>
+            <MenuItemButton onClick={() => signOut()}>Log out</MenuItemButton>
           </MenuItem>
         </MenuItemsContent>
         <div className="flex items-center gap-4 px-4 py-3 rounded-b bg-secondary">

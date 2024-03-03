@@ -1,7 +1,9 @@
 'use client'
 
 import * as DropdownPrimitive from '@radix-ui/react-dropdown-menu'
+import Link, { type LinkProps } from 'next/link'
 import * as React from 'react'
+import { forwardRef, type ComponentPropsWithRef, type Ref } from 'react'
 
 import { classNames } from '~/utils/core'
 
@@ -10,7 +12,53 @@ export const Menu = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const MenuButton = DropdownPrimitive.Trigger
-export const MenuItem = DropdownPrimitive.Item
+export const MenuItem = ({
+  asChild = true,
+  ...props
+}: DropdownPrimitive.DropdownMenuItemProps) => {
+  return <DropdownPrimitive.Item asChild={asChild} {...props} />
+}
+
+type MenuItemButtonProps = React.ComponentPropsWithRef<'button'>
+
+export const MenuItemButton = forwardRef(
+  (
+    { className, ...props }: MenuItemButtonProps,
+    ref: Ref<HTMLButtonElement>,
+  ) => {
+    return (
+      <button
+        className={classNames(
+          'block w-full text-left px-4 py-2 text-sm transition-colors',
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+
+MenuItemButton.displayName = 'MenuItemButton'
+
+type MenuItemLink = Omit<ComponentPropsWithRef<'a'>, 'href'> & LinkProps
+
+export const MenuItemLink = forwardRef(
+  ({ className, ...props }: MenuItemLink, ref: Ref<HTMLAnchorElement>) => {
+    return (
+      <Link
+        className={classNames(
+          'block w-full text-left px-4 py-2 text-sm transition-colors',
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+
+MenuItemLink.displayName = 'MenuItemLink'
 
 export const MenuItems = ({
   children,

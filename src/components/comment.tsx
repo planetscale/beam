@@ -7,10 +7,10 @@ import { AuthorWithDate } from '~/components/author-with-date'
 import {
   Menu,
   MenuButton,
-  MenuItemButton,
   MenuItems,
   MenuItem,
   MenuItemsContent,
+  MenuItemButton,
 } from '~/components/menu'
 import DotsIcon from '~/components/svg/dots-icon'
 import { Button } from '~/components/button'
@@ -78,13 +78,13 @@ export const Comment = ({ postId, comment }: CommentProps) => {
 
             <MenuItems className="w-28">
               <MenuItemsContent>
-                <MenuItem>
+                <MenuItem asChild>
                   <MenuItemButton onClick={() => setIsEditing(true)}>
                     Edit
                   </MenuItemButton>
                 </MenuItem>
 
-                <MenuItem>
+                <MenuItem asChild>
                   <MenuItemButton
                     onClick={() => {
                       handleDialog({
