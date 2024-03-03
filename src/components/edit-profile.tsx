@@ -40,6 +40,7 @@ const EditProfileDialog = ({
       title: user.title ?? '',
     },
   })
+
   const editUserMutation = api.user.edit.useMutation({
     onMutate: async (data) => {
       utils.user.profile.setData(
@@ -130,9 +131,9 @@ export const EditProfileAction = ({
     <>
       <div className="flex items-center gap-8">
         {env.NEXT_PUBLIC_ENABLE_IMAGE_UPLOAD && profileBelongsToUser ? (
-          <UpdateAvatarAction name={data.name!} image={data.image} />
+          <UpdateAvatarAction name={data.name ?? ''} image={data.image} />
         ) : (
-          <Avatar name={data.name!} src={data.image} size="lg" />
+          <Avatar name={data.name ?? ''} src={data.image} size="lg" />
         )}
 
         <div className="flex-1">
