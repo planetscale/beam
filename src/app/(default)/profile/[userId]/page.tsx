@@ -19,13 +19,17 @@ export default async function ProfilePage({
   return (
     <>
       <div className="relative flex items-center gap-4 py-8 overflow-hidden">
-        <EditProfileAction id={params.userId} profileBelongsToUser={true} />
+        <EditProfileAction
+          currentPageNumber={currentPageNumber}
+          id={params.userId}
+        />
 
         <DotPattern />
       </div>
 
       <div className="mt-28">
         <PostFeed
+          fallbackMessage="This user hasn't published any posts yet."
           authorId={params.userId}
           currentPageNumber={currentPageNumber}
         />

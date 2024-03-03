@@ -4,23 +4,22 @@ import { api } from '~/trpc/react'
 import { PostSummary, getFeedPagination } from './post-summary'
 import { Pagination } from './pagination'
 import { PostSkeleton } from './post-skeleton'
-import { POSTS_PER_PAGE } from '~/utils/core'
 import { useSession } from 'next-auth/react'
 
 type PostFeedProps = {
+  fallbackMessage: string
   currentPageNumber?: number
   authorId?: string
 }
 
-export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
-  const { data, isLoading } = api.post.feed.useQuery({
-    take: POSTS_PER_PAGE,
-    skip:
-      currentPageNumber === 1
-        ? undefined
-        : POSTS_PER_PAGE * (currentPageNumber ?? 1 - 1),
-    authorId,
-  })
+export const PostFeed = ({
+  fallbackMessage,
+  currentPageNumber,
+  authorId,
+}: PostFeedProps) => {
+  const { data, isLoading } = api.post.feed.useQuery(
+    getFeedPagination({ authorId, currentPageNumber }),
+  )
 
   const { like, unlike } = useReaction({ currentPageNumber, authorId })
 
@@ -28,24 +27,31 @@ export const PostFeed = ({ currentPageNumber, authorId }: PostFeedProps) => {
 
   return (
     <>
-      <ul className="-my-12 divide-y divide-primary">
-        {data?.posts.map((post) => {
-          return (
-            <li key={post.id} className="py-10">
-              <PostSummary
-                onLike={() => like.mutate({ id: post.id })}
-                onUnlike={() => unlike.mutate({ id: post.id })}
-                post={post}
-              />
-            </li>
-          )
-        })}
-      </ul>
-
-      <Pagination
-        itemCount={data?.postCount ?? 0}
-        currentPageNumber={currentPageNumber ?? 1}
-      />
+      {data?.postCount === 0 ? (
+        <div className="text-center text-secondary border rounded py-20 px-10">
+          {fallbackMessage}
+        </div>
+      ) : (
+        <>
+          <ul className="-my-12 divide-y divide-primary">
+            {data?.posts.map((post) => {
+              return (
+                <li key={post.id} className="py-10">
+                  <PostSummary
+                    onLike={() => like.mutate({ id: post.id })}
+                    onUnlike={() => unlike.mutate({ id: post.id })}
+                    post={post}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+          <Pagination
+            itemCount={data?.postCount ?? 0}
+            currentPageNumber={currentPageNumber ?? 1}
+          />
+        </>
+      )}
     </>
   )
 }

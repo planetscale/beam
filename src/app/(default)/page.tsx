@@ -9,5 +9,10 @@ export default function Index({
 }) {
   const currentPageNumber = searchParams.page ? Number(searchParams.page) : 1
 
-  return <PostFeed currentPageNumber={currentPageNumber} />
+  return (
+    <PostFeed
+      fallbackMessage="There are no published posts to show yet."
+      currentPageNumber={currentPageNumber}
+    />
+  )
 }
