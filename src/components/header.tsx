@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Logo from '~/components/svg/logo'
+
 import { Actions } from '~/components/actions'
 
 export const Header = async () => {

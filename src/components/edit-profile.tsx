@@ -19,8 +19,8 @@ import { type RouterOutputs } from '~/trpc/shared'
 import { env } from '~/env'
 import { UpdateAvatarAction } from './update-avatar'
 import { Avatar } from '~/components/avatar'
+import { getFeedPagination } from '~/components/post-summary'
 import { useSession } from 'next-auth/react'
-import { getFeedPagination } from './post-summary'
 
 type EditFormData = {
   name: string

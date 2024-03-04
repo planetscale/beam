@@ -1,7 +1,7 @@
 'use client'
 
 import { api } from '~/trpc/react'
-import { Banner } from './banner'
+import { Banner } from '~/components/banner'
 import { useSession } from 'next-auth/react'
 import { PostAction } from '~/components/post-action'
 import { AuthorWithDate } from './author-with-date'
