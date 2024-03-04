@@ -2,7 +2,7 @@
 
 import { type SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
-import { Button } from '~/app/_components/button'
+import { Button } from '~/components/button'
 import {
   AlertDialogContent,
   AlertDialogTitle,
@@ -10,15 +10,15 @@ import {
   AlertDialogCloseButton,
   AlertDialogAction,
   AlertDialogCancel,
-} from '~/app/_components/alert-dialog'
-import { TextField } from '~/app/_components/text-field'
+} from '~/components/alert-dialog'
+import { TextField } from '~/components/text-field'
 import { useDialogStore } from '~/hooks/use-dialog-store'
 import EditIcon from '~/components/svg/edit-icon'
 import { api } from '~/trpc/react'
 import { type RouterOutputs } from '~/trpc/shared'
 import { env } from '~/env'
 import { UpdateAvatarAction } from './update-avatar'
-import { Avatar } from '~/app/_components/avatar'
+import { Avatar } from '~/components/avatar'
 
 type EditFormData = {
   name: string

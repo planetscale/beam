@@ -3,7 +3,7 @@
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 import * as React from 'react'
 import XIcon from '~/components/svg/x-icon'
-import { useDialogStore } from '../_hooks/use-dialog-store'
+import { useDialogStore } from '~/hooks/use-dialog-store'
 import { type ReactNode } from 'react'
 import { classNames } from '~/utils/core'
 
