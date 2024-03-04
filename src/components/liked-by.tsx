@@ -5,6 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { type RouterOutputs } from '~/trpc/shared'
 import { MAX_LIKED_BY_SHOWN } from './reaction-button'
 import { type ReactNode } from 'react'
+import { useSession } from 'next-auth/react'
 
 type LikedByProps = {
   trigger: ReactNode
@@ -13,6 +14,7 @@ type LikedByProps = {
 
 export const LikedBy = ({ trigger, likedBy }: LikedByProps) => {
   const likeCount = likedBy.length
+  const { data: session } = useSession()
 
   return (
     <Tooltip.TooltipProvider>
@@ -39,7 +41,9 @@ export const LikedBy = ({ trigger, likedBy }: LikedByProps) => {
           <p className="text-sm">
             {likedBy
               .slice(0, MAX_LIKED_BY_SHOWN)
-              .map((name) => name)
+              .map(({ user }) =>
+                session?.user.name === user.name ? 'You' : user.name,
+              )
               .join(', ')}
             {likeCount > MAX_LIKED_BY_SHOWN &&
               ` and ${likeCount - MAX_LIKED_BY_SHOWN} more`}

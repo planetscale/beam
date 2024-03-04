@@ -8,7 +8,7 @@ import { type ReactNode } from 'react'
 import { classNames } from '~/utils/core'
 
 export const AlertDialog = () => {
-  const { isOpen, handleDialogClose, dialogContent } = useDialogStore()
+  const { isOpen, handleDialogClose, component } = useDialogStore()
 
   return (
     <AlertDialogPrimitive.Root open={isOpen} onOpenChange={handleDialogClose}>
@@ -23,7 +23,7 @@ export const AlertDialog = () => {
           <AlertDialogPrimitive.Overlay className="fixed inset-0 transition-opacity bg-gray-700 opacity-90 dark:bg-gray-900" />
 
           <div className="inline-block w-full max-w-md mt-[15vh] mb-8 overflow-hidden text-left align-middle transition-all transform bg-primary rounded-lg shadow-xl dark:border">
-            {dialogContent}
+            {component}
           </div>
         </div>
       </AlertDialogPrimitive.Content>

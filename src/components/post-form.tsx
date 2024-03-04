@@ -6,6 +6,7 @@ import { TextField } from '~/components/text-field'
 import { Button } from '~/components/button'
 import MarkdownIcon from '~/components/svg/markdown-icon'
 import { MarkdownEditor } from '~/components/markdown-editor'
+import { markdownToHtml } from '~/utils/text'
 import { useRouter } from 'next/navigation'
 import { api } from '~/trpc/react'
 
@@ -15,31 +16,36 @@ type FormData = {
 }
 
 type PostFormProps = {
+  postId?: number
   defaultValues?: FormData
   isSubmitting?: boolean
   backTo: string
 }
 
 export function PostForm({
+  postId,
   defaultValues,
   isSubmitting,
   backTo,
 }: PostFormProps) {
-  const { control, register, getValues, reset, handleSubmit } =
+  const { control, register, handleSubmit, reset, getValues } =
     useForm<FormData>({
       defaultValues,
     })
 
-  const router = useRouter()
-  const addPostMutation = api.post.add.useMutation({
-    onSuccess(data) {
-      router.push(`/post/${data.id}`)
-      reset(getValues())
-    },
-  })
+  const { newPost, editPost } = usePostMutations(postId, () =>
+    reset(getValues()),
+  )
 
   const onSubmit = (values: FormData) => {
-    addPostMutation.mutate(values)
+    if (postId) {
+      editPost.mutate({
+        id: postId,
+        data: values,
+      })
+    } else {
+      newPost.mutate(values)
+    }
   }
 
   return (
@@ -96,4 +102,42 @@ export function PostForm({
       </div>
     </form>
   )
+}
+
+const usePostMutations = (id?: number, callback?: () => void) => {
+  const router = useRouter()
+  const utils = api.useUtils()
+
+  const newPost = api.post.add.useMutation({
+    onSuccess(data) {
+      router.push(`/post/${data.id}`)
+      callback?.()
+    },
+  })
+
+  const editPost = api.post.edit.useMutation({
+    onMutate: async (newPost) => {
+      const post = utils.post.detail.getData({
+        id: id!,
+      })
+
+      utils.post.detail.setData(
+        {
+          id: id!,
+        },
+        {
+          ...post!,
+          title: newPost.data.title,
+          content: newPost.data.content,
+          contentHtml: markdownToHtml(newPost.data.content),
+        },
+      )
+      await utils.post.feed.invalidate()
+    },
+    onSuccess: () => {
+      router.push(`/post/${id}`)
+    },
+  })
+
+  return { newPost, editPost }
 }

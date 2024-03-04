@@ -4,15 +4,15 @@ import { create } from 'zustand'
 interface DialogState {
   isOpen: boolean
   onClose: () => void
-  dialogContent: React.ReactNode
-  handleDialog: ({ content }: { content: ReactNode }) => void
+  component: ReactNode
+  handleDialog: ({ component }: { component: ReactNode }) => void
   handleDialogClose: () => void
 }
 
 export const useDialogStore = create<DialogState>((set) => ({
   isOpen: false,
   onClose: () => set(() => ({ isOpen: false })),
-  dialogContent: null,
-  handleDialog: ({ content }) => set({ dialogContent: content, isOpen: true }),
+  component: null,
+  handleDialog: ({ component }) => set({ component, isOpen: true }),
   handleDialogClose: () => set({ isOpen: false }),
 }))

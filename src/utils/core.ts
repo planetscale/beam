@@ -4,3 +4,5 @@ import { twMerge } from 'tailwind-merge'
 export const classNames = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs))
 }
+
+export const POSTS_PER_PAGE = 20

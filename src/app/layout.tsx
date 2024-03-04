@@ -12,6 +12,7 @@ import { SearchDialog } from '~/components/search-dialog'
 import { AlertDialog } from '~/components/alert-dialog'
 import { getServerAuthSession } from '~/server/auth'
 import { SessionProvider } from '~/providers/auth'
+import { type Metadata } from 'next'
 
 const inter = localFont({
   variable: '--font-sans',
@@ -30,8 +31,12 @@ const inter = localFont({
     },
   ],
 })
-export const metadata = {
-  title: 'Beam',
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s - Beam',
+    default: 'Beam',
+  },
 }
 
 export default async function RootLayout({

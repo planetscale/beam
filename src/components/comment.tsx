@@ -1,26 +1,25 @@
 'use client'
 
-import { type Session } from 'next-auth'
 import { useState } from 'react'
 import { type RouterOutputs } from '~/trpc/shared'
-import { Avatar } from './avatar'
-import { AuthorWithDate } from './author-with-date'
+import { Avatar } from '~/components/avatar'
+import { AuthorWithDate } from '~/components/author-with-date'
 import {
   Menu,
   MenuButton,
-  MenuItemButton,
   MenuItems,
   MenuItem,
   MenuItemsContent,
-} from './menu'
+  MenuItemButton,
+} from '~/components/menu'
 import DotsIcon from '~/components/svg/dots-icon'
-import { Button } from './button'
-import { HtmlView } from './html-view'
+import { Button } from '~/components/button'
+import { HtmlView } from '~/components/html-view'
 import { api } from '~/trpc/react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
-import { MarkdownEditor } from './markdown-editor'
+import { MarkdownEditor } from '~/components/markdown-editor'
 
 import { useDialogStore } from '~/hooks/use-dialog-store'
 import {
@@ -31,19 +30,21 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
-} from './alert-dialog'
+} from '~/components/alert-dialog'
+import { useSession } from 'next-auth/react'
+import { markdownToHtml } from '~/utils/text'
 
 type Comment = RouterOutputs['post']['detail']['comments'][number]
 
 type CommentProps = {
-  session: Session | null
   postId: number
   comment: Comment
 }
 
-export const Comment = ({ session, postId, comment }: CommentProps) => {
+export const Comment = ({ postId, comment }: CommentProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const { handleDialog } = useDialogStore()
+  const { data: session } = useSession()
 
   const commentBelongsToUser = comment.author.id === session!.user.id
 
@@ -77,18 +78,21 @@ export const Comment = ({ session, postId, comment }: CommentProps) => {
 
             <MenuItems className="w-28">
               <MenuItemsContent>
-                <MenuItem>
+                <MenuItem asChild>
                   <MenuItemButton onClick={() => setIsEditing(true)}>
                     Edit
                   </MenuItemButton>
                 </MenuItem>
 
-                <MenuItem>
+                <MenuItem asChild>
                   <MenuItemButton
                     onClick={() => {
                       handleDialog({
-                        content: (
-                          <ConfirmDeleteCommentDialog commentId={comment.id} />
+                        component: (
+                          <ConfirmDeleteCommentDialog
+                            postId={postId}
+                            commentId={comment.id}
+                          />
                         ),
                       })
                     }}
@@ -186,8 +190,36 @@ const EditCommentForm = ({ comment, onDone }: EditCommentFormProps) => {
 export const AddCommentForm = ({ postId }: { postId: number }) => {
   const router = useRouter()
   const [markdownEditorKey, setMarkdownEditorKey] = useState(0)
+  const utils = api.useUtils()
+  const { data: session } = useSession()
 
   const addCommentMutation = api.comment.add.useMutation({
+    onMutate: (data) => {
+      const previousPostData = utils.post.detail.getData({ id: postId })
+
+      if (previousPostData) {
+        utils.post.detail.setData(
+          { id: postId },
+          {
+            ...previousPostData,
+            comments: [
+              ...previousPostData.comments,
+              {
+                id: data.postId,
+                content: data.content,
+                contentHtml: markdownToHtml(data.content),
+                createdAt: new Date(),
+                author: {
+                  name: session!.user.name,
+                  image: session!.user.image ?? '',
+                  id: session!.user.id,
+                },
+              },
+            ],
+          },
+        )
+      }
+    },
     onSuccess: () => {
       router.refresh()
     },
@@ -231,31 +263,39 @@ export const AddCommentForm = ({ postId }: { postId: number }) => {
         )}
       />
       <div className="mt-4">
-        <Button
-          type="submit"
-          isLoading={addCommentMutation.isLoading}
-          loadingChildren="Adding comment"
-        >
-          Add comment
-        </Button>
+        <Button type="submit">Add comment</Button>
       </div>
     </form>
   )
 }
 
 type ConfirmDeleteCommentDialogProps = {
+  postId: number
   commentId: number
 }
 
 const ConfirmDeleteCommentDialog = ({
+  postId,
   commentId,
 }: ConfirmDeleteCommentDialogProps) => {
-  const router = useRouter()
   const { handleDialogClose } = useDialogStore()
+  const utils = api.useUtils()
 
   const deleteCommentMutation = api.comment.delete.useMutation({
-    onSuccess: () => {
-      router.refresh()
+    onMutate: () => {
+      const previousPostData = utils.post.detail.getData({ id: postId })
+
+      if (previousPostData) {
+        utils.post.detail.setData(
+          { id: postId },
+          {
+            ...previousPostData,
+            comments: previousPostData.comments.filter(
+              (comment) => comment.id !== commentId,
+            ),
+          },
+        )
+      }
     },
     onError: (error) => {
       toast.error(`Something went wrong: ${error.message}`)

@@ -11,16 +11,16 @@ import {
 } from './menu'
 import { useTheme } from 'next-themes'
 import { capitalize } from 'string-ts'
-import { signOut } from 'next-auth/react'
-import { type Session } from 'next-auth'
+import { signOut, useSession } from 'next-auth/react'
 import { Avatar } from './avatar'
 import { usePathname } from 'next/navigation'
 import { classNames } from '~/utils/core'
 import { api } from '~/trpc/react'
 
-export const ProfileMenu = ({ session }: { session: Session | null }) => {
+export const ProfileMenu = () => {
   const { theme, themes, setTheme } = useTheme()
   const pathname = usePathname()
+  const { data: session } = useSession()
   const { data } = api.user.profile.useQuery(
     {
       id: session!.user.id,
@@ -39,13 +39,13 @@ export const ProfileMenu = ({ session }: { session: Session | null }) => {
     active,
     className,
   }: {
-    active: boolean
+    active?: boolean
     className?: string
-  }) => {
+  } = {}) => {
     return classNames(
       { 'bg-secondary': active },
       className,
-      'block w-full text-left px-4 py-2 text-sm text-primary transition-colors',
+      'block w-full text-left px-4 py-2 text-sm text-primary transition-colors focus:ring-0',
     )
   }
 
@@ -57,7 +57,10 @@ export const ProfileMenu = ({ session }: { session: Session | null }) => {
 
       <MenuItems className="w-48">
         <MenuItemsContent>
-          <MenuItem>
+          <MenuItem
+            className="focus:outline-none focus:bg-secondary transition-colors"
+            asChild
+          >
             <MenuItemLink
               href={`/profile/${session!.user.id}`}
               className={menuItemClasses({
@@ -67,7 +70,10 @@ export const ProfileMenu = ({ session }: { session: Session | null }) => {
               Profile
             </MenuItemLink>
           </MenuItem>
-          <MenuItem>
+          <MenuItem
+            className="focus:outline-none focus:bg-secondary transition-colors"
+            asChild
+          >
             <MenuItemButton onClick={() => signOut()}>Log out</MenuItemButton>
           </MenuItem>
         </MenuItemsContent>

@@ -1,56 +1,129 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
 import { api } from '~/trpc/react'
-import { PostSummary } from './post-summary'
-import { type RouterOutputs } from '~/trpc/shared'
+import { PostSummary, getFeedPagination } from './post-summary'
 import { Pagination } from './pagination'
+import { PostSkeleton } from './post-skeleton'
+import { useSession } from 'next-auth/react'
 
 type PostFeedProps = {
-  postsPerPage: number
-  initialPosts: RouterOutputs['post']['feed']
+  fallbackMessage: string
+  currentPageNumber?: number
   authorId?: string
 }
 
 export const PostFeed = ({
-  postsPerPage,
-  initialPosts,
+  fallbackMessage,
+  currentPageNumber,
   authorId,
 }: PostFeedProps) => {
-  const searchParams = useSearchParams()
-  const currentPageNumber = searchParams.get('page')
-    ? Number(searchParams.get('page'))
-    : 1
-
-  const { data } = api.post.feed.useQuery(
-    {
-      take: postsPerPage,
-      skip:
-        currentPageNumber === 1
-          ? undefined
-          : postsPerPage * (currentPageNumber - 1),
-      authorId,
-    },
-    {
-      initialData: initialPosts,
-    },
+  const { data, isLoading } = api.post.feed.useQuery(
+    getFeedPagination({ authorId, currentPageNumber }),
   )
+
+  const { like, unlike } = useReaction({ currentPageNumber, authorId })
+
+  if (isLoading) return <PostSkeleton count={3} />
 
   return (
     <>
-      <ul className="-my-12 divide-y divide-primary">
-        {data.posts.map((post) => (
-          <li key={post.id} className="py-10">
-            <PostSummary post={post} />
-          </li>
-        ))}
-      </ul>
-
-      <Pagination
-        itemCount={initialPosts.postCount}
-        itemsPerPage={postsPerPage}
-        currentPageNumber={currentPageNumber}
-      />
+      {data?.postCount === 0 ? (
+        <div className="text-center text-secondary border rounded py-20 px-10">
+          {fallbackMessage}
+        </div>
+      ) : (
+        <>
+          <ul className="-my-12 divide-y divide-primary">
+            {data?.posts.map((post) => {
+              return (
+                <li key={post.id} className="py-10">
+                  <PostSummary
+                    onLike={() => like.mutate({ id: post.id })}
+                    onUnlike={() => unlike.mutate({ id: post.id })}
+                    post={post}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+          <Pagination
+            itemCount={data?.postCount ?? 0}
+            currentPageNumber={currentPageNumber ?? 1}
+          />
+        </>
+      )}
     </>
   )
+}
+
+const useReaction = ({
+  authorId,
+  currentPageNumber,
+}: {
+  authorId?: string
+  currentPageNumber?: number
+}) => {
+  const { data: session } = useSession()
+
+  const utils = api.useUtils()
+  const previousQuery = utils.post.feed.getData(
+    getFeedPagination({ authorId, currentPageNumber }),
+  )
+
+  const like = api.post.like.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(
+          getFeedPagination({ authorId, currentPageNumber }),
+          {
+            ...previousQuery,
+            posts: previousQuery.posts.map((post) =>
+              post.id === id
+                ? {
+                    ...post,
+                    likedBy: [
+                      ...post.likedBy,
+                      {
+                        user: {
+                          id: session!.user.id,
+                          name: session!.user.name,
+                        },
+                      },
+                    ],
+                  }
+                : post,
+            ),
+          },
+        )
+      }
+    },
+  })
+
+  const unlike = api.post.unlike.useMutation({
+    onMutate: async ({ id }) => {
+      if (previousQuery) {
+        utils.post.feed.setData(
+          getFeedPagination({ authorId, currentPageNumber }),
+          {
+            ...previousQuery,
+            posts: previousQuery.posts.map((post) =>
+              post.id === id
+                ? {
+                    ...post,
+                    likedBy: post.likedBy.filter(
+                      (item) => item.user.id !== session!.user.id,
+                    ),
+                  }
+                : post,
+            ),
+          },
+        )
+      }
+    },
+  })
+
+  return {
+    like,
+    unlike,
+  }
 }

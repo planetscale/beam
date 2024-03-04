@@ -6,12 +6,13 @@ import { getServerAuthSession } from '~/server/auth'
 import { SignInButtons } from '~/components/sign-in-buttons'
 
 export const metadata: Metadata = {
-  title: 'Sign In - Beam',
+  title: 'Sign In',
 }
 
 export default async function SignIn() {
   const session = await getServerAuthSession()
 
+  // Redirect to home if the user is already authenticated
   if (session?.user) {
     redirect('/')
   }
