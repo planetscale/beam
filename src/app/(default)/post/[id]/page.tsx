@@ -1,10 +1,10 @@
-import { Avatar } from '~/app/_components/avatar'
+import { Avatar } from '~/components/avatar'
 
-import { Comment, AddCommentForm } from '~/app/_components/comment'
+import { Comment, AddCommentForm } from '~/components/comment'
 
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
-import { PostView } from '~/app/_components/post-view'
+import { PostView } from '~/components/post-view'
 
 type PostPageParams = {
   params: {

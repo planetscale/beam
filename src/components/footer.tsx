@@ -1,5 +1,5 @@
-import GithubLogo from '../_svg/github-logo'
-import HeartFilledIcon from '../_svg/heart-filled-icon'
+import GithubLogo from '~/components/svg/github-logo'
+import HeartFilledIcon from '~/components/svg/heart-filled-icon'
 
 export const Footer = () => {
   return (

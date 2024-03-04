@@ -1,5 +1,5 @@
 import { api } from '~/trpc/server'
-import { PostFeed } from '../_components/post-feed'
+import { PostFeed } from '~/components/post-feed'
 
 const POSTS_PER_PAGE = 20
 

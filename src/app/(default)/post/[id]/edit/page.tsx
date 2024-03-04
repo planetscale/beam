@@ -1,7 +1,7 @@
 import { getServerAuthSession } from '~/server/auth'
 import { api } from '~/trpc/server'
 
-import { EditPostForm } from '../_components/edit-post-form'
+import { EditPostForm } from '~/components/edit-post-form'
 
 type ProfilePageParams = {
   params: {

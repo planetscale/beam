@@ -13,7 +13,7 @@ import {
   MenuItem,
   MenuItemsContent,
 } from './menu'
-import DotsIcon from '../_svg/dots-icon'
+import DotsIcon from '~/components/svg/dots-icon'
 import { Button } from './button'
 import { HtmlView } from './html-view'
 import { api } from '~/trpc/react'
@@ -22,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 import { MarkdownEditor } from './markdown-editor'
 
-import { useDialogStore } from '../_hooks/use-dialog-store'
+import { useDialogStore } from '~/hooks/use-dialog-store'
 import {
   AlertDialogAction,
   AlertDialogActions,

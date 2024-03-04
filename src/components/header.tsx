@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Logo from '../_svg/logo'
+import Logo from '~/components/svg/logo'
 import { getServerAuthSession } from '~/server/auth'
 
 import { Actions } from './actions'

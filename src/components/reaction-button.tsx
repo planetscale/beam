@@ -2,8 +2,8 @@
 
 import { classNames } from '~/utils/core'
 import { Button } from './button'
-import HeartFilledIcon from '../_svg/heart-filled-icon'
-import HeartIcon from '../_svg/heart-icon'
+import HeartFilledIcon from '~/components/svg/heart-filled-icon'
+import HeartIcon from '~/components/svg/heart-icon'
 
 import { api } from '~/trpc/react'
 import { useState } from 'react'

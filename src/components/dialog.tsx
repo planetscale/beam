@@ -2,8 +2,8 @@
 
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import * as React from 'react'
-import XIcon from '../_svg/x-icon'
-import { useDialogStore } from '../_hooks/use-dialog-store'
+import XIcon from '~/components/svg/x-icon'
+import { useDialogStore } from '~/hooks/use-dialog-store'
 import { type ReactNode } from 'react'
 import { classNames } from '~/utils/core'
 
