@@ -151,12 +151,22 @@ export const postRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const posts = await ctx.db.post.findMany({
+      const postsQuery = await ctx.db.post.findMany({
         take: 10,
         where: {
           hidden: false,
-          title: { search: input.query },
-          content: { search: input.query },
+          OR: [
+            {
+              title: {
+                contains: input.query,
+              },
+            },
+            {
+              content: {
+                contains: input.query,
+              },
+            },
+          ],
         },
         select: {
           id: true,
@@ -164,7 +174,27 @@ export const postRouter = createTRPCRouter({
         },
       })
 
-      return posts
+      const authorsQuery = await ctx.db.user.findMany({
+        take: 10,
+        where: {
+          name: {
+            contains: input.query,
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+        },
+      })
+
+      const [posts, authors] = await Promise.all([postsQuery, authorsQuery])
+
+      return {
+        posts,
+        authors,
+        isPosts: posts.length > 0,
+        isAuthors: authors.length > 0,
+      }
     }),
   add: protectedProcedure
     .input(

@@ -60,6 +60,8 @@ model User {
     likedPosts    LikedPosts[]
     comments      Comment[]
     role          Role         @default(USER)
+
+    @@fulltext([name])
 }
 
 model VerificationToken {
