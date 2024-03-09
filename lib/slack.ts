@@ -16,7 +16,7 @@ export async function postToSlackIfEnabled({
 
     const web = new WebClient(serverEnv.SLACK_TOKEN)
     return await web.chat.postMessage({
-      channel: '#mike-test',
+      channel: serverEnv.SLACK_CHANNEL,
       text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
       blocks: [
         {
