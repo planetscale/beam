@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.4.3",
-    "@instantish/mack": "^1.2.0",
     "@next-auth/prisma-adapter": "^1.0.1",
     "@prisma/client": "^3.9.1",
     "@radix-ui/react-tooltip": "^0.1.6",
+    "@slack/web-api": "^7.0.2",
     "@trpc/client": "^9.18.0",
     "@trpc/next": "^9.18.0",
     "@trpc/react": "^9.18.0",

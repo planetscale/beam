@@ -66,6 +66,7 @@ export const serverEnv = {
     CLOUDINARY_API_KEY: cloudinaryParser({ allowEmpty: true, default: '' }),
     CLOUDINARY_API_SECRET: cloudinaryParser({ allowEmpty: true, default: '' }),
     ENABLE_SLACK_POSTING: bool({ default: false }),
-    SLACK_WEBHOOK_URL: slackParser({ allowEmpty: true, default: '' }),
+    SLACK_TOKEN: slackParser({ allowEmpty: true, default: '' }),
+    SLACK_CHANNEL: slackParser({ allowEmpty: true, default: '#general' }),
   }),
 }
