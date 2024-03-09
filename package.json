@@ -19,7 +19,6 @@
     "@trpc/next": "^9.18.0",
     "@trpc/react": "^9.18.0",
     "@trpc/server": "^9.18.0",
-    "@tryfabric/mack": "^1.2.1",
     "cloudinary": "^1.27.1",
     "crypto-hash": "^2.0.1",
     "date-fns": "^2.28.0",

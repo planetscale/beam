@@ -1,6 +1,5 @@
 import { serverEnv } from '@/env/server'
 import type { Post } from '@prisma/client'
-import { markdownToBlocks } from '@tryfabric/mack'
 import { marked } from 'marked'
 import { WebClient } from '@slack/web-api'
 
@@ -13,16 +12,7 @@ export async function postToSlackIfEnabled({
 }) {
   if (serverEnv.ENABLE_SLACK_POSTING && serverEnv.SLACK_TOKEN) {
     const tokens = marked.lexer(post.content)
-    const summaryToken = tokens.find((token) => {
-      return (
-        token.type === 'paragraph' ||
-        token.type === 'html' ||
-        token.type === 'image'
-      )
-    })
-    const summaryBlocks = summaryToken
-      ? await markdownToBlocks(summaryToken.raw)
-      : []
+    const summary = summarize(tokens)
 
     const web = new WebClient(serverEnv.SLACK_TOKEN)
     return await web.chat.postMessage({
@@ -36,7 +26,13 @@ export async function postToSlackIfEnabled({
             text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
           },
         },
-        summaryBlocks[0],
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: summary,
+          },
+        },
         { type: 'divider' },
         {
           type: 'context',
@@ -50,34 +46,27 @@ export async function postToSlackIfEnabled({
         },
       ],
     })
-    // return fetch(serverEnv.SLACK_WEBHOOK_URL, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     blocks: [
-    //       {
-    //         type: 'section',
-    //         text: {
-    //           type: 'mrkdwn',
-    //           text: `*<${serverEnv.NEXT_APP_URL}/post/${post.id}|${post.title}>*`,
-    //         },
-    //       },
-    //       summaryBlocks[0],
-    //       { type: 'divider' },
-    //       {
-    //         type: 'context',
-    //         elements: [
-    //           {
-    //             type: 'plain_text',
-    //             text: authorName,
-    //             emoji: true,
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   }),
-    // })
   }
+}
+
+const MAX_CHARS = 250
+
+function summarize(tokens: marked.Token[]) {
+  let summary = ''
+  let charCount = 0
+
+  for (const token of tokens) {
+    if (token.type === 'paragraph') {
+      const text = token.text || ''
+      const remainingChars = MAX_CHARS - charCount
+      summary += ' ' + text.substring(0, remainingChars)
+      charCount += text.length
+
+      if (charCount >= MAX_CHARS) {
+        break
+      }
+    }
+  }
+
+  return summary
 }
