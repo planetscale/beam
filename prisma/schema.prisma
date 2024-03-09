@@ -99,7 +99,6 @@ model LikedPosts {
   createdAt DateTime @default(now())
 
   @@id([postId, userId])
-  @@index([postId])
   @@index([userId])
 }
 
