@@ -28,7 +28,7 @@
     "marked": "^4.0.12",
     "match-sorter": "^6.3.1",
     "next": "12.1.0",
-    "next-auth": "^4.2.1",
+    "next-auth": "^4.24.5",
     "next-themes": "^0.0.15",
     "react": "17.0.2",
     "react-beforeunload": "^2.5.2",
